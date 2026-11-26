@@ -2,737 +2,179 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <title>Kalshi 15-Min BTC Paper Bot</title>
-  <meta name="description" content="Live Buy / Sell / Wait signals for Kalshi’s 15-minute Bitcoin contracts, with a $100 paper book." />
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23f7931a'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-size='18' font-family='Georgia' fill='%23110d08'%3E%E2%82%BF%3C/text%3E%3C/svg%3E" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Outfit:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
-  <style>
-    :root {
-      --bg: #0b0907;
-      --bg-2: #120e0a;
-      --card: #16110c;
-      --card-2: #1c1610;
-      --line: rgba(247, 147, 26, 0.14);
-      --line-strong: rgba(247, 147, 26, 0.32);
-      --text: #f6efe4;
-      --muted: #9a8b78;
-      --faint: #6d6154;
-      --amber: #f7931a;
-      --amber-2: #ffc46b;
-      --amber-dim: rgba(247, 147, 26, 0.12);
-      --green: #3ee687;
-      --green-dim: rgba(62, 230, 135, 0.14);
-      --red: #ff6b6b;
-      --red-dim: rgba(255, 107, 107, 0.14);
-      --shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
-      --radius: 18px;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { background: var(--bg); color: var(--text); }
-    body {
-      font-family: "Outfit", system-ui, sans-serif;
-      min-height: 100vh;
-      background:
-        radial-gradient(1200px 600px at 10% -10%, rgba(247, 147, 26, 0.14), transparent 55%),
-        radial-gradient(800px 500px at 100% 0%, rgba(247, 147, 26, 0.06), transparent 50%),
-        var(--bg);
-    }
-    .wrap { width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 28px 0 80px; }
-    header.top { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; flex-wrap: wrap; margin-bottom: 22px; }
-    .brand { display: flex; align-items: center; gap: 14px; }
-    .mark {
-      width: 46px; height: 46px; border-radius: 14px;
-      background: linear-gradient(160deg, #ffb347, #f7931a 55%, #c56a08);
-      color: #1a1208; display: grid; place-items: center;
-      font-family: "Syne", sans-serif; font-weight: 800; font-size: 26px;
-      box-shadow: 0 8px 24px rgba(247, 147, 26, 0.28);
-    }
-    .brand h1 { font-family: "Syne", sans-serif; font-weight: 800; font-size: 22px; line-height: 1; }
-    .brand p { color: var(--muted); font-size: 13px; margin-top: 5px; }
-    .updated { color: var(--muted); font-size: 13px; text-align: right; }
-    .updated strong { color: var(--text); font-weight: 500; display: block; font-size: 14px; }
-    nav.tabs {
-      display: flex; gap: 6px; background: var(--card);
-      border: 1px solid var(--line); border-radius: 999px; padding: 5px;
-      width: fit-content; margin-bottom: 22px;
-    }
-    nav.tabs button {
-      appearance: none; border: 0; background: transparent; color: var(--muted);
-      font-family: inherit; font-size: 14px; font-weight: 500;
-      padding: 9px 16px; border-radius: 999px; cursor: pointer;
-    }
-    nav.tabs button[aria-selected="true"] {
-      background: var(--amber-dim); color: var(--amber-2);
-      box-shadow: inset 0 0 0 1px var(--line-strong);
-    }
-    .panel[hidden] { display: none; }
-    .call {
-      border-radius: 24px; padding: 26px 28px; margin-bottom: 16px;
-      border: 1px solid var(--line); box-shadow: var(--shadow);
-      background: linear-gradient(180deg, var(--card-2), var(--card));
-    }
-    .call.BUY_YES, .call.TAKE_PROFIT, .call.HOLD.yes { background: linear-gradient(180deg, rgba(62,230,135,0.16), var(--card)); border-color: rgba(62,230,135,0.35); }
-    .call.BUY_NO, .call.CUT_LOSS, .call.HOLD.no { background: linear-gradient(180deg, rgba(255,107,107,0.14), var(--card)); border-color: rgba(255,107,107,0.32); }
-    .call.WAIT { background: linear-gradient(180deg, rgba(247,147,26,0.10), var(--card)); }
-    .call .kicker { color: var(--muted); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 8px; }
-    .call .label {
-      font-family: "Syne", sans-serif; font-weight: 800;
-      font-size: clamp(28px, 5vw, 52px); letter-spacing: -0.03em; line-height: 1.05;
-    }
-    .call.BUY_YES .label, .call.TAKE_PROFIT .label, .call.HOLD.yes .label { color: var(--green); }
-    .call.BUY_NO .label, .call.CUT_LOSS .label, .call.HOLD.no .label { color: var(--red); }
-    .call.WAIT .label { color: var(--amber-2); }
-    .call .reason { margin-top: 12px; font-size: 16px; line-height: 1.55; max-width: 820px; }
-    .call-meta { display: flex; flex-wrap: wrap; gap: 10px 18px; margin-top: 16px; color: var(--muted); font-size: 13.5px; }
-    .call-meta a { color: var(--amber-2); }
-    .countdown { font-family: "IBM Plex Mono", monospace; color: var(--text); font-size: 15px; }
-    .session-card {
-      border-radius: 24px; padding: 22px 24px; margin-bottom: 16px;
-      border: 1px solid var(--line-strong); box-shadow: var(--shadow);
-      background:
-        linear-gradient(180deg, rgba(247,147,26,0.16), var(--card));
-    }
-    .session-card.SETTLING { background: linear-gradient(180deg, rgba(247,147,26,0.10), var(--card)); }
-    .session-card.COMPLETE { background: linear-gradient(180deg, rgba(62,230,135,0.10), var(--card)); border-color: rgba(62,230,135,0.28); }
-    .session-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
-    .session-head .kicker { color: var(--muted); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 6px; }
-    .session-window { font-family: "Syne", sans-serif; font-weight: 800; font-size: clamp(20px, 3vw, 28px); letter-spacing: -0.02em; }
-    .session-badge {
-      display: inline-flex; align-items: center; gap: 8px;
-      border-radius: 999px; padding: 10px 16px; font-weight: 700;
-      letter-spacing: 0.06em; font-size: 13px; border: 1px solid transparent;
-      font-family: "IBM Plex Mono", monospace; white-space: nowrap;
-    }
-    .session-badge.LIVE { background: var(--green-dim); color: var(--green); border-color: rgba(62,230,135,0.35); }
-    .session-badge.SETTLING { background: var(--amber-dim); color: var(--amber-2); border-color: var(--line-strong); }
-    .session-badge.COMPLETE { background: var(--green-dim); color: var(--green); border-color: rgba(62,230,135,0.28); }
-    .session-badge .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; box-shadow: 0 0 10px currentColor; }
-    .section-label {
-      color: var(--muted); font-size: 12px; letter-spacing: 0.12em;
-      text-transform: uppercase; font-weight: 600; margin: 8px 0 12px;
-    }
-    .check-log { width: 100%; border-collapse: collapse; font-size: 13px; }
-    .check-log th, .check-log td { text-align: left; padding: 8px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
-    .check-log th { color: var(--muted); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; }
-    .hero-row { display: grid; grid-template-columns: 1.2fr 1fr; gap: 12px; margin-bottom: 16px; }
-    .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
-    .card, .box {
-      background: linear-gradient(180deg, var(--card-2), var(--card));
-      border: 1px solid var(--line); border-radius: var(--radius);
-      padding: 16px 18px; box-shadow: var(--shadow);
-    }
-    .box { margin-bottom: 14px; }
-    .card .lbl, .box h2 {
-      color: var(--muted); font-size: 12px; letter-spacing: 0.08em;
-      text-transform: uppercase; margin-bottom: 8px; font-weight: 600;
-    }
-    .card .val { font-family: "IBM Plex Mono", monospace; font-size: 22px; letter-spacing: -0.03em; }
-    .card .sub, .fee, .note p { color: var(--muted); font-size: 12.5px; margin-top: 5px; }
-    .price { font-family: "IBM Plex Mono", monospace; font-size: clamp(28px, 4vw, 44px); letter-spacing: -0.04em; line-height: 1; }
-    .up { color: var(--green); } .down { color: var(--red); }
-    .inds { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
-    .ind-cell { background: var(--bg-2); border: 1px solid var(--line); border-radius: 14px; padding: 12px; }
-    .ind-cell .k { color: var(--muted); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; }
-    .ind-cell .v { font-family: "IBM Plex Mono", monospace; font-size: 18px; margin-top: 6px; }
-    .quotes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
-    .quotes div { background: var(--bg-2); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; }
-    .quotes .k { color: var(--muted); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; }
-    .quotes .v { font-family: "IBM Plex Mono", monospace; font-size: 20px; margin-top: 4px; }
-    .pos-grid, .compare { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-    .pos-grid div { background: var(--bg-2); border-radius: 12px; padding: 12px; border: 1px solid var(--line); }
-    .pos-grid .k { color: var(--muted); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; }
-    .pos-grid .v { font-family: "IBM Plex Mono", monospace; font-size: 16px; margin-top: 5px; }
-    svg.chart-svg { width: 100%; height: 260px; display: block; }
-    table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
-    th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
-    th { color: var(--muted); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600; }
-    .mono { font-family: "IBM Plex Mono", monospace; }
-    .empty { color: var(--muted); padding: 8px 0; }
-    .rules ol { padding-left: 20px; display: grid; gap: 10px; margin-top: 8px; }
-    .rules li, .rules p { line-height: 1.55; }
-    .rules li strong { color: var(--amber-2); font-weight: 600; }
-    footer { margin-top: 28px; color: var(--faint); font-size: 12.5px; line-height: 1.5; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-    footer a { color: var(--muted); }
-    .err { background: var(--red-dim); border: 1px solid rgba(255,107,107,0.3); color: #ffd2d2; border-radius: 14px; padding: 14px 16px; margin-bottom: 14px; }
-    .live-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 10px var(--green); margin-right: 6px; }
-    .stale { background: var(--amber); }
-    @media (max-width: 900px) {
-      .cards, .inds, .pos-grid, .compare, .hero-row, .quotes { grid-template-columns: 1fr 1fr; }
-      .updated { text-align: left; }
-    }
-    @media (max-width: 560px) {
-      .cards, .inds, .pos-grid, .compare, .hero-row, .quotes { grid-template-columns: 1fr; }
-      .wrap { width: min(1180px, calc(100% - 20px)); }
-    }
-  </style>
+  <meta name="theme-color" content="#EA580C" />
+  <title>BTC 15-Min Bot</title>
+  <meta name="description" content="Live Buy Yes / Buy No / Wait signals for Kalshi’s 15-minute Bitcoin contracts, with a $40 one-hour paper run." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23F7931A'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-size='18' font-family='Georgia' fill='%231C140A'%3E%E2%82%BF%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="style.css?v=20261126-ui1" />
 </head>
 <body>
   <div class="wrap">
-    <header class="top">
-      <div class="brand">
-        <div class="mark" aria-hidden="true">₿</div>
-        <div>
-          <h1>Kalshi 15-Min BTC Bot</h1>
-          <p>Buy Yes / Buy No / Wait signals · $100 paper book · $5 per trade</p>
+    <header class="hero">
+      <div class="hero-row">
+        <div class="hero-copy">
+          <div class="hero-kicker">Kalshi · KXBTC15M</div>
+          <h1>BTC 15-Min Bot</h1>
+          <p class="hero-sub">Paper Buy / Sell / Wait signals for the 15-minute Bitcoin contract. $5 tickets, real Kalshi fees.</p>
+        </div>
+        <div class="hero-live">
+          <div class="btc-live-label"><span id="btc-dot" class="dot"></span>Live Bitcoin</div>
+          <div id="btc-price" class="btc-live-price">—</div>
+          <div id="btc-sub" class="btc-live-sub">Waiting for price…</div>
+          <div id="updated" class="btc-live-updated"></div>
         </div>
       </div>
-      <div class="updated">Last bot run (PT)<br /><strong id="updated">Loading…</strong></div>
-    </header>
 
-    <nav class="tabs" role="tablist">
-      <button type="button" role="tab" id="tab-live" aria-selected="true" aria-controls="panel-live">Live Paper Bot</button>
-      <button type="button" role="tab" id="tab-backtest" aria-selected="false" aria-controls="panel-backtest">Backtest</button>
-      <button type="button" role="tab" id="tab-rules" aria-selected="false" aria-controls="panel-rules">Rules</button>
-    </nav>
+      <div class="stats">
+        <div class="stat">
+          <div class="lbl">$40 run</div>
+          <div class="val" id="stat-balance-val">—</div>
+          <div class="sub">Start → current balance</div>
+        </div>
+        <div class="stat">
+          <div class="lbl">Net PnL</div>
+          <div class="val" id="stat-pnl-val">—</div>
+          <div class="sub" id="stat-pnl-sub"></div>
+        </div>
+        <div class="stat">
+          <div class="lbl">Record</div>
+          <div class="val" id="stat-record-val">—</div>
+          <div class="sub" id="stat-record-sub">1-hour $40 run</div>
+        </div>
+        <div class="stat">
+          <div class="lbl">Current call</div>
+          <div class="val" id="stat-call-val">—</div>
+          <div class="sub">Official signal</div>
+        </div>
+      </div>
+
+      <nav class="tabs" role="tablist">
+        <button type="button" role="tab" id="tab-live" aria-selected="true" aria-controls="panel-live">Live</button>
+        <button type="button" role="tab" id="tab-trades" aria-selected="false" aria-controls="panel-trades">Trades</button>
+        <button type="button" role="tab" id="tab-backtest" aria-selected="false" aria-controls="panel-backtest">Backtest</button>
+        <button type="button" role="tab" id="tab-rules" aria-selected="false" aria-controls="panel-rules">Rules</button>
+      </nav>
+    </header>
 
     <div id="error" hidden class="err"></div>
 
     <section id="panel-live" class="panel" role="tabpanel">
-      <div id="session-card" class="session-card LIVE">
-        <div class="session-head">
+      <article id="session-card" class="card session-card">
+        <div class="card-head">
           <div>
-            <div class="kicker">1-Hour $40 Live Run</div>
-            <div class="session-window" id="session-window">Loading session…</div>
-            <p class="fee" id="session-range" style="margin-top:6px"></p>
+            <div class="card-kicker">1-Hour $40 Run</div>
+            <div class="card-title" id="session-window">Starting…</div>
+            <div class="card-range" id="session-range"></div>
           </div>
-          <div id="session-badge" class="session-badge LIVE"><span class="dot"></span><span id="session-badge-text">LIVE</span></div>
+          <div id="session-pill" class="pill LIVE">LIVE</div>
         </div>
-        <div class="cards" id="session-stats">
-          <div class="card"><div class="lbl">Starting</div><div class="val" id="sess-start-bal">$40.00</div><div class="sub">$5 per trade · after fees</div></div>
-          <div class="card"><div class="lbl">Current Balance</div><div class="val" id="sess-equity">—</div><div class="sub" id="sess-cash"></div></div>
-          <div class="card"><div class="lbl">Net PnL</div><div class="val" id="sess-pnl">—</div><div class="sub" id="sess-pnl-sub"></div></div>
-          <div class="card"><div class="lbl">Record</div><div class="val" id="sess-record">0–0</div><div class="sub" id="sess-win"></div></div>
+        <div class="metrics">
+          <div class="metric"><div class="k">Balance</div><div class="v" id="sess-equity">$40.00</div></div>
+          <div class="metric"><div class="k">Net PnL</div><div class="v" id="sess-pnl">$0.00</div></div>
+          <div class="metric"><div class="k">Return</div><div class="v" id="sess-ret">0.00%</div></div>
+          <div class="metric"><div class="k">Record</div><div class="v" id="sess-record">0–0</div></div>
         </div>
-        <div class="box" id="session-open" hidden style="box-shadow:none;margin:12px 0 0">
-          <h2>Open session trade</h2>
-          <div class="pos-grid" id="session-open-grid"></div>
-        </div>
-        <div class="box" style="box-shadow:none;margin:14px 0 0">
-          <h2>Session trade log</h2>
-          <div id="session-trades"></div>
-        </div>
-        <div class="box" style="box-shadow:none;margin:14px 0 0">
-          <h2>Activity log (every 5-minute scan)</h2>
-          <div id="session-checks"></div>
-        </div>
-      </div>
+        <div id="session-open" class="open-line" hidden></div>
+      </article>
 
-      <div id="call" class="call WAIT">
-        <div class="kicker" id="call-kicker">Current call</div>
-        <div class="label" id="call-label">Loading…</div>
-        <p class="reason" id="reason">Fetching the latest Kalshi 15-minute contract and BTC indicators.</p>
-        <div class="call-meta" id="call-meta"></div>
-      </div>
+      <article id="signal-card" class="card signal-card WAIT">
+        <div class="card-kicker">Current Signal</div>
+        <div class="signal-action" id="signal-action">Loading…</div>
+        <div class="signal-meta" id="signal-meta"></div>
+        <p class="signal-reason" id="signal-reason">Fetching the latest Kalshi 15-minute contract and BTC indicators.</p>
+        <a class="cta" id="kalshi-cta" hidden target="_blank" rel="noopener">Open on Kalshi ↗</a>
+        <details class="details">
+          <summary>Details</summary>
+          <div class="inds" id="signal-inds"></div>
+          <p class="note" id="signal-math" style="margin-top:10px"></p>
+        </details>
+      </article>
 
-      <div class="hero-row">
-        <div class="card">
-          <div class="lbl"><span id="btc-dot" class="live-dot"></span>Live Bitcoin (BTC/USD)</div>
-          <div class="price" id="btc-price">—</div>
-          <div class="sub" id="btc-sub">Waiting for price…</div>
+      <article class="card">
+        <h2>Recent checks &amp; trades</h2>
+        <div id="recent-list"></div>
+        <button type="button" class="more-link" id="recent-more">See the full $40-session log and the $100 book →</button>
+      </article>
+    </section>
+
+    <section id="panel-trades" class="panel" role="tabpanel" hidden>
+      <div class="section-head">
+        <h2>1-Hour $40 run</h2>
+        <p>Every trade and every 5-minute check from this hour, including WAIT windows.</p>
+      </div>
+      <article class="card">
+        <h2>Session trades</h2>
+        <div id="session-trades"></div>
+      </article>
+      <article class="card">
+        <h2>Activity log</h2>
+        <div id="session-checks"></div>
+      </article>
+
+      <div class="section-head" style="margin-top:22px">
+        <h2>Ongoing $100 paper book</h2>
+        <p>Separate from the 1-hour $40 run. Same rules, ongoing bankroll.</p>
+      </div>
+      <article class="card">
+        <div class="metrics">
+          <div class="metric"><div class="k">Equity</div><div class="v" id="book-equity">—</div></div>
+          <div class="metric"><div class="k">Cash</div><div class="v" id="book-cash">—</div></div>
+          <div class="metric"><div class="k">Net PnL</div><div class="v" id="book-pnl">—</div></div>
+          <div class="metric"><div class="k">Record</div><div class="v" id="book-record">—</div></div>
         </div>
-        <div class="card">
-          <div class="lbl">Contract quotes <span id="quote-age"></span></div>
-          <div class="quotes">
-            <div><div class="k">Yes bid / ask</div><div class="v" id="yes-q">—</div></div>
-            <div><div class="k">No bid / ask</div><div class="v" id="no-q">—</div></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="box">
-        <h2>1-minute indicators</h2>
-        <div class="inds" id="inds"></div>
-        <p class="fee" id="ind-time"></p>
-      </div>
-
-      <div class="section-label">Ongoing $100 paper book (separate from the 1-hour $40 run)</div>
-      <div class="cards">
-        <div class="card"><div class="lbl">Paper Equity</div><div class="val" id="equity">—</div><div class="sub" id="cash-sub"></div></div>
-        <div class="card"><div class="lbl">Net PnL (after fees)</div><div class="val" id="pnl">—</div><div class="sub" id="pnl-sub"></div></div>
-        <div class="card"><div class="lbl">Win Rate</div><div class="val" id="winrate">—</div><div class="sub" id="win-sub"></div></div>
-        <div class="card"><div class="lbl">Record</div><div class="val" id="record">—</div><div class="sub">$5 stake · $100 start</div></div>
-      </div>
-
-      <div class="box" id="position-card" hidden>
-        <h2>Open paper position</h2>
-        <div class="pos-grid" id="position-grid"></div>
-      </div>
-
-      <div class="box">
-        <h2>Paper equity curve</h2>
-        <div id="live-chart"></div>
-      </div>
-      <div class="box">
-        <h2>Trade history</h2>
-        <div id="trade-log"></div>
-      </div>
-      <p class="fee" id="poll-note"></p>
+        <p class="note" id="book-pnl-sub" style="margin-top:8px"></p>
+        <p class="note" id="book-win"></p>
+        <div id="book-open" class="open-line" hidden></div>
+      </article>
+      <article class="card">
+        <h2>$100-book trade history</h2>
+        <div id="book-trades"></div>
+      </article>
     </section>
 
     <section id="panel-backtest" class="panel" role="tabpanel" hidden>
-      <div class="box">
-        <h2>Honest historical test of these exact rules</h2>
+      <div class="section-head">
+        <h2>5-day backtest</h2>
         <p id="bt-range">Loading backtest…</p>
       </div>
-      <div class="compare" style="margin-bottom:16px">
+      <div class="compare">
         <div class="card"><div class="lbl">Net PnL</div><div class="val" id="bt-pnl">—</div><div class="sub" id="bt-eq"></div></div>
         <div class="card"><div class="lbl">Return</div><div class="val" id="bt-ret">—</div><div class="sub" id="bt-windows"></div></div>
         <div class="card"><div class="lbl">Win rate</div><div class="val" id="bt-win">—</div><div class="sub" id="bt-trades"></div></div>
         <div class="card"><div class="lbl">Max drawdown</div><div class="val" id="bt-dd">—</div><div class="sub" id="bt-pf"></div></div>
       </div>
-      <div class="box">
+      <article class="card">
         <h2>Backtest equity</h2>
         <div id="bt-chart"></div>
-      </div>
-      <div class="box"><p id="bt-note" class="note"></p></div>
-      <div class="box">
+      </article>
+      <article class="card"><p id="bt-note" class="note"></p></article>
+      <article class="card">
         <h2>Backtest trades</h2>
         <div id="bt-log"></div>
-      </div>
+      </article>
     </section>
 
     <section id="panel-rules" class="panel" role="tabpanel" hidden>
-      <div class="box rules">
-        <h2>How the bot trades Kalshi’s 15-minute BTC contract</h2>
-        <p>This is a paper bot for Kalshi’s <strong>KXBTC15M</strong> market — “BTC price up in the next 15 mins?” It never places a real order. Yes wins if the CF Benchmarks BRTI average in the last 60 seconds of the window is at or above the strike (the prior window’s close). No wins if it finishes below.</p>
-        <ol>
-          <li><strong>Market.</strong> The live 15-minute Kalshi contract, paired with Coinbase 1-minute and 5-minute BTC/USD candles (Kraken fallback).</li>
-          <li><strong>Buy Yes</strong> when the 1-minute trend is cleanly bullish (EMA 9 above 21, price above EMA 50, MACD histogram positive, RSI 52–75), the 5-minute trend agrees, BTC is at least $20 above the strike, the Yes ask is between 35¢ and 72¢, and at least 2 minutes remain.</li>
+      <article class="card">
+        <h2 style="text-transform:none;font-size:20px;letter-spacing:-0.03em;color:var(--ink)">How the bot trades</h2>
+        <p class="note" style="margin-bottom:10px">This is a paper bot for Kalshi’s <strong>KXBTC15M</strong> market — “BTC price up in the next 15 mins?” It never places a real order. Yes wins if the CF Benchmarks BRTI average in the last 60 seconds of the window is at or above the strike. No wins if it finishes below.</p>
+        <ol class="rules">
+          <li><strong>Buy Yes</strong> when the 1-minute trend is cleanly bullish (EMA 9 above 21, price above EMA 50, MACD histogram positive, RSI 52–75), the 5-minute trend agrees, BTC is at least $20 above the strike, the Yes ask is 35¢–72¢, and at least 2 minutes remain.</li>
           <li><strong>Buy No</strong> is the bearish mirror (EMA 9 below 21, price below EMA 50, MACD negative, RSI 25–48, BTC at least $20 below the strike, No ask 35¢–72¢).</li>
-          <li><strong>Wait</strong> when those conditions conflict, the EMAs are flat, the window has under 2 minutes left, or Kalshi’s price is already too expensive (above 72¢) — there’s no edge in buying a 90¢ Yes.</li>
-          <li><strong>Sell early</strong> if you’re in a trade and the live bid hits ~80¢ or +15¢ from entry (take profit), drops 12¢ (cut loss), or momentum and BTC-vs-strike both flip against you. Otherwise the bot holds to official settlement.</li>
-          <li><strong>Sizing &amp; fees.</strong> $100 starting paper cash, a flat $5 stake per trade, and Kalshi’s real taker fee: <span class="mono">ceil(0.07 × contracts × price × (1 − price))</span>, rounded up to the next cent, on every buy and every early sale.</li>
+          <li><strong>Wait</strong> when those conditions conflict, the EMAs are flat, the window has under 2 minutes left, or Kalshi’s price is already too expensive (above 72¢).</li>
+          <li><strong>Sell early</strong> if the live bid hits ~80¢ or +15¢ from entry (take profit), drops 12¢ (cut loss), or momentum and BTC-vs-strike both flip against you. Otherwise the bot holds to official settlement.</li>
+          <li><strong>Sizing &amp; fees.</strong> The 1-hour run starts at $40. The ongoing book starts at $100. Both use a flat $5 stake and Kalshi’s real taker fee: ceil(0.07 × contracts × price × (1 − price)).</li>
         </ol>
-      </div>
+      </article>
     </section>
 
     <footer>
       <div>Paper trading only. Not financial advice. A backtest is not a promise of future results. Kalshi settlement uses CF Benchmarks BRTI, which can differ slightly from Coinbase’s last price.</div>
-      <div><a href="https://github.com/nfm0984-png/btc-paper-bot">GitHub repo</a> · Bot runs every 5 minutes · BTC price polls live in this page</div>
+      <div><a href="https://github.com/nfm0984-png/btc-paper-bot">GitHub repo</a> · Bot runs every 5 minutes · BTC price polls live every 20 seconds</div>
     </footer>
   </div>
-
-  <script>
-    const $ = (id) => document.getElementById(id);
-    const money = (n, sign=false) => {
-      if (n == null || Number.isNaN(n)) return "—";
-      const abs = Math.abs(n).toLocaleString("en-US", { style: "currency", currency: "USD" });
-      if (!sign) return n < 0 ? "−" + abs : abs;
-      if (n > 0) return "+" + abs;
-      if (n < 0) return "−" + abs;
-      return abs;
-    };
-    const pct = (n) => {
-      if (n == null || Number.isNaN(n)) return "—";
-      const v = Math.abs(n).toFixed(2) + "%";
-      if (n > 0) return "+" + v;
-      if (n < 0) return "−" + v;
-      return v;
-    };
-    const px = (n) => n == null ? "—" : "$" + Number(n).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    const cents = (n) => n == null ? "—" : Math.round(n * 100) + "¢";
-
-    let DATA = null;
-    let liveBtc = null;
-    let liveInd = null;
-    let closeTimer = null;
-    let sessionTimer = null;
-    const DASH_V = "s40-1h";
-
-    function switchTab(id) {
-      document.querySelectorAll("nav.tabs button").forEach((b) => {
-        const on = b.id === id;
-        b.setAttribute("aria-selected", on ? "true" : "false");
-        const panel = document.getElementById(b.getAttribute("aria-controls"));
-        if (panel) panel.hidden = !on;
-      });
-    }
-    document.querySelectorAll("nav.tabs button").forEach((b) => b.addEventListener("click", () => switchTab(b.id)));
-
-    function ema(values, period) {
-      const out = Array(values.length).fill(null);
-      if (values.length < period) return out;
-      const k = 2 / (period + 1);
-      let seed = 0;
-      for (let i = 0; i < period; i++) seed += values[i];
-      seed /= period;
-      out[period - 1] = seed;
-      for (let i = period; i < values.length; i++) {
-        seed = (values[i] - seed) * k + seed;
-        out[i] = seed;
-      }
-      return out;
-    }
-    function rsi(values, period=14) {
-      const out = Array(values.length).fill(null);
-      if (values.length < period + 1) return out;
-      let gain = 0, loss = 0;
-      for (let i = 1; i <= period; i++) {
-        const ch = values[i] - values[i-1];
-        if (ch >= 0) gain += ch; else loss -= ch;
-      }
-      let ag = gain / period, al = loss / period;
-      const val = (ag, al) => al === 0 ? 100 : (ag === 0 ? 0 : 100 - (100 / (1 + ag/al)));
-      out[period] = val(ag, al);
-      for (let i = period + 1; i < values.length; i++) {
-        const ch = values[i] - values[i-1];
-        const g = ch > 0 ? ch : 0, l = ch < 0 ? -ch : 0;
-        ag = (ag * (period-1) + g) / period;
-        al = (al * (period-1) + l) / period;
-        out[i] = val(ag, al);
-      }
-      return out;
-    }
-    function lastInd(closes) {
-      if (!closes || closes.length < 60) return null;
-      const e9 = ema(closes, 9), e21 = ema(closes, 21), e50 = ema(closes, 50);
-      const r = rsi(closes, 14);
-      const macdLine = ema(closes, 12).map((a,i) => (a==null || ema(closes,26)[i]==null) ? null : a - ema(closes,26)[i]);
-      const hist = (() => {
-        const sig = ema(macdLine.map(v => v==null ? 0 : v), 9);
-        // redo properly with leading nulls skipped is heavy in JS; use last ready values
-        const m = macdLine, s = ema(m.map(v => v == null ? NaN : v).filter(v => !Number.isNaN(v)), 9);
-        // simpler last-point MACD using already computed arrays:
-        return null;
-      })();
-      const i = closes.length - 1;
-      const macd12 = ema(closes, 12);
-      const macd26 = ema(closes, 26);
-      const line = macd12.map((a, idx) => (a==null || macd26[idx]==null) ? null : a - macd26[idx]);
-      const lineVals = line.map(v => v == null ? null : v);
-      // seed signal on first 9 non-null line values
-      const compact = [];
-      const idxMap = [];
-      lineVals.forEach((v, idx) => { if (v != null) { compact.push(v); idxMap.push(idx); } });
-      const sigComp = ema(compact, 9);
-      const signal = Array(lineVals.length).fill(null);
-      sigComp.forEach((v, j) => { if (v != null) signal[idxMap[j]] = v; });
-      const macdHist = (line[i] != null && signal[i] != null) ? (line[i] - signal[i]) : null;
-      return {
-        ema9: e9[i], ema21: e21[i], ema50: e50[i], rsi14: r[i], macd_hist: macdHist, ready: e50[i]!=null && r[i]!=null && macdHist!=null
-      };
-    }
-
-    function drawChart(el, series) {
-      el.innerHTML = "";
-      const w = 1050, h = 260, padL = 58, padR = 16, padT = 16, padB = 28;
-      const a = (series || []).filter(p => p && p.equity != null);
-      if (!a.length) { el.innerHTML = '<p class="empty">No equity points yet.</p>'; return; }
-      let min = Math.min(...a.map(p => p.equity)), max = Math.max(...a.map(p => p.equity));
-      if (min === max) { min -= 1; max += 1; }
-      const span = max - min; min -= span*0.08; max += span*0.08;
-      const t0 = a[0].t, t1 = a[a.length-1].t || t0+1;
-      const x = (t) => padL + ((t - t0) / Math.max(t1-t0,1)) * (w-padL-padR);
-      const y = (v) => padT + (1 - (v-min)/(max-min)) * (h-padT-padB);
-      const path = a.map((p,i) => (i?"L":"M")+x(p.t).toFixed(1)+" "+y(p.equity).toFixed(1)).join(" ");
-      const area = a.length>1 ? path + ` L ${x(a[a.length-1].t).toFixed(1)} ${h-padB} L ${x(a[0].t).toFixed(1)} ${h-padB} Z` : "";
-      let grid = "";
-      for (let i=0;i<=4;i++){
-        const v = min + (max-min)*(i/4), yy=y(v);
-        grid += `<line x1="${padL}" x2="${w-padR}" y1="${yy.toFixed(1)}" y2="${yy.toFixed(1)}" stroke="rgba(247,147,26,0.08)" />`;
-        grid += `<text x="${padL-8}" y="${(yy+4).toFixed(1)}" text-anchor="end" fill="#9a8b78" font-size="11" font-family="IBM Plex Mono, monospace">${money(v)}</text>`;
-      }
-      el.innerHTML = `<svg class="chart-svg" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">${grid}${area?`<path d="${area}" fill="rgba(247,147,26,0.10)" />`:""}<path d="${path}" fill="none" stroke="#f7931a" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" /></svg>`;
-    }
-
-    function remainingText(closeIso) {
-      if (!closeIso) return "—";
-      const sec = Math.floor((Date.parse(closeIso) - Date.now()) / 1000);
-      if (Number.isNaN(sec)) return "—";
-      if (sec <= 0) return "Window closed";
-      const m = Math.floor(sec / 60), s = sec % 60;
-      return m + ":" + String(s).padStart(2,"0") + " left";
-    }
-
-    function tradeTable(trades, emptyText) {
-      if (!trades || !trades.length) return `<p class="empty">${emptyText}</p>`;
-      const rows = trades.map(t => {
-        const side = (t.side || "").toUpperCase();
-        const pnl = t.pnl == null ? "—" : `<span class="${t.pnl>=0?"up":"down"}">${money(t.pnl,true)}</span>`;
-        const exit = t.status === "open" ? "Open" : (t.outcome === "settlement" ? ("Settled " + String(t.result||"").toUpperCase()) : ("Exit " + cents(t.exit_price)));
-        return `<tr>
-          <td>${t.entry_time_pt || ""}</td>
-          <td class="mono">${(t.ticker||"").replace("KXBTC15M-","")}</td>
-          <td>${side}</td>
-          <td class="mono">${cents(t.entry_price)} × ${t.contracts||""}</td>
-          <td>${exit}</td>
-          <td>${pnl}</td>
-          <td>${t.reason_exit || t.reason || t.reason_entry || ""}</td>
-        </tr>`;
-      }).join("");
-      return `<div style="overflow:auto"><table>
-        <thead><tr><th>Time (PT)</th><th>Contract</th><th>Side</th><th>Entry</th><th>Exit / settlement</th><th>PnL</th><th>Why</th></tr></thead>
-        <tbody>${rows}</tbody></table></div>`;
-    }
-
-    function renderIndicators(ind) {
-      if (!ind) { $("inds").innerHTML = ""; return; }
-      const cells = [
-        ["EMA 9", ind.ema9],
-        ["EMA 21", ind.ema21],
-        ["EMA 50", ind.ema50],
-        ["RSI 14", ind.rsi14],
-        ["MACD Hist", ind.macd_hist],
-      ];
-      $("inds").innerHTML = cells.map(([k,v]) => {
-        const shown = v==null ? "—" : Number(v).toLocaleString("en-US", { maximumFractionDigits: 2 });
-        return `<div class="ind-cell"><div class="k">${k}</div><div class="v">${shown}</div></div>`;
-      }).join("");
-    }
-
-    function applyCall(live) {
-      const call = $("call");
-      const action = live.call || "WAIT";
-      call.className = "call " + action + (action === "HOLD" && live.side ? " " + live.side : "");
-      $("call-label").textContent = live.call_label || action;
-      $("reason").textContent = live.reason || "—";
-      const m = live.market || {};
-      const bits = [];
-      if (m.ticker) bits.push(`<span>${m.ticker}</span>`);
-      if (m.close_time) bits.push(`<span class="countdown" id="countdown">${remainingText(m.close_time)}</span>`);
-      if (m.strike != null) bits.push(`<span>Strike ${px(m.strike)}</span>`);
-      if (m.kalshi_url) bits.push(`<a href="${m.kalshi_url}" target="_blank" rel="noopener">Open on Kalshi</a>`);
-      $("call-meta").innerHTML = bits.join("");
-      if (closeTimer) clearInterval(closeTimer);
-      if (m.close_time) {
-        closeTimer = setInterval(() => {
-          const el = $("countdown");
-          if (el) el.textContent = remainingText(m.close_time);
-        }, 1000);
-      }
-    }
-
-    function sessionBadgeLabel(sess) {
-      const status = (sess && sess.status) || "LIVE";
-      if (status === "COMPLETE") return "COMPLETE";
-      const endIso = sess && sess.end;
-      if (!endIso) return status;
-      const sec = Math.floor((Date.parse(endIso) - Date.now()) / 1000);
-      if (status === "SETTLING" || sec <= 0) return "SETTLING";
-      const m = Math.floor(sec / 60), s = Math.max(0, sec % 60);
-      return "LIVE · " + m + "m " + String(s).padStart(2, "0") + "s left";
-    }
-
-    function tickSessionBadge(sess) {
-      const badge = $("session-badge");
-      const text = $("session-badge-text");
-      if (!badge || !text || !sess) return;
-      let status = sess.status || "LIVE";
-      const sec = sess.end ? Math.floor((Date.parse(sess.end) - Date.now()) / 1000) : 0;
-      if (status === "LIVE" && sec <= 0) status = sess.position ? "SETTLING" : "COMPLETE";
-      badge.className = "session-badge " + status;
-      $("session-card").className = "session-card " + status;
-      text.textContent = sessionBadgeLabel(Object.assign({}, sess, { status: status }));
-    }
-
-    function checkTable(checks) {
-      if (!checks || !checks.length) return '<p class="empty">The bot will log every 5-minute check here, including WAIT / skip reasons, so you can see it watching the window.</p>';
-      const rows = checks.slice().reverse().map(c => {
-        const call = c.label || c.action || "—";
-        const quotes = (c.yes_ask != null || c.no_ask != null)
-          ? ("Yes " + cents(c.yes_ask) + " / No " + cents(c.no_ask))
-          : "—";
-        return `<tr>
-          <td>${c.t_pt || ""}</td>
-          <td>${call}</td>
-          <td class="mono">${(c.ticker || "—").replace("KXBTC15M-","")}</td>
-          <td class="mono">${quotes}</td>
-          <td>${c.reason || ""}</td>
-        </tr>`;
-      }).join("");
-      return `<div style="overflow:auto"><table class="check-log">
-        <thead><tr><th>Time (PT)</th><th>Call</th><th>Contract</th><th>Yes / No</th><th>Why</th></tr></thead>
-        <tbody>${rows}</tbody></table></div>`;
-    }
-
-    function sessionTradeTable(trades) {
-      if (!trades || !trades.length) {
-        return '<p class="empty">No session trades yet. If the bot stands aside, that still shows up in the activity log below.</p>';
-      }
-      const rows = trades.slice().reverse().map(t => {
-        const side = (t.side || "").toUpperCase();
-        const pnl = t.pnl == null ? "—" : `<span class="${t.pnl>=0?"up":"down"}">${money(t.pnl,true)}</span>`;
-        const fee = Number(t.entry_fee || 0) + Number(t.exit_fee || 0);
-        const exit = t.status === "open" ? "Open" : (t.outcome === "settlement" ? ("Settled " + String(t.result||"").toUpperCase()) : ("Exit " + cents(t.exit_price)));
-        const why = t.reason_exit || t.reason || t.reason_entry || "";
-        return `<tr>
-          <td>${t.entry_time_pt || ""}</td>
-          <td class="mono">${(t.ticker||"").replace("KXBTC15M-","")}</td>
-          <td>${side}</td>
-          <td class="mono">${cents(t.entry_price)} × ${t.contracts||""}</td>
-          <td>${exit}</td>
-          <td class="mono">${money(fee)}</td>
-          <td>${pnl}</td>
-          <td>${why}</td>
-        </tr>`;
-      }).join("");
-      return `<div style="overflow:auto"><table>
-        <thead><tr><th>Time (PT)</th><th>Contract</th><th>Side</th><th>Entry</th><th>Exit / settlement</th><th>Fee</th><th>PnL</th><th>Why</th></tr></thead>
-        <tbody>${rows}</tbody></table></div>`;
-    }
-
-    function renderSession(sess) {
-      if (!sess) {
-        $("session-window").textContent = "Session not started yet";
-        return;
-      }
-      $("session-window").textContent = sess.window_label || "1-hour $40 run";
-      $("session-range").textContent = (sess.start_pt && sess.end_pt)
-        ? (sess.start_pt + " → " + sess.end_pt + " · $40 start · $5 tickets · Kalshi taker fees")
-        : "";
-      $("sess-start-bal").textContent = money(sess.starting_balance != null ? sess.starting_balance : 40);
-      $("sess-equity").textContent = money(sess.final_balance != null && sess.status === "COMPLETE" ? sess.final_balance : sess.equity);
-      $("sess-cash").textContent = "Cash " + money(sess.cash);
-      const pnl = $("sess-pnl");
-      pnl.textContent = money(sess.pnl, true);
-      pnl.className = "val " + (sess.pnl>0?"up":sess.pnl<0?"down":"");
-      $("sess-pnl-sub").textContent = pct(sess.pnl_pct);
-      $("sess-record").textContent = (sess.wins||0) + "–" + (sess.losses||0);
-      $("sess-win").textContent = sess.win_rate == null ? "No closed trades yet" : (sess.win_rate.toFixed(1) + "% win rate");
-      tickSessionBadge(sess);
-      if (sessionTimer) clearInterval(sessionTimer);
-      sessionTimer = setInterval(function() { tickSessionBadge(sess); }, 1000);
-
-      const openCard = $("session-open");
-      if (sess.position) {
-        openCard.hidden = false;
-        const p = sess.position;
-        const items = [
-          ["Side", (p.side||"").toUpperCase() + " × " + p.contracts],
-          ["Entry", cents(p.entry_price) + " + " + money(p.entry_fee) + " fee"],
-          ["Contract", p.ticker || ""],
-          ["Entered", p.entry_time_pt || ""],
-        ];
-        $("session-open-grid").innerHTML = items.map(([k,v]) => `<div><div class="k">${k}</div><div class="v">${v}</div></div>`).join("");
-      } else openCard.hidden = true;
-
-      $("session-trades").innerHTML = sessionTradeTable(sess.trades);
-      $("session-checks").innerHTML = checkTable(sess.checks);
-    }
-
-    function render(data) {
-      DATA = data;
-      const live = data.live || {};
-      const bt = data.backtest || {};
-      $("updated").textContent = data.generated_at_pt || "—";
-      applyCall(live);
-      renderSession(data.session);
-
-      const btc = liveBtc != null ? liveBtc : live.btc_price;
-      $("btc-price").textContent = px(btc);
-      const strike = live.market && live.market.strike;
-      if (btc != null && strike != null) {
-        const d = btc - strike;
-        const el = $("btc-sub");
-        el.textContent = (d>=0?"+":"") + money(d).replace("$","") + " vs strike " + px(strike);
-        el.className = "sub " + (d>=0?"up":"down");
-      } else {
-        $("btc-sub").textContent = strike != null ? ("Strike " + px(strike)) : "";
-      }
-      const m = live.market || {};
-      $("yes-q").textContent = cents(m.yes_bid) + " / " + cents(m.yes_ask);
-      $("no-q").textContent = cents(m.no_bid) + " / " + cents(m.no_ask);
-      $("quote-age").textContent = data.generated_at_pt ? ("· as of " + data.generated_at_pt.replace(", 2026, ",", ")) : "";
-
-      renderIndicators(liveInd || live.indicators_1m);
-      $("ind-time").textContent = liveInd
-        ? "1-minute indicators are updating live from Coinbase in this browser."
-        : (live.last_1m_time_pt ? ("Confirmed 1-minute readings from the bar that closed at " + live.last_1m_time_pt + ".") : "");
-
-      $("equity").textContent = money(live.equity);
-      $("cash-sub").textContent = "Cash " + money(live.cash);
-      const pnlEl = $("pnl");
-      pnlEl.textContent = money(live.pnl, true);
-      pnlEl.className = "val " + (live.pnl>0?"up":live.pnl<0?"down":"");
-      $("pnl-sub").textContent = pct(live.pnl_pct) + " from " + money(live.starting_balance);
-      $("winrate").textContent = live.win_rate == null ? "—" : live.win_rate.toFixed(1) + "%";
-      $("win-sub").textContent = (live.wins||0) + "W / " + (live.losses||0) + "L after fees";
-      $("record").textContent = (live.wins||0) + "–" + (live.losses||0);
-
-      const posCard = $("position-card");
-      if (live.position) {
-        posCard.hidden = false;
-        const p = live.position;
-        const items = [
-          ["Side", (p.side||"").toUpperCase() + " × " + p.contracts],
-          ["Entry", cents(p.entry_price) + " + " + money(p.entry_fee) + " fee"],
-          ["Contract", p.ticker || ""],
-          ["Entered", p.entry_time_pt || ""],
-        ];
-        $("position-grid").innerHTML = items.map(([k,v]) => `<div><div class="k">${k}</div><div class="v">${v}</div></div>`).join("");
-      } else posCard.hidden = true;
-
-      drawChart($("live-chart"), live.equity_history || []);
-      $("trade-log").innerHTML = tradeTable(live.trades, "No live paper trades yet. When the bot finds a 35¢–72¢ Yes or No with a clean trend, it will log a $5 ticket here.");
-      if (data.polling && data.polling.note) $("poll-note").textContent = data.polling.note;
-
-      $("bt-range").textContent = bt.start_pt && bt.end_pt
-        ? `Same rules on ${bt.windows_scanned} settled KXBTC15M windows from ${bt.start_pt} to ${bt.end_pt} (${bt.days} days). Entry uses the real Kalshi quote 1 minute after each window opens; exits are official settlements.`
-        : "Backtest unavailable.";
-      const ret = $("bt-ret");
-      ret.textContent = pct(bt.return_pct);
-      ret.className = "val " + (bt.return_pct>0?"up":bt.return_pct<0?"down":"");
-      $("bt-windows").textContent = (bt.windows_traded||0) + " trades · " + (bt.windows_skipped||0) + " stands aside";
-      const pn = $("bt-pnl");
-      pn.textContent = money(bt.net_pnl, true);
-      pn.className = "val " + (bt.net_pnl>0?"up":bt.net_pnl<0?"down":"");
-      $("bt-eq").textContent = money(bt.starting_balance) + " → " + money(bt.ending_equity) + " · $5 tickets";
-      $("bt-win").textContent = bt.win_rate == null ? "—" : bt.win_rate.toFixed(1) + "%";
-      $("bt-trades").textContent = (bt.wins||0) + "W / " + (bt.losses||0) + "L";
-      $("bt-dd").textContent = bt.max_drawdown_pct == null ? "—" : "−" + Number(bt.max_drawdown_pct).toFixed(2) + "%";
-      $("bt-pf").textContent = bt.profit_factor != null ? ("Profit factor " + bt.profit_factor) : (bt.profit_factor_note || "Profit factor n/a");
-      $("bt-note").textContent = [bt.assumption_note, bt.fee_note].filter(Boolean).join(" ");
-      drawChart($("bt-chart"), bt.equity_history || []);
-      $("bt-log").innerHTML = tradeTable(bt.trades, "No backtest trades in this window.");
-    }
-
-    async function loadDashboard() {
-      const res = await fetch("data.json?v=" + DASH_V + "&t=" + Date.now(), { cache: "no-store" });
-      if (!res.ok) throw new Error("Could not load data.json (" + res.status + ")");
-      const data = await res.json();
-      $("error").hidden = true;
-      render(data);
-    }
-
-    async function pollCoinbase() {
-      try {
-        const [tickRes, candleRes] = await Promise.all([
-          fetch("https://api.exchange.coinbase.com/products/BTC-USD/ticker", { cache: "no-store" }),
-          fetch("https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60", { cache: "no-store" }),
-        ]);
-        if (!tickRes.ok) throw new Error("ticker " + tickRes.status);
-        const tick = await tickRes.json();
-        liveBtc = parseFloat(tick.price);
-        $("btc-dot").className = "live-dot";
-        if (candleRes.ok) {
-          const raw = await candleRes.json();
-          // Coinbase returns newest first: [time, low, high, open, close, volume]
-          const closes = raw.slice().sort((a,b)=>a[0]-b[0]).map(r => r[4]);
-          liveInd = lastInd(closes);
-        }
-        if (DATA) render(DATA);
-      } catch (err) {
-        $("btc-dot").className = "live-dot stale";
-        // Coinbase poll failed — keep using the last Actions snapshot.
-        console.warn("Coinbase live poll failed", err);
-      }
-    }
-
-    async function start() {
-      try { await loadDashboard(); }
-      catch (err) {
-        $("error").hidden = false;
-        $("error").textContent = "Could not load the live dashboard data. " + err.message;
-      }
-      pollCoinbase();
-      setInterval(pollCoinbase, 20000);
-      setInterval(() => { loadDashboard().catch(() => {}); }, 30 * 1000);
-    }
-    start();
-  </script>
+  <script src="app.js?v=20261126-ui1"></script>
 </body>
 </html>
