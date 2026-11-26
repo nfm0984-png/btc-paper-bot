@@ -23,6 +23,38 @@
   const cents = (n) => n == null ? "—" : Math.round(n * 100) + "¢";
   const num = (n, d = 2) => n == null || Number.isNaN(n) ? "—" : Number(n).toLocaleString("en-US", { maximumFractionDigits: d });
 
+  function totalContracts(book) {
+    const trades = (book && book.trades) || [];
+    let n = trades.reduce((s, t) => s + (Number(t.contracts) || 0), 0);
+    if (!trades.length && book && book.position) n = Number(book.position.contracts) || 0;
+    return n;
+  }
+  function contractsLabel(n) {
+    const c = Number(n) || 0;
+    return c + (c === 1 ? " contract" : " contracts");
+  }
+  function openTradeLine(p, prefix) {
+    if (!p) return "";
+    const side = (p.side || "").toUpperCase();
+    const head = prefix ? `<strong>${esc(prefix)}</strong> ` : "<strong>Open trade</strong> · ";
+    const bits = [
+      side ? esc(side) : null,
+      contractsLabel(p.contracts) + " @ " + cents(p.entry_price),
+      p.entry_fee != null ? (money(p.entry_fee) + " fee") : null,
+      p.ticker ? esc(p.ticker) : null,
+      p.entry_time_pt ? ("entered " + esc(p.entry_time_pt)) : null,
+    ].filter(Boolean);
+    return head + bits.join(" · ");
+  }
+  function longDatePt(d) {
+    try {
+      return new Intl.DateTimeFormat("en-US", {
+        timeZone: "America/Los_Angeles",
+        weekday: "long", month: "long", day: "numeric", year: "numeric"
+      }).format(d || new Date());
+    } catch (e) { return ""; }
+  }
+
   let DATA = null;
   let liveBtc = null;
   let liveInd = null;
@@ -128,7 +160,7 @@
     if (status === "COMPLETE") return "COMPLETE";
     if (status === "SETTLING" || sec <= 0) return "SETTLING";
     const m = Math.floor(sec / 60), s = Math.max(0, sec % 60);
-    return "LIVE · " + m + ":" + String(s).padStart(2, "0") + " left";
+    return "LIVE · " + m + "m " + String(s).padStart(2, "0") + "s left";
   }
 
   function tickSessionBadge() {
@@ -187,7 +219,7 @@
         <td>${esc(t.entry_time_pt || "")}</td>
         <td class="mono">${esc((t.ticker || "").replace("KXBTC15M-", ""))}</td>
         <td>${esc(side)}</td>
-        <td class="mono">${cents(t.entry_price)} × ${esc(t.contracts || "")}</td>
+        <td class="mono">${esc(contractsLabel(t.contracts))} @ ${cents(t.entry_price)}</td>
         <td>${esc(exit)}</td>
         ${withFee ? `<td class="mono">${money(fee)}</td>` : ""}
         <td>${pnl}</td>
@@ -195,7 +227,7 @@
       </tr>`;
     }).join("");
     return `<div class="table-wrap"><table>
-      <thead><tr><th>Time (PT)</th><th>Contract</th><th>Side</th><th>Entry</th><th>Exit / settlement</th>${withFee ? "<th>Fee</th>" : ""}<th>PnL</th><th>Why</th></tr></thead>
+      <thead><tr><th>Time (PT)</th><th>Contract</th><th>Side</th><th>Contracts / entry</th><th>Exit / settlement</th>${withFee ? "<th>Fee</th>" : ""}<th>PnL</th><th>Why</th></tr></thead>
       <tbody>${rows}</tbody></table></div>`;
   }
 
@@ -225,10 +257,12 @@
       const act = e.label || e.action || ((e.side || "") + (e.status === "open" ? " OPEN" : "")).toUpperCase() || "CHECK";
       const why = e.reason || e.reason_exit || e.reason_entry || "";
       const pnl = e.pnl != null ? ` · ${money(e.pnl, true)}` : "";
+      const contracts = e.contracts != null ? (contractsLabel(e.contracts) + (e.entry_price != null ? " @ " + cents(e.entry_price) : "")) : "";
       return `<div class="row">
         <div class="row-top">
           <span class="when">${esc(when)}</span>
           ${ticker ? `<span class="mono">${esc(ticker)}</span>` : ""}
+          ${contracts ? `<span class="mono">${esc(contracts)}</span>` : ""}
           ${quotes ? `<span>${esc(quotes)}</span>` : ""}
           <span class="act">${esc(act)}${esc(pnl)}</span>
         </div>
@@ -255,6 +289,8 @@
       sub.textContent = strike != null ? ("Strike " + px(strike)) : "Live Coinbase BTC/USD";
       sub.className = "btc-live-sub";
     }
+    const dateEl = $("hero-date");
+    if (dateEl) dateEl.textContent = longDatePt(new Date());
     $("updated").textContent = data.generated_at_pt
       ? ("Bot refresh " + data.generated_at_pt.replace(", 2026, ", ", "))
       : "";
@@ -262,6 +298,11 @@
     const start = sess && (sess.starting_balance != null ? sess.starting_balance : 40);
     const equity = sess ? (sess.equity != null ? sess.equity : sess.cash) : null;
     $("stat-balance-val").textContent = equity != null ? (money(start) + " → " + money(equity)) : "—";
+    const balSub = $("stat-balance-sub");
+    if (balSub) {
+      const n = sess ? totalContracts(sess) : 0;
+      balSub.textContent = n ? (contractsLabel(n) + " traded") : "Start → current balance";
+    }
     const pnl = $("stat-pnl-val");
     pnl.textContent = sess ? money(sess.pnl, true) : "—";
     pnl.className = "val " + (sess && sess.pnl > 0 ? "up" : sess && sess.pnl < 0 ? "down" : "");
@@ -279,7 +320,9 @@
     }
     card.hidden = false;
     $("session-window").textContent = sess.window_label_pt || sess.window_label || "1-hour $40 run";
-    $("session-range").textContent = " $5 per trade · real Kalshi taker fees";
+    $("session-range").textContent = (sess.start_pt && sess.end_pt)
+      ? (sess.start_pt + " → " + sess.end_pt + " · $5 per trade · real Kalshi taker fees")
+      : "$5 per trade · real Kalshi taker fees";
     tickSessionBadge();
     if (sessionTimer) clearInterval(sessionTimer);
     sessionTimer = setInterval(tickSessionBadge, 1000);
@@ -293,12 +336,13 @@
     $("sess-ret").textContent = pct(sess.pnl_pct);
     $("sess-ret").className = "v " + (sess.pnl_pct > 0 ? "up" : sess.pnl_pct < 0 ? "down" : "");
     $("sess-record").textContent = (sess.wins || 0) + "–" + (sess.losses || 0);
+    const sessC = $("sess-contracts");
+    if (sessC) sessC.textContent = String(totalContracts(sess));
 
     const posEl = $("session-open");
     if (sess.position) {
-      const p = sess.position;
       posEl.hidden = false;
-      posEl.innerHTML = `<strong>Open:</strong> ${(p.side || "").toUpperCase()} × ${esc(p.contracts)} ${esc(p.ticker || "")} @ ${cents(p.entry_price)} + ${money(p.entry_fee)} fee · entered ${esc(p.entry_time_pt || "")}`;
+      posEl.innerHTML = openTradeLine(sess.position, "Open trade");
     } else {
       posEl.hidden = true;
       posEl.innerHTML = "";
@@ -362,6 +406,8 @@
       label: ((t.side || "") + (t.status === "open" ? " · OPEN" : (t.pnl != null ? " · " + (t.pnl >= 0 ? "WIN" : "LOSS") : ""))).toUpperCase(),
       reason: t.reason_exit || t.reason || t.reason_entry || "",
       pnl: t.pnl,
+      contracts: t.contracts,
+      entry_price: t.entry_price,
       yes_ask: null,
       no_ask: null,
     }));
@@ -392,13 +438,14 @@
     bp.className = "v " + (live.pnl > 0 ? "up" : live.pnl < 0 ? "down" : "");
     $("book-pnl-sub").textContent = pct(live.pnl_pct) + " from " + money(live.starting_balance);
     $("book-record").textContent = (live.wins || 0) + "–" + (live.losses || 0);
+    const bookC = $("book-contracts");
+    if (bookC) bookC.textContent = String(totalContracts(live));
     $("book-win").textContent = live.win_rate == null ? "No closed trades yet" : (live.win_rate.toFixed(1) + "% after fees");
 
     const pos = $("book-open");
     if (live.position) {
-      const p = live.position;
       pos.hidden = false;
-      pos.innerHTML = `<strong>Open $100 book:</strong> ${(p.side || "").toUpperCase()} × ${esc(p.contracts)} ${esc(p.ticker || "")} @ ${cents(p.entry_price)} + ${money(p.entry_fee)} fee · entered ${esc(p.entry_time_pt || "")}`;
+      pos.innerHTML = openTradeLine(live.position, "Open $100 book");
     } else {
       pos.hidden = true;
       pos.innerHTML = "";
