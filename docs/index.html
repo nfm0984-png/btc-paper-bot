@@ -8,7 +8,7 @@
   <title>BTC 15-Min Bot</title>
   <meta name="description" content="Live Buy Yes / Buy No / Wait signals for Kalshi’s 15-minute Bitcoin contracts, with a $40 one-hour paper run." />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23F7931A'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-size='18' font-family='Georgia' fill='%231C140A'%3E%E2%82%BF%3C/text%3E%3C/svg%3E" />
-  <link rel="stylesheet" href="style.css?v=20261126-ui3" />
+  <link rel="stylesheet" href="style.css?v=20261126-ui4" />
 </head>
 <body>
   <div class="wrap">
@@ -54,6 +54,7 @@
     <nav class="tabs" role="tablist">
       <button type="button" role="tab" id="tab-live" aria-selected="true" aria-controls="panel-live">Live</button>
       <button type="button" role="tab" id="tab-trades" aria-selected="false" aria-controls="panel-trades">Trades</button>
+      <button type="button" role="tab" id="tab-learning" aria-selected="false" aria-controls="panel-learning">Learning</button>
       <button type="button" role="tab" id="tab-backtest" aria-selected="false" aria-controls="panel-backtest">Backtest</button>
       <button type="button" role="tab" id="tab-rules" aria-selected="false" aria-controls="panel-rules">Rules</button>
     </nav>
@@ -139,6 +140,34 @@
       </article>
     </section>
 
+    <section id="panel-learning" class="panel" role="tabpanel" hidden>
+      <div class="section-head">
+        <h2>Hourly learning</h2>
+        <p>Every hour the bot studies settled 15-minute windows and only promotes a new rule set when unseen P&amp;L is clearly better. That run is on GitHub Actions — $0 Grok Bot usage.</p>
+      </div>
+      <article class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-kicker">Active strategy</div>
+            <div class="card-title" id="learn-version">v1</div>
+            <div class="card-range" id="learn-updated"></div>
+          </div>
+          <div id="learn-pill" class="pill BASE">Defaults</div>
+        </div>
+        <p class="signal-reason" id="learn-rules">Loading the current rules…</p>
+        <div class="metrics">
+          <div class="metric"><div class="k">Windows studied</div><div class="v" id="learn-windows">—</div></div>
+          <div class="metric"><div class="k">Train / Unseen</div><div class="v" id="learn-split">—</div></div>
+          <div class="metric"><div class="k">Unseen P&amp;L</div><div class="v" id="learn-val-pnl">—</div></div>
+          <div class="metric"><div class="k">Last decision</div><div class="v" id="learn-decision" style="font-size:18px">—</div></div>
+        </div>
+      </article>
+      <article class="card">
+        <h2>Learning log</h2>
+        <div id="learn-log"></div>
+      </article>
+    </section>
+
     <section id="panel-backtest" class="panel" role="tabpanel" hidden>
       <div class="section-head">
         <h2>5-day backtest</h2>
@@ -173,15 +202,16 @@
           <li><strong>Sizing.</strong> A normal qualifying signal buys a <strong>$2</strong> ticket. A strong signal (clearer EMA / MACD / RSI alignment and more distance from the strike) buys <strong>$3</strong>. A top-conviction signal buys <strong>$4</strong>.</li>
           <li><strong>Double after a win (press).</strong> If a trade hits (wins), the next trade is <strong>2× that winning stake</strong> — $2 → $4, $3 → $6, $4 → $8 — capped at <strong>$8</strong> and never more than the cash left in that book. If the pressed trade loses, sizing resets to $2–$4. If it wins, the bot keeps pressing 2×, still capped at $8. The 1-hour $40 run and the ongoing $100 book each track this separately.</li>
           <li><strong>Fees.</strong> The 1-hour run starts at $40. The ongoing book starts at $100. Every ticket uses Kalshi’s real taker fee: ceil(0.07 × contracts × price × (1 − price)).</li>
+          <li><strong>Learns every hour.</strong> A GitHub Action pulls newly settled windows, walk-forward tests new parameters on unseen hours (train on the older ~70%, validate on the newest ~30%), and only promotes a change when validation P&amp;L is clearly better — enough trades, a positive unseen profit, a meaningful edge over the live rules, and a 3-hour cooldown so it doesn’t flip-flop on noise. That run is free and does not use Grok Bot.</li>
         </ol>
       </article>
     </section>
 
     <footer>
       <div>Paper trading only. Not financial advice. A backtest is not a promise of future results. Kalshi settlement uses CF Benchmarks BRTI, which can differ slightly from Coinbase’s last price.</div>
-      <div><a href="https://github.com/nfm0984-png/btc-paper-bot">GitHub repo</a> · Bot runs every 5 minutes · BTC price polls live every 20 seconds</div>
+      <div><a href="https://github.com/nfm0984-png/btc-paper-bot">GitHub repo</a> · Bot runs every 5 minutes · Learns every hour · BTC price polls live every 20 seconds</div>
     </footer>
   </div>
-  <script src="app.js?v=20261126-ui3"></script>
+  <script src="app.js?v=20261126-ui4"></script>
 </body>
 </html>

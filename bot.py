@@ -54,6 +54,7 @@ TREND_EMA = 50
 RSI_PERIOD = 14
 MACD_FAST, MACD_SLOW, MACD_SIGNAL = 12, 26, 9
 
+# v1 defaults — also stored in data/strategy_config.json and overridable by the hourly learner.
 ASK_MIN = 0.35
 ASK_MAX = 0.72
 MIN_REMAINING_SEC = 120
@@ -61,6 +62,13 @@ MIN_STRIKE_DISTANCE = 20.0  # dollars
 EMA_FLAT_DOLLARS = 8.0
 RSI_YES_LO, RSI_YES_HI = 52.0, 75.0
 RSI_NO_LO, RSI_NO_HI = 25.0, 48.0
+STRATEGY_CONFIG_PATH = DATA_DIR / "strategy_config.json"
+HISTORY_WINDOWS_PATH = DATA_DIR / "history_windows.json"
+LEARNING_LOG_PATH = DATA_DIR / "learning_log.json"
+HISTORY_DAYS = 14
+PROMOTION_COOLDOWN_SEC = 3 * 3600
+MIN_PROMOTION_TRADES = 20
+MIN_PROMOTION_VAL_TRADES = 6
 TAKE_PROFIT_BID = 0.80
 TAKE_PROFIT_GAIN = 0.15
 STOP_LOSS_DROP = 0.12
@@ -512,15 +520,181 @@ def indicators_at(candles: list[dict], series: list[Indicators], ts: int) -> Opt
 
 def ind_payload(ind: Optional[Indicators]) -> dict:
     if not ind:
-        return {"ema9": None, "ema21": None, "ema50": None, "rsi14": None, "macd_hist": None, "ready": False}
+        return {"ema9": None, "ema21": None, "ema50": None, "rsi14": None, "macd_hist": None, "close": None, "ready": False}
     return {
         "ema9": None if ind.ema9 is None else round_px(ind.ema9, 2),
         "ema21": None if ind.ema21 is None else round_px(ind.ema21, 2),
         "ema50": None if ind.ema50 is None else round_px(ind.ema50, 2),
         "rsi14": None if ind.rsi14 is None else round_px(ind.rsi14, 2),
         "macd_hist": None if ind.macd_hist is None else round_px(ind.macd_hist, 2),
+        "close": None if ind.close is None else round_px(ind.close, 2),
         "ready": ind.ready,
     }
+
+
+def indicators_from_payload(d: Optional[dict]) -> Optional[Indicators]:
+    if not d:
+        return None
+    ind = Indicators(
+        ema9=d.get("ema9"),
+        ema21=d.get("ema21"),
+        ema50=d.get("ema50"),
+        rsi14=d.get("rsi14"),
+        macd_hist=d.get("macd_hist"),
+        close=d.get("close"),
+        ready=bool(d.get("ready")),
+    )
+    if not ind.ready:
+        ind.ready = None not in (ind.ema9, ind.ema21, ind.ema50, ind.rsi14, ind.macd_hist)
+    return ind
+
+
+# ---------------------------------------------------------------------------
+# Tunable strategy config (hourly learner writes this; v1 defaults if missing)
+# ---------------------------------------------------------------------------
+
+@dataclass
+class StrategyParams:
+    min_entry_cents: int = 35
+    max_entry_cents: int = 72
+    min_strike_gap_usd: float = 20.0
+    min_mins_left: int = 2
+    max_mins_left: int = 15
+    rsi_bull_min: float = 52.0
+    rsi_bull_max: float = 75.0
+    rsi_bear_min: float = 25.0
+    rsi_bear_max: float = 48.0
+    require_ema50_align: bool = True
+    require_5m_align: bool = True
+    min_volatility_usd: float = 0.0
+    max_chop_ratio: float = 1.0
+    ema_flat_dollars: float = 8.0
+
+    @property
+    def min_entry(self) -> float:
+        return float(self.min_entry_cents) / 100.0
+
+    @property
+    def max_entry(self) -> float:
+        return float(self.max_entry_cents) / 100.0
+
+    @property
+    def min_remaining_sec(self) -> int:
+        return int(self.min_mins_left) * 60
+
+    @property
+    def max_remaining_sec(self) -> int:
+        return int(self.max_mins_left) * 60
+
+    def as_dict(self) -> dict:
+        return {
+            "min_entry_cents": int(self.min_entry_cents),
+            "max_entry_cents": int(self.max_entry_cents),
+            "min_strike_gap_usd": float(self.min_strike_gap_usd),
+            "min_mins_left": int(self.min_mins_left),
+            "max_mins_left": int(self.max_mins_left),
+            "rsi_bull_min": float(self.rsi_bull_min),
+            "rsi_bull_max": float(self.rsi_bull_max),
+            "rsi_bear_min": float(self.rsi_bear_min),
+            "rsi_bear_max": float(self.rsi_bear_max),
+            "require_ema50_align": bool(self.require_ema50_align),
+            "require_5m_align": bool(self.require_5m_align),
+            "min_volatility_usd": float(self.min_volatility_usd),
+            "max_chop_ratio": float(self.max_chop_ratio),
+            "ema_flat_dollars": float(self.ema_flat_dollars),
+        }
+
+
+def params_from_dict(d: Optional[dict]) -> StrategyParams:
+    base = StrategyParams()
+    if not d:
+        return base
+    fields = base.as_dict()
+    kw = {}
+    for k in fields:
+        if k in d and d[k] is not None:
+            kw[k] = type(fields[k])(d[k])
+    return StrategyParams(**{**fields, **kw})
+
+
+def default_strategy_config(now: Optional[datetime] = None) -> dict:
+    now = now or utc_now()
+    params = StrategyParams()
+    return {
+        "version": 1,
+        "updated_at": iso_utc(now),
+        "updated_at_pt": fmt_pt(now),
+        "source": "defaults",
+        "params": params.as_dict(),
+        "metrics": {},
+        "plain_english": plain_english_params(params),
+        "last_promoted_at": None,
+        "last_promoted_at_pt": None,
+    }
+
+
+def plain_english_params(p: StrategyParams) -> str:
+    bits = [
+        f"Buys Yes/No when the 1-minute trend is clean, BTC is at least ${p.min_strike_gap_usd:.0f} from the strike, the ask is {p.min_entry_cents}–{p.max_entry_cents}¢, and {p.min_mins_left}–{p.max_mins_left} minutes remain in the window.",
+        ("Requires the 50-period EMA to agree." if p.require_ema50_align else "Does not require the 50-period EMA to agree."),
+        ("Requires the 5-minute trend to agree." if p.require_5m_align else "Does not require the 5-minute trend to agree."),
+    ]
+    if p.min_volatility_usd > 0 or p.max_chop_ratio < 0.999:
+        chop = []
+        if p.min_volatility_usd > 0:
+            chop.append(f"skips windows that moved less than ${p.min_volatility_usd:.0f} over 15 minutes")
+        if p.max_chop_ratio < 0.999:
+            chop.append(f"skips choppy tapes (chop ratio above {p.max_chop_ratio:.2f})")
+        bits.append("Also " + " and ".join(chop) + ".")
+    else:
+        bits.append("No extra chop filter.")
+    return " ".join(bits)
+
+
+def load_strategy_config() -> dict:
+    if not STRATEGY_CONFIG_PATH.exists():
+        return default_strategy_config()
+    with STRATEGY_CONFIG_PATH.open() as f:
+        raw = json.load(f)
+    cfg = default_strategy_config()
+    if isinstance(raw, dict):
+        cfg.update({k: raw[k] for k in raw if k != "params"})
+        cfg["params"] = params_from_dict(raw.get("params") or raw).as_dict()
+        if not cfg.get("plain_english"):
+            cfg["plain_english"] = plain_english_params(params_from_dict(cfg["params"]))
+        cfg.setdefault("version", 1)
+        cfg.setdefault("source", "defaults")
+        cfg.setdefault("metrics", {})
+    return cfg
+
+
+def active_params(cfg: Optional[dict] = None) -> StrategyParams:
+    if cfg is None:
+        try:
+            cfg = load_strategy_config()
+        except Exception:
+            return StrategyParams()
+    return params_from_dict((cfg or {}).get("params"))
+
+
+def window_chop_features(candles: list[dict], ts: int, lookback: int = 15) -> tuple[Optional[float], Optional[float]]:
+    """15-minute range (volatility) and a 0–1 chop ratio (1 = went nowhere)."""
+    bars = [c for c in candles if int(c["time"]) <= int(ts)]
+    bars = bars[-lookback:]
+    if len(bars) < 8:
+        return None, None
+    hi = max(float(c["high"]) for c in bars)
+    lo = min(float(c["low"]) for c in bars)
+    vol = hi - lo
+    move = abs(float(bars[-1]["close"]) - float(bars[0]["open"]))
+    chop = 1.0 if vol <= 1e-9 else max(0.0, min(1.0, 1.0 - move / vol))
+    return round(vol, 2), round(chop, 3)
+
+
+def contract_window_label(close_ts: str | int | float | datetime) -> str:
+    close = parse_iso(close_ts)
+    start = close - timedelta(minutes=15)
+    return session_window_label(start, close)
 
 
 # ---------------------------------------------------------------------------
@@ -539,7 +713,7 @@ class Signal:
     base_stake: Optional[float] = None
 
 
-def _bullish(ind: Indicators, trend: Optional[Indicators]) -> tuple[bool, list[str], list[str]]:
+def _bullish(ind: Indicators, trend: Optional[Indicators], p: StrategyParams) -> tuple[bool, list[str], list[str]]:
     ok, yes, no = True, [], []
     if not ind.ready:
         return False, [], ["indicators still warming up"]
@@ -548,28 +722,29 @@ def _bullish(ind: Indicators, trend: Optional[Indicators]) -> tuple[bool, list[s
     else:
         ok = False
         no.append("EMA 9 is below EMA 21")
-    if abs((ind.ema9 or 0) - (ind.ema21 or 0)) < EMA_FLAT_DOLLARS:
+    if abs((ind.ema9 or 0) - (ind.ema21 or 0)) < p.ema_flat_dollars:
         ok = False
         no.append("EMAs are flat — looks choppy")
-    if ind.close > ind.ema50:
-        yes.append("price above the 50-period EMA")
-    else:
-        ok = False
-        no.append("price is below the 50-period EMA")
+    if p.require_ema50_align:
+        if ind.close > ind.ema50:
+            yes.append("price above the 50-period EMA")
+        else:
+            ok = False
+            no.append("price is below the 50-period EMA")
     if ind.macd_hist > 0:
         yes.append("MACD histogram is positive")
     else:
         ok = False
         no.append("MACD histogram is negative")
-    if RSI_YES_LO <= ind.rsi14 <= RSI_YES_HI:
+    if p.rsi_bull_min <= ind.rsi14 <= p.rsi_bull_max:
         yes.append(f"RSI {ind.rsi14:.0f}")
     else:
         ok = False
-        if ind.rsi14 > RSI_YES_HI:
+        if ind.rsi14 > p.rsi_bull_max:
             no.append(f"RSI {ind.rsi14:.0f} looks overheated")
         else:
-            no.append(f"RSI {ind.rsi14:.0f} is short of the 52 momentum mark")
-    if trend and trend.ready:
+            no.append(f"RSI {ind.rsi14:.0f} is short of the {p.rsi_bull_min:.0f} momentum mark")
+    if p.require_5m_align and trend and trend.ready:
         if trend.ema9 >= trend.ema21:
             yes.append("5-minute trend agrees")
         else:
@@ -578,7 +753,7 @@ def _bullish(ind: Indicators, trend: Optional[Indicators]) -> tuple[bool, list[s
     return ok, yes, no
 
 
-def _bearish(ind: Indicators, trend: Optional[Indicators]) -> tuple[bool, list[str], list[str]]:
+def _bearish(ind: Indicators, trend: Optional[Indicators], p: StrategyParams) -> tuple[bool, list[str], list[str]]:
     ok, yes, no = True, [], []
     if not ind.ready:
         return False, [], ["indicators still warming up"]
@@ -587,28 +762,29 @@ def _bearish(ind: Indicators, trend: Optional[Indicators]) -> tuple[bool, list[s
     else:
         ok = False
         no.append("EMA 9 is still above EMA 21")
-    if abs((ind.ema9 or 0) - (ind.ema21 or 0)) < EMA_FLAT_DOLLARS:
+    if abs((ind.ema9 or 0) - (ind.ema21 or 0)) < p.ema_flat_dollars:
         ok = False
         no.append("EMAs are flat — looks choppy")
-    if ind.close < ind.ema50:
-        yes.append("price below the 50-period EMA")
-    else:
-        ok = False
-        no.append("price is still above the 50-period EMA")
+    if p.require_ema50_align:
+        if ind.close < ind.ema50:
+            yes.append("price below the 50-period EMA")
+        else:
+            ok = False
+            no.append("price is still above the 50-period EMA")
     if ind.macd_hist < 0:
         yes.append("MACD histogram is negative")
     else:
         ok = False
         no.append("MACD histogram is still positive")
-    if RSI_NO_LO <= ind.rsi14 <= RSI_NO_HI:
+    if p.rsi_bear_min <= ind.rsi14 <= p.rsi_bear_max:
         yes.append(f"RSI {ind.rsi14:.0f}")
     else:
         ok = False
-        if ind.rsi14 < RSI_NO_LO:
+        if ind.rsi14 < p.rsi_bear_min:
             no.append(f"RSI {ind.rsi14:.0f} is oversold / stretched")
         else:
-            no.append(f"RSI {ind.rsi14:.0f} is not in the bearish 25–48 band")
-    if trend and trend.ready:
+            no.append(f"RSI {ind.rsi14:.0f} is not in the bearish {p.rsi_bear_min:.0f}–{p.rsi_bear_max:.0f} band")
+    if p.require_5m_align and trend and trend.ready:
         if trend.ema9 <= trend.ema21:
             yes.append("5-minute trend agrees")
         else:
@@ -703,7 +879,11 @@ def make_signal(
     no_bid: Optional[float],
     remaining_sec: Optional[int],
     position: Optional[dict] = None,
+    params: Optional[StrategyParams] = None,
+    features: Optional[dict] = None,
 ) -> Signal:
+    p = params or StrategyParams()
+    feats = features or {}
     if remaining_sec is not None and remaining_sec <= 0:
         return Signal("WAIT", "WAIT — Window closed", "This 15-minute window has closed. Waiting for the next contract.")
 
@@ -721,45 +901,67 @@ def make_signal(
         held += ". No exit trigger yet — still watching until settlement or a flip."
         return Signal("HOLD", f"HOLD {side.upper()}", held, side=side, ask=None, bid=bid)
 
-    if remaining_sec is not None and remaining_sec < MIN_REMAINING_SEC:
+    if remaining_sec is not None and remaining_sec < p.min_remaining_sec:
         mm, ss = divmod(max(0, remaining_sec), 60)
         return Signal(
             "WAIT",
             "WAIT — Too close to expiry",
-            f"Only {mm}:{ss:02d} left in this window. The bot stands aside under 2 minutes.",
+            f"Only {mm}:{ss:02d} left in this window. The bot stands aside under {p.min_mins_left} minutes.",
+        )
+    if remaining_sec is not None and remaining_sec > p.max_remaining_sec:
+        return Signal(
+            "WAIT",
+            "WAIT — Too early",
+            f"This window still has more than {p.max_mins_left} minutes left, so the bot waits for the tape to develop.",
         )
     if not ind_1m or not ind_1m.ready:
         return Signal("WAIT", "WAIT — No Trade", "1-minute indicators are still warming up.")
     if strike is None:
         return Signal("WAIT", "WAIT — No Trade", "The contract strike is not posted yet.")
 
+    vol = feats.get("volatility_usd")
+    chop = feats.get("chop_ratio")
+    if vol is not None and p.min_volatility_usd > 0 and float(vol) < p.min_volatility_usd:
+        return Signal(
+            "WAIT",
+            "WAIT — Too quiet",
+            f"The last 15 minutes only moved ${float(vol):,.0f}, below the ${p.min_volatility_usd:.0f} volatility floor — a coin-flip window.",
+        )
+    if chop is not None and p.max_chop_ratio < 0.999 and float(chop) > p.max_chop_ratio:
+        return Signal(
+            "WAIT",
+            "WAIT — Too choppy",
+            f"The last 15 minutes were choppy (chop {float(chop):.2f} vs a {p.max_chop_ratio:.2f} cap) — the bot stands aside.",
+        )
+
     dist = btc_price - float(strike)
     dist_txt = f"BTC {('+' if dist >= 0 else '')}${dist:,.2f} vs the ${float(strike):,.2f} strike"
 
-    if abs(dist) < MIN_STRIKE_DISTANCE:
+    if abs(dist) < p.min_strike_gap_usd:
         return Signal(
             "WAIT",
             "WAIT — Too close to strike",
-            f"{dist_txt}. That’s inside a ${MIN_STRIKE_DISTANCE:.0f} band, so settlement could still flip either way.",
+            f"{dist_txt}. That’s inside a ${p.min_strike_gap_usd:.0f} band, so settlement could still flip either way.",
         )
 
-    bull_ok, bull_yes, bull_no = _bullish(ind_1m, ind_5m)
-    bear_ok, bear_yes, bear_no = _bearish(ind_1m, ind_5m)
+    bull_ok, bull_yes, bull_no = _bullish(ind_1m, ind_5m, p)
+    bear_ok, bear_yes, bear_no = _bearish(ind_1m, ind_5m, p)
+    band = f"{p.min_entry_cents}¢–{p.max_entry_cents}¢"
 
     if bull_ok and dist > 0:
         if yes_ask is None:
             return Signal("WAIT", "WAIT — No Trade", f"{'; '.join(bull_yes)}. {dist_txt}. Yes ask is unavailable.")
-        if not (ASK_MIN <= yes_ask <= ASK_MAX):
-            if yes_ask > ASK_MAX:
+        if not (p.min_entry <= yes_ask <= p.max_entry):
+            if yes_ask > p.max_entry:
                 return Signal(
                     "WAIT",
                     "WAIT — No Edge",
-                    f"{'; '.join(bull_yes)}. {dist_txt}, but Yes is already {cents_label(yes_ask)} — too expensive (bot only buys 35¢–72¢).",
+                    f"{'; '.join(bull_yes)}. {dist_txt}, but Yes is already {cents_label(yes_ask)} — too expensive (bot only buys {band}).",
                 )
             return Signal(
                 "WAIT",
                 "WAIT — No Edge",
-                f"{'; '.join(bull_yes)}. {dist_txt}, but Yes ask is only {cents_label(yes_ask)} (below the 35¢ floor — something looks off).",
+                f"{'; '.join(bull_yes)}. {dist_txt}, but Yes ask is only {cents_label(yes_ask)} (below the {p.min_entry_cents}¢ floor — something looks off).",
             )
         reason = f"{'; '.join(bull_yes)}. {dist_txt}, Yes ask {cents_label(yes_ask)} — Buy Yes."
         return apply_strength(
@@ -770,17 +972,17 @@ def make_signal(
     if bear_ok and dist < 0:
         if no_ask is None:
             return Signal("WAIT", "WAIT — No Trade", f"{'; '.join(bear_yes)}. {dist_txt}. No ask is unavailable.")
-        if not (ASK_MIN <= no_ask <= ASK_MAX):
-            if no_ask > ASK_MAX:
+        if not (p.min_entry <= no_ask <= p.max_entry):
+            if no_ask > p.max_entry:
                 return Signal(
                     "WAIT",
                     "WAIT — No Edge",
-                    f"{'; '.join(bear_yes)}. {dist_txt}, but No is already {cents_label(no_ask)} — too expensive (bot only buys 35¢–72¢).",
+                    f"{'; '.join(bear_yes)}. {dist_txt}, but No is already {cents_label(no_ask)} — too expensive (bot only buys {band}).",
                 )
             return Signal(
                 "WAIT",
                 "WAIT — No Edge",
-                f"{'; '.join(bear_yes)}. {dist_txt}, but No ask is only {cents_label(no_ask)} (below the 35¢ floor — something looks off).",
+                f"{'; '.join(bear_yes)}. {dist_txt}, but No ask is only {cents_label(no_ask)} (below the {p.min_entry_cents}¢ floor — something looks off).",
             )
         reason = f"{'; '.join(bear_yes)}. {dist_txt}, No ask {cents_label(no_ask)} — Buy No."
         return apply_strength(
@@ -1196,7 +1398,9 @@ def run_backtest(
     series_1m: list[Indicators],
     candles_5m: list[dict],
     series_5m: list[Indicators],
+    params: Optional[StrategyParams] = None,
 ) -> dict:
+    params = params or StrategyParams()
     # Oldest first, only markets with a real yes/no result and a strike.
     markets = [
         m
@@ -1228,6 +1432,7 @@ def run_backtest(
             continue
         btc_px = snap_1[0]["close"]
         strike = dollars(m["floor_strike"])
+        vol, chop = window_chop_features(candles_1m, decision_ts - 1)
         sig = make_signal(
             ind_1m=snap_1[1],
             ind_5m=snap_5[1] if snap_5 else None,
@@ -1239,6 +1444,8 @@ def run_backtest(
             no_bid=q["no_bid"],
             remaining_sec=to_ts(m["close_time"]) - decision_ts,
             position=None,
+            params=params,
+            features={"volatility_usd": vol, "chop_ratio": chop},
         )
         if sig.action not in ("BUY_YES", "BUY_NO"):
             skipped += 1
@@ -1316,6 +1523,96 @@ def run_backtest(
             "those live extras are not in this backtest."
         ),
         "fee_note": "Paper PnL includes Kalshi’s taker fee: ceil(0.07 × contracts × price × (1 − price)), rounded up to the next cent.",
+    }
+
+
+def simulate_prepared_windows(
+    windows: list[dict],
+    params: StrategyParams,
+    starting: float = STARTING_BALANCE,
+) -> dict:
+    """Replay settled feature-windows with live sizing, fees, and 2× press."""
+    cash = float(starting)
+    press_next = False
+    last_win_stake: Optional[float] = None
+    trades: list[dict] = []
+    peak = float(starting)
+    max_dd = 0.0
+    for w in windows:
+        ind1 = indicators_from_payload(w.get("ind_1m"))
+        ind5 = indicators_from_payload(w.get("ind_5m"))
+        sig = make_signal(
+            ind_1m=ind1,
+            ind_5m=ind5,
+            btc_price=float(w["btc_price"]),
+            strike=w.get("strike"),
+            yes_ask=w.get("yes_ask"),
+            yes_bid=w.get("yes_bid"),
+            no_ask=w.get("no_ask"),
+            no_bid=w.get("no_bid"),
+            remaining_sec=w.get("remaining_sec"),
+            position=None,
+            params=params,
+            features={"volatility_usd": w.get("volatility_usd"), "chop_ratio": w.get("chop_ratio")},
+        )
+        if sig.action not in ("BUY_YES", "BUY_NO") or sig.ask is None:
+            continue
+        base = float(sig.base_stake or STAKE_NORMAL)
+        entry_stake, pressed = resolve_entry_stake(base, press_next, last_win_stake, cash)
+        market = {
+            "ticker": w["ticker"],
+            "floor_strike": w.get("strike"),
+            "open_time": w.get("open_time"),
+            "close_time": w.get("close_time"),
+        }
+        when = parse_iso(w.get("decision_ts") or w.get("open_time"))
+        opened = open_trade(
+            cash, market, sig.side or "yes", float(sig.ask), sig.reason, when,
+            stake=entry_stake, pressed=pressed, strength=sig.strength,
+        )
+        if not opened:
+            continue
+        cash, position, _log = opened
+        result = (w.get("result") or "").lower()
+        close_when = parse_iso(w.get("close_time") or w.get("decision_ts") or when)
+        cash, trade = close_trade(
+            cash,
+            position,
+            exit_price=None,
+            exit_fee=0.0,
+            result=result,
+            outcome="settlement",
+            reason=f"Settled {result.upper()} at BTC {w.get('expiration_value') or 'n/a'} vs strike {w.get('strike')}.",
+            now=close_when,
+            expiration_value=w.get("expiration_value"),
+        )
+        press_next, last_win_stake = apply_press_from_trade(press_next, last_win_stake, trade)
+        trades.append(trade)
+        peak = max(peak, cash)
+        if peak > 0:
+            max_dd = max(max_dd, (peak - cash) / peak * 100.0)
+    stats = trade_stats(trades)
+    wins = [t for t in trades if (t.get("pnl") or 0) > 0]
+    losses = [t for t in trades if (t.get("pnl") or 0) <= 0]
+    gross_win = sum(float(t["pnl"]) for t in wins)
+    gross_loss = abs(sum(float(t["pnl"]) for t in losses))
+    if gross_loss > 0:
+        pf = gross_win / gross_loss
+    elif gross_win > 0:
+        pf = 999.0
+    else:
+        pf = 0.0
+    return {
+        "trade_count": stats["trade_count"],
+        "wins": stats["wins"],
+        "losses": stats["losses"],
+        "win_rate": stats["win_rate"],
+        "net_pnl": stats["net_pnl"],
+        "ending_equity": round_money(cash),
+        "max_drawdown_pct": round(max_dd, 2),
+        "profit_factor": round(pf, 3),
+        "starting_balance": starting,
+        "trades": trades,
     }
 
 
@@ -1402,8 +1699,12 @@ def step_paper_book(
     stake: float = STAKE,
     press_next: bool = False,
     last_win_stake: Optional[float] = None,
+    params: Optional[StrategyParams] = None,
+    features: Optional[dict] = None,
 ) -> tuple[float, Optional[dict], list[dict], list[str], Signal, Optional[float], Optional[float], bool, Optional[float]]:
     """Apply settlements, early exits, and optional new entries to one paper book."""
+    params = params or StrategyParams()
+    features = features or {}
     if position:
         pos_m = find_market(position["ticker"], settled, [market] if market else [])
         if pos_m is None:
@@ -1453,6 +1754,8 @@ def step_paper_book(
             no_bid=no_bid,
             remaining_sec=remaining,
             position=position,
+            params=params,
+            features=features,
         )
         if sig.action in ("TAKE_PROFIT", "CUT_LOSS") and sig.bid is not None:
             fee = kalshi_taker_fee(int(position["contracts"]), float(sig.bid))
@@ -1484,6 +1787,8 @@ def step_paper_book(
             no_bid=no_bid,
             remaining_sec=remaining,
             position=position,
+            params=params,
+            features=features,
         )
 
     if allow_new_entries and position is None and market and sig.action in ("BUY_YES", "BUY_NO") and sig.ask is not None:
@@ -1536,6 +1841,8 @@ def step_paper_book(
             no_bid=no_bid,
             remaining_sec=remaining,
             position=position,
+            params=params,
+            features=features,
         )
 
     return cash, position, trades, events, sig, yes_bid, no_bid, press_next, last_win_stake
@@ -1549,6 +1856,8 @@ def run_live(
     ind_5m: Optional[Indicators],
     btc_price: float,
     now: datetime,
+    params: Optional[StrategyParams] = None,
+    features: Optional[dict] = None,
 ) -> tuple[dict, Signal, list[str]]:
     events: list[str] = []
     ensure_press_fields(state)
@@ -1567,6 +1876,8 @@ def run_live(
         stake=float(state.get("stake") or STAKE),
         press_next=bool(state.get("press_next")),
         last_win_stake=state.get("last_win_stake"),
+        params=params,
+        features=features,
     )
     equity_history = list(state.get("equity_history") or [])
     equity = mark_equity(cash, position, yes_bid, no_bid)
@@ -1628,6 +1939,8 @@ def run_session(
     ind_5m: Optional[Indicators],
     btc_price: float,
     now: datetime,
+    params: Optional[StrategyParams] = None,
+    features: Optional[dict] = None,
 ) -> dict:
     sess = state.get("session")
     if not sess or not sess.get("start") or not sess.get("end"):
@@ -1663,6 +1976,8 @@ def run_session(
         stake=float(sess.get("stake") or SESSION_STAKE),
         press_next=bool(sess.get("press_next")),
         last_win_stake=sess.get("last_win_stake"),
+        params=params,
+        features=features,
     )
 
     action = sig.action
@@ -1677,17 +1992,26 @@ def run_session(
 
     mp = market_payload(market, now) if market else None
     checks = list(sess.get("checks") or [])
+    ticker = (mp or {}).get("ticker") or (position or {}).get("ticker")
+    close_time = (mp or {}).get("close_time") or (position or {}).get("close_time")
     checks.append(
         {
             "t": iso_utc(now),
             "t_pt": fmt_pt(now),
-            "ticker": (mp or {}).get("ticker") or (position or {}).get("ticker"),
+            "ticker": ticker,
+            "close_time": close_time,
+            "close_time_pt": (mp or {}).get("close_time_pt") or (fmt_pt(close_time) if close_time else None),
+            "window_label": contract_window_label(close_time) if close_time else None,
             "action": action,
             "label": label,
             "reason": reason,
             "btc_price": round_px(btc_price, 2),
+            "strike": (mp or {}).get("strike") or (position or {}).get("strike"),
             "yes_ask": (mp or {}).get("yes_ask"),
             "no_ask": (mp or {}).get("no_ask"),
+            "side": (position or {}).get("side") or sig.side,
+            "contracts": (position or {}).get("contracts"),
+            "entry_price": (position or {}).get("entry_price"),
             "cash": round_money(cash),
         }
     )
@@ -1765,11 +2089,63 @@ def run_session(
 # Main
 # ---------------------------------------------------------------------------
 
+def rules_summary_from_params(p: StrategyParams) -> dict:
+    yes = (
+        f"1m EMA 9 > 21, {'close > EMA 50, ' if p.require_ema50_align else ''}"
+        f"MACD hist > 0, RSI {p.rsi_bull_min:.0f}–{p.rsi_bull_max:.0f}"
+        f"{', 5m trend agrees' if p.require_5m_align else ''}, "
+        f"BTC at least ${p.min_strike_gap_usd:.0f} above the strike, "
+        f"Yes ask {p.min_entry_cents}¢–{p.max_entry_cents}¢, and {p.min_mins_left}–{p.max_mins_left} minutes left."
+    )
+    no = (
+        f"The bearish mirror (EMA 9 < 21, "
+        f"{'close < EMA 50, ' if p.require_ema50_align else ''}"
+        f"MACD hist < 0, RSI {p.rsi_bear_min:.0f}–{p.rsi_bear_max:.0f}"
+        f"{', 5m trend agrees' if p.require_5m_align else ''}, "
+        f"BTC at least ${p.min_strike_gap_usd:.0f} below the strike, "
+        f"No ask {p.min_entry_cents}¢–{p.max_entry_cents}¢)."
+    )
+    return {
+        "buy_yes": yes,
+        "buy_no": no,
+        "exits": (
+            "Sell early if the bid reaches 80¢ or +15¢ from entry (take profit), drops 12¢ from entry, "
+            "or momentum and BTC-vs-strike both flip against the position. Otherwise hold to official settlement."
+        ),
+        "sizing": (
+            "Normal qualifying signal $2, strong $3, top-conviction $4. After a win, the next trade is 2× that "
+            "winning stake, capped at $8 and never more than cash on hand. A loss resets to $2–$4; another win "
+            "keeps pressing 2× up to the $8 cap. The $40 run and $100 book each track this separately."
+        ),
+        "learning": (
+            "Every hour a GitHub Action studies the last 7–14 days of settled 15-minute windows, walk-forward "
+            "tests new parameter sets on unseen hours, and only promotes a change when validation P&L is clearly "
+            "better. That run is free — it does not use Grok Bot."
+        ),
+    }
+
+
+def load_existing_dashboard() -> dict:
+    if not DASHBOARD_PATH.exists():
+        return {}
+    try:
+        with DASHBOARD_PATH.open() as f:
+            data = json.load(f)
+        return data if isinstance(data, dict) else {}
+    except Exception:
+        return {}
+
+
 def main() -> int:
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     DOCS_DIR.mkdir(parents=True, exist_ok=True)
     now = utc_now()
-    print(f"[{fmt_pt(now)}] Fetching Kalshi {SERIES} + BTC candles…", flush=True)
+    strategy_cfg = load_strategy_config()
+    if not STRATEGY_CONFIG_PATH.exists():
+        save_json(STRATEGY_CONFIG_PATH, strategy_cfg)
+        print(f"  Wrote default strategy config v{strategy_cfg.get('version', 1)}", flush=True)
+    params = params_from_dict(strategy_cfg.get("params"))
+    print(f"[{fmt_pt(now)}] Fetching Kalshi {SERIES} + BTC candles… (strategy v{strategy_cfg.get('version', 1)})", flush=True)
 
     open_markets = fetch_kalshi_markets("open", limit=50, max_pages=1)
     # Also grab recently closed / settled for grading + backtest.
@@ -1803,7 +2179,7 @@ def main() -> int:
     sticks = fetch_candlesticks_for_markets(settled_window, first_minutes=3)
     print(f"  Candlesticks for {sum(1 for v in sticks.values() if v)} / {len(settled_window)} markets", flush=True)
 
-    backtest = run_backtest(settled_window, sticks, candles_1m, series_1m, candles_5m, series_5m)
+    backtest = run_backtest(settled_window, sticks, candles_1m, series_1m, candles_5m, series_5m, params=params)
     backtest["generated_at"] = iso_utc(now)
     backtest["generated_at_pt"] = fmt_pt(now)
     backtest["candle_source_1m"] = src_1m
@@ -1841,8 +2217,10 @@ def main() -> int:
     else:
         ensure_press_fields(state)
 
-    new_state, sig, events = run_live(state, market, settled, ind_1m, ind_5m, btc_price, now)
-    session = run_session(state, market, settled, ind_1m, ind_5m, btc_price, now)
+    vol, chop = window_chop_features(candles_1m, now_ts - 60)
+    features = {"volatility_usd": vol, "chop_ratio": chop}
+    new_state, sig, events = run_live(state, market, settled, ind_1m, ind_5m, btc_price, now, params=params, features=features)
+    session = run_session(state, market, settled, ind_1m, ind_5m, btc_price, now, params=params, features=features)
     new_state["session"] = session
     save_json(STATE_PATH, new_state)
 
@@ -1915,13 +2293,18 @@ def main() -> int:
         },
         "session": session,
         "backtest": backtest,
-        "fee_note": "Every paper trade uses Kalshi’s taker fee, ceil(0.07 × contracts × price × (1 − price)), rounded up to the next cent. The ongoing book starts at $100; the separate 1-hour session starts at $40. Both use a $2–$4 base stake by signal strength, then 2× after a win, capped at $8.",
-        "rules_summary": {
-            "buy_yes": "1m EMA 9 > 21, close > EMA 50, MACD hist > 0, RSI 52–75, 5m trend agrees, BTC at least $20 above the strike, Yes ask 35¢–72¢, and ≥ 2 minutes left.",
-            "buy_no": "The bearish mirror (EMA 9 < 21, close < EMA 50, MACD hist < 0, RSI 25–48, 5m trend agrees, BTC at least $20 below the strike, No ask 35¢–72¢).",
-            "exits": "Sell early if the bid reaches 80¢ or +15¢ from entry (take profit), drops 12¢ from entry, or momentum and BTC-vs-strike both flip against the position. Otherwise hold to official settlement.",
-            "sizing": "Normal qualifying signal $2, strong $3, top-conviction $4. After a win, the next trade is 2× that winning stake, capped at $8 and never more than cash on hand. A loss resets to $2–$4; another win keeps pressing 2× up to the $8 cap. The $40 run and $100 book each track this separately.",
+        "strategy": {
+            "version": strategy_cfg.get("version", 1),
+            "updated_at": strategy_cfg.get("updated_at"),
+            "updated_at_pt": strategy_cfg.get("updated_at_pt"),
+            "source": strategy_cfg.get("source"),
+            "params": params.as_dict(),
+            "plain_english": strategy_cfg.get("plain_english") or plain_english_params(params),
+            "metrics": strategy_cfg.get("metrics") or {},
         },
+        "learning": load_existing_dashboard().get("learning"),
+        "fee_note": "Every paper trade uses Kalshi’s taker fee, ceil(0.07 × contracts × price × (1 − price)), rounded up to the next cent. The ongoing book starts at $100; the separate 1-hour session starts at $40. Both use a $2–$4 base stake by signal strength, then 2× after a win, capped at $8.",
+        "rules_summary": rules_summary_from_params(params),
     }
     save_json(DASHBOARD_PATH, dashboard)
 

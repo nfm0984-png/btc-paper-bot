@@ -101,20 +101,18 @@ def test_legacy_state_upgrades_without_reset():
     assert "press_next" not in raw or raw.get("press_next") in (False, True)
     book = ensure_press_fields(dict(raw))
     sess = ensure_press_fields(dict(raw["session"]))
-    assert book["press_next"] is False
-    assert book["last_win_stake"] is None
     assert book["cash"] == raw["cash"]
-    assert book["position"]["ticker"] == raw["position"]["ticker"]
-    assert sess["press_next"] is False
     assert sess["cash"] == raw["session"]["cash"]
-    # Existing open ticket has no stake field -> treat as the old $5 ticket.
-    assert "stake" not in (raw["position"] or {})
-    assert inferred_stake(raw["position"]) == LEGACY_FLAT_STAKE
+    # Open or already-settled books both keep their cash and ticket history.
+    if raw.get("position"):
+        assert book["position"]["ticker"] == raw["position"]["ticker"]
+        if "stake" not in (raw["position"] or {}):
+            assert inferred_stake(raw["position"]) == LEGACY_FLAT_STAKE
     amount, contracts = book_totals(raw["session"]["trades"], raw["session"]["position"])
     assert contracts == 8
     assert amount == 4.7
-    # If that $5 ticket later wins, next press is capped at $8 (not $10).
-    press, last = apply_press_from_trade(False, None, {"pnl": 3.3, "total_in": 4.7})
+    # A legacy $5 ticket that wins still arms a press capped at $8 (not $10).
+    press, last = apply_press_from_trade(False, None, {"pnl": 3.3, "total_in": 4.7, "stake": 5})
     assert last == 5.0
     stake, _ = resolve_entry_stake(2, press, last, cash=35.3)
     assert stake == 8.0

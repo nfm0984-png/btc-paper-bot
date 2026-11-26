@@ -1,0 +1,116 @@
+{
+  "updated_at": "2026-11-26T20:02:10Z",
+  "updated_at_pt": "Nov 26, 2026, 12:02 PM PT",
+  "runs": [
+    {
+      "t": "2026-11-26T20:02:10Z",
+      "t_pt": "Nov 26, 2026, 12:02 PM PT",
+      "windows": 1327,
+      "train_windows": 928,
+      "val_windows": 399,
+      "candidates_tested": 41,
+      "live_version": 1,
+      "live": {
+        "train": {
+          "trade_count": 116,
+          "wins": 74,
+          "losses": 42,
+          "win_rate": 63.8,
+          "net_pnl": -14.84,
+          "profit_factor": 0.946,
+          "max_drawdown_pct": 66.53,
+          "ending_equity": 85.16
+        },
+        "val": {
+          "trade_count": 42,
+          "wins": 29,
+          "losses": 13,
+          "win_rate": 69.0,
+          "net_pnl": 42.14,
+          "profit_factor": 1.592,
+          "max_drawdown_pct": 14.42,
+          "ending_equity": 142.14
+        },
+        "overall": {
+          "trade_count": 158,
+          "wins": 103,
+          "losses": 55,
+          "win_rate": 65.2,
+          "net_pnl": 29.01,
+          "profit_factor": 1.084,
+          "max_drawdown_pct": 66.53,
+          "ending_equity": 129.01
+        }
+      },
+      "best_candidate": {
+        "name": "max_entry_75",
+        "params": {
+          "min_entry_cents": 35,
+          "max_entry_cents": 75,
+          "min_strike_gap_usd": 20.0,
+          "min_mins_left": 2,
+          "max_mins_left": 15,
+          "rsi_bull_min": 52.0,
+          "rsi_bull_max": 75.0,
+          "rsi_bear_min": 25.0,
+          "rsi_bear_max": 48.0,
+          "require_ema50_align": true,
+          "require_5m_align": true,
+          "min_volatility_usd": 0.0,
+          "max_chop_ratio": 1.0,
+          "ema_flat_dollars": 8.0
+        },
+        "train": {
+          "trade_count": 126,
+          "wins": 82,
+          "losses": 44,
+          "win_rate": 65.1,
+          "net_pnl": -8.83,
+          "profit_factor": 0.969,
+          "max_drawdown_pct": 59.39,
+          "ending_equity": 91.17
+        },
+        "val": {
+          "trade_count": 48,
+          "wins": 35,
+          "losses": 13,
+          "win_rate": 72.9,
+          "net_pnl": 50.92,
+          "profit_factor": 1.676,
+          "max_drawdown_pct": 11.78,
+          "ending_equity": 150.92
+        },
+        "overall": {
+          "trade_count": 174,
+          "wins": 117,
+          "losses": 57,
+          "win_rate": 67.2,
+          "net_pnl": 43.27,
+          "profit_factor": 1.12,
+          "max_drawdown_pct": 59.39,
+          "ending_equity": 143.27
+        }
+      },
+      "promoted_to": 2,
+      "promoted_params": {
+        "min_entry_cents": 35,
+        "max_entry_cents": 75,
+        "min_strike_gap_usd": 20.0,
+        "min_mins_left": 2,
+        "max_mins_left": 15,
+        "rsi_bull_min": 52.0,
+        "rsi_bull_max": 75.0,
+        "rsi_bear_min": 25.0,
+        "rsi_bear_max": 48.0,
+        "require_ema50_align": true,
+        "require_5m_align": true,
+        "min_volatility_usd": 0.0,
+        "max_chop_ratio": 1.0,
+        "ema_flat_dollars": 8.0
+      },
+      "decision": "PROMOTED v1 \u2192 v2",
+      "takeaway": "Changing max entry from 72\u00a2 to 75\u00a2 improved unseen P&L by +$8.78 after fees (72.9% WR on 48 trades). Promoted v1 \u2192 v2.",
+      "reason": "unseen P&L +$50.92 vs live +$42.14"
+    }
+  ]
+}

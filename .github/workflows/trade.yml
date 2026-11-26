@@ -33,9 +33,35 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/state.json data/backtest.json docs/data.json
+          if [ -f data/strategy_config.json ]; then
+            git add data/strategy_config.json
+          fi
           if git diff --staged --quiet; then
             echo "No paper-book changes to commit."
           else
             git commit -m "chore: update Kalshi 15m paper book $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-            git push
           fi
+          # Rebase-retry so this never loses a race with the hourly learner.
+          for i in 1 2 3 4 5 6; do
+            if ! git pull --rebase origin main; then
+              echo "Rebase failed (attempt $i); aborting and retrying."
+              git rebase --abort || true
+              sleep $((i * 8))
+              continue
+            fi
+            if [ -f learn.py ]; then
+              python3 learn.py --merge-dashboard || true
+              git add docs/data.json
+              if ! git diff --staged --quiet; then
+                git commit -m "chore: keep learning payload on dashboard $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+              fi
+            fi
+            if git push origin HEAD:main; then
+              echo "Push succeeded on attempt $i."
+              exit 0
+            fi
+            echo "Push rejected (attempt $i); retrying."
+            sleep $((i * 8))
+          done
+          echo "Failed to push paper-book commit after retries."
+          exit 1

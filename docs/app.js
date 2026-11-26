@@ -110,7 +110,7 @@
   let closeTimer = null;
   let sessionTimer = null;
 
-  const TABS = ["live", "trades", "backtest", "rules"];
+  const TABS = ["live", "trades", "learning", "backtest", "rules"];
 
   function switchTab(id) {
     const name = String(id || "live").replace(/^tab-/, "");
@@ -268,7 +268,7 @@
       const why = t.reason_exit || t.reason || t.reason_entry || "";
       return `<tr>
         <td>${esc(t.entry_time_pt || "")}</td>
-        <td class="mono">${esc((t.ticker || "").replace("KXBTC15M-", ""))}${pressTag(t)}</td>
+        <td>${esc(prettyWindow(t) || (t.ticker || "").replace("KXBTC15M-", ""))}${pressTag(t)}</td>
         <td>${esc(side)}</td>
         <td class="mono">${esc(contractsLabel(t.contracts))} @ ${cents(t.entry_price)}</td>
         <td class="mono">Bought ${esc(money(bought))}</td>
@@ -282,44 +282,281 @@
       <tbody>${rows}</tbody></table></div>`;
   }
 
+
+  const MONTHS = {JAN:0,FEB:1,MAR:2,APR:3,MAY:4,JUN:5,JUL:6,AUG:7,SEP:8,OCT:9,NOV:10,DEC:11};
+
+  function fmtClockPT(date) {
+    const parts = new Intl.DateTimeFormat("en-US", {
+      timeZone: "America/Los_Angeles", hour: "numeric", minute: "2-digit", hour12: true
+    }).formatToParts(date);
+    const get = (ty) => (parts.find((x) => x.type === ty) || {}).value;
+    return (get("hour") + ":" + get("minute") + " " + get("dayPeriod")).replace(/\s+/g, " ");
+  }
+
+  function windowLabelFromClose(date) {
+    const close = new Date(date);
+    const start = new Date(+close - 15 * 60 * 1000);
+    const s = fmtClockPT(start);
+    const e = fmtClockPT(close);
+    const sP = s.slice(-2), eP = e.slice(-2);
+    const sC = s.slice(0, -3), eC = e.slice(0, -3);
+    if (sP.toUpperCase() === eP.toUpperCase()) return sC + "–" + eC + " " + eP + " window";
+    return s + "–" + e + " window";
+  }
+
+  function parseTickerClose(ticker) {
+    const s = String(ticker || "").replace(/^KXBTC15M-/, "");
+    const m = s.match(/^(\d{2})([A-Za-z]{3})(\d{2})(\d{4})/);
+    if (!m) return null;
+    const day = +m[1];
+    const mon = MONTHS[m[2].toUpperCase()];
+    const year = 2000 + +m[3];
+    const hh = +m[4].slice(0, 2);
+    const mm = +m[4].slice(2, 4);
+    if (mon == null || Number.isNaN(day) || Number.isNaN(year)) return null;
+    const iso = (off) => {
+      const sign = off < 0 ? "-" : "+";
+      const abs = String(Math.abs(off)).padStart(2, "0");
+      return `${year}-${String(mon + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}T${String(hh).padStart(2, "0")}:${String(mm).padStart(2, "0")}:00${sign}${abs}:00`;
+    };
+    for (const off of [-5, -4]) {
+      const d = new Date(iso(off));
+      if (Number.isNaN(+d)) continue;
+      const parts = new Intl.DateTimeFormat("en-US", {
+        timeZone: "America/New_York", hour: "2-digit", minute: "2-digit", hour12: false,
+        year: "numeric", month: "2-digit", day: "2-digit"
+      }).formatToParts(d);
+      const get = (ty) => (parts.find((x) => x.type === ty) || {}).value;
+      let hour24 = get("hour");
+      if (hour24 === "24") hour24 = "00";
+      if (+get("year") === year && +get("month") === mon + 1 && +get("day") === day && +hour24 === hh && +get("minute") === mm) {
+        return d;
+      }
+    }
+    return new Date(iso(-5));
+  }
+
+  function shortTimePT(raw) {
+    const s = String(raw || "");
+    const m = s.match(/(\d{1,2}:\d{2}\s*[AP]M)/i);
+    if (m) return m[1].replace(/\s+/g, " ").toUpperCase().replace("AM", "AM").replace("PM", "PM") + (/\bPT\b/.test(s) ? " PT" : " PT");
+    const d = Date.parse(s);
+    if (!Number.isNaN(d)) return fmtClockPT(new Date(d)) + " PT";
+    return s;
+  }
+
+  function prettyWindow(item) {
+    if (!item) return "";
+    const close = item.close_time || item.exit_time;
+    if (close) {
+      const d = Date.parse(close);
+      if (!Number.isNaN(d)) return windowLabelFromClose(new Date(d));
+    }
+    const fromTicker = parseTickerClose(item.ticker);
+    if (fromTicker) return windowLabelFromClose(fromTicker);
+    const wl = String(item.window_label || "");
+    const m = wl.match(/(\d{1,2}:\d{2})\s*([AP]M)\s*[–-]\s*(\d{1,2}:\d{2})\s*([AP]M)/i);
+    if (m) {
+      if (m[2].toUpperCase() === m[4].toUpperCase()) return `${m[1]}–${m[3]} ${m[4].toUpperCase()} window`;
+      return `${m[1]} ${m[2].toUpperCase()}–${m[3]} ${m[4].toUpperCase()} window`;
+    }
+    return "";
+  }
+
+  function isIndicatorDump(text) {
+    return /EMA 9|MACD histogram|RSI \d+|5-minute trend agrees/i.test(text || "");
+  }
+
+  function fmtUsdRound(n) {
+    if (n == null || Number.isNaN(n)) return "$0";
+    return "$" + Math.round(Number(n)).toLocaleString("en-US");
+  }
+
+  function plainReason(item) {
+    const raw = String((item && (item.reason_exit || item.reason || item.reason_entry)) || "").replace(/\s+/g, " ").trim();
+    if (!raw) return "";
+    const settle = raw.match(/Settled\s+(YES|NO)\s+at\s+BTC\s+([\d,.]+)\s+vs\s+strike\s+([\d,.]+)/i);
+    if (settle) {
+      return `Settled ${settle[1].toUpperCase()} (${fmtUsdRound(Number(settle[2].replace(/,/g, "")))} vs ${fmtUsdRound(Number(settle[3].replace(/,/g, "")))} strike)`;
+    }
+    const closeExpiry = raw.match(/Only\s+(\d+:\d+)\s+left/i);
+    if (closeExpiry || /Too close to expiry|stands aside under/i.test(raw)) {
+      return closeExpiry
+        ? `Only ${closeExpiry[1]} left in this window, so the bot stood aside.`
+        : "Too close to expiry — the bot stood aside.";
+    }
+    const expensive = /too expensive|too pricey|bot only buys/i.test(raw);
+    const choppy = /Choppy|no clean edge/i.test(raw);
+    const dist = raw.match(/BTC\s+([+\-−]?)\s*\$?([\d,]+(?:\.\d+)?)\s+vs\s+(?:the\s+)?\$?([\d,]+(?:\.\d+)?)\s+strike/i);
+    const sideAsk = raw.match(/\b(Yes|No)\s+(?:is already|ask is(?: only)?)\s+(\d+\s*¢)/i) || raw.match(/\b(Yes|No)\s+ask\s+(\d+\s*¢)/i);
+    if (expensive && dist && sideAsk) {
+      const sign = (dist[1] === "-" || dist[1] === "−") ? "−" : "+";
+      const amt = "$" + Math.round(Number(dist[2].replace(/,/g, "")));
+      const dir = sign === "−" ? "below" : "above";
+      return `BTC ${sign}${amt} ${dir} strike, but ${sideAsk[1]} at ${sideAsk[2].replace(/\s+/g, "")} was too pricey`;
+    }
+    if (dist) {
+      const sign = (dist[1] === "-" || dist[1] === "−") ? "−" : "+";
+      const amt = "$" + Math.round(Number(String(dist[2]).replace(/,/g, "")));
+      const dir = sign === "−" ? "below" : "above";
+      let line = `BTC ${sign}${amt} ${dir} strike`;
+      if (sideAsk) line += `, ${sideAsk[1]} ask ${sideAsk[2].replace(/\s+/g, "")}`;
+      if (/Buy No/i.test(raw)) return line + " — bought No.";
+      if (/Buy Yes/i.test(raw)) return line + " — bought Yes.";
+      if (choppy) return "Choppy / no clean edge: " + line + ".";
+      return line + ".";
+    }
+    if (choppy) {
+      const after = raw.replace(/^Choppy\s*\/\s*no clean edge:\s*/i, "");
+      const clipped = after.replace(/\(5-minute trend[^)]*\)/g, "").replace(/\s+/g, " ").trim();
+      return clipped.length < 160 ? ("Choppy / no clean edge: " + clipped) : "Choppy / no clean edge on this window.";
+    }
+    if (!isIndicatorDump(raw) && raw.length <= 180) return raw;
+    const sentences = raw.split(/(?<=\.)\s+/);
+    const rest = sentences.filter((s) => !isIndicatorDump(s) && !/^Just bought/i.test(s));
+    if (rest.length) {
+      const line = rest.join(" ").trim();
+      return line.length <= 180 ? line : line.slice(0, 177) + "…";
+    }
+    const last = sentences[sentences.length - 1] || raw;
+    return last.length <= 180 ? last : last.slice(0, 177) + "…";
+  }
+
+  function indicatorDetails(item) {
+    const raw = String((item && (item.reason_entry || item.reason || item.reason_exit)) || "").replace(/\s+/g, " ").trim();
+    if (!isIndicatorDump(raw)) return "";
+    const m = raw.match(/((?:Just bought[^.]*—\s*)?EMA 9[^.]+\.)/i);
+    return m ? m[1].replace(/^Just bought[^.]*—\s*/i, "").trim() : raw;
+  }
+
+  function eventPill(item) {
+    const action = String((item && (item.action || item.label)) || "").toUpperCase();
+    const pnl = item && item.pnl;
+    const settled = item && (item.status === "closed" || item.outcome === "settlement" || item.kind === "trade");
+    if (settled && pnl != null) {
+      if (pnl >= 0) return { cls: "WIN", text: "WIN " + money(pnl, true) };
+      return { cls: "LOSS", text: "LOSS " + money(pnl, true) };
+    }
+    if (/WIN/.test(action) && pnl != null) return { cls: "WIN", text: "WIN " + money(pnl, true) };
+    if (/LOSS/.test(action) && pnl != null) return { cls: "LOSS", text: "LOSS " + money(pnl, true) };
+    if (/BUY_NO|BOUGHT NO|BUY NO/.test(action) && !/HOLD/.test(action)) return { cls: "BOUGHT", text: "BOUGHT NO" };
+    if (/BUY_YES|BOUGHT YES|BUY YES/.test(action) && !/HOLD/.test(action)) return { cls: "BOUGHT", text: "BOUGHT YES" };
+    if (/HOLD/.test(action) || (item && item.status === "open")) {
+      const side = String((item && item.side) || (/YES/.test(action) ? "YES" : /NO/.test(action) ? "NO" : "")).toUpperCase();
+      return { cls: "HOLD", text: side ? "HOLD " + side : "HOLD" };
+    }
+    if (/SKIP/.test(action)) return { cls: "SKIP", text: "SKIP" };
+    if (/WAIT/.test(action)) return { cls: "WAIT", text: "WAIT" };
+    const short = String((item && (item.label || item.action)) || "CHECK").replace(/—.*$/, "").trim();
+    return { cls: "WAIT", text: short };
+  }
+
+  function feedRightMeta(item) {
+    const bits = [];
+    if (item.contracts != null && item.entry_price != null) {
+      bits.push(contractsLabel(item.contracts) + " @ " + cents(item.entry_price));
+    } else if (item.yes_ask != null || item.no_ask != null) {
+      bits.push("Yes " + cents(item.yes_ask) + " / No " + cents(item.no_ask));
+    }
+    const bought = item.amount_bought != null ? item.amount_bought : item.total_in;
+    if (bought != null) bits.push("bought " + money(bought));
+    return bits.join(" · ");
+  }
+
+  function feedCard(item) {
+    const when = shortTimePT(item.t_pt || item.entry_time_pt || item.exit_time_pt || item.t || "");
+    const window = prettyWindow(item);
+    const pill = eventPill(item);
+    const meta = feedRightMeta(item);
+    const line = plainReason(item);
+    const details = indicatorDetails(item);
+    const detailsHtml = details
+      ? `<details class="details"><summary>Details</summary><div class="feed-details">${esc(details)}</div></details>`
+      : "";
+    return `<article class="feed-card">
+      <div class="feed-top">
+        <div>
+          <div class="feed-when">${esc(when)}</div>
+          ${window ? `<div class="feed-window">${esc(window)}</div>` : ""}
+        </div>
+        <div class="feed-right">
+          <div class="pill sm ${esc(pill.cls)}">${esc(pill.text)}</div>
+          ${meta ? `<div class="feed-meta">${esc(meta)}</div>` : ""}
+        </div>
+      </div>
+      ${line ? `<div class="feed-line">${esc(line)}</div>` : ""}
+      ${detailsHtml}
+    </article>`;
+  }
+
+  function groupFeedItems(checks, trades) {
+    const groups = new Map();
+    const keyOf = (it) => it.ticker || prettyWindow(it) || (it.t || "");
+    const bump = (it, extra) => {
+      const key = keyOf(it);
+      const g = groups.get(key) || { ticker: it.ticker, checks: [], trade: null, t: it.t };
+      Object.assign(g, extra || {});
+      const ts = Date.parse(it.t || it.exit_time || it.entry_time || 0);
+      if (!g.t || ts >= Date.parse(g.t || 0)) g.t = it.t || it.exit_time || it.entry_time;
+      groups.set(key, g);
+      return g;
+    };
+    (trades || []).forEach((t) => {
+      const g = bump({
+        ...t,
+        t: t.exit_time || t.entry_time,
+        t_pt: t.exit_time_pt || t.entry_time_pt,
+        ticker: t.ticker,
+        close_time: t.close_time || t.exit_time,
+      });
+      g.trade = t;
+    });
+    (checks || []).forEach((c) => {
+      const g = bump(c);
+      g.checks.push(c);
+    });
+    const cards = [];
+    for (const g of groups.values()) {
+      if (g.trade) {
+        const entryCheck = g.checks.find((c) => /HOLD|BUY/i.test(String(c.action || c.label || "")));
+        cards.push({
+          kind: "trade",
+          t: g.trade.exit_time || g.trade.entry_time || g.t,
+          t_pt: g.trade.exit_time_pt || g.trade.entry_time_pt,
+          ticker: g.trade.ticker,
+          close_time: g.trade.close_time || g.trade.exit_time || (entryCheck && entryCheck.close_time),
+          window_label: (entryCheck && entryCheck.window_label) || g.trade.window_label,
+          status: g.trade.status || "closed",
+          outcome: g.trade.outcome,
+          side: g.trade.side,
+          pnl: g.trade.pnl,
+          contracts: g.trade.contracts,
+          entry_price: g.trade.entry_price,
+          amount_bought: g.trade.amount_bought != null ? g.trade.amount_bought : g.trade.total_in,
+          reason: g.trade.reason_exit || g.trade.reason || "",
+          reason_entry: (entryCheck && entryCheck.reason) || g.trade.reason_entry || "",
+          action: (g.trade.pnl != null && g.trade.pnl >= 0) ? "WIN" : "LOSS",
+        });
+        continue;
+      }
+      const ranked = g.checks.slice().sort((a, b) => Date.parse(b.t || 0) - Date.parse(a.t || 0));
+      const hold = ranked.find((c) => /HOLD|BUY_YES|BUY_NO/i.test(String(c.action || c.label || "")));
+      const chosen = hold || ranked[0];
+      if (chosen) cards.push(chosen);
+    }
+    cards.sort((a, b) => Date.parse(b.t || 0) - Date.parse(a.t || 0));
+    return cards;
+  }
+
   function checkRows(checks) {
     const list = (checks || []).filter(Boolean);
     if (!list.length) return '<p class="empty">The bot will log every 5-minute check here, including WAIT reasons.</p>';
-    return `<div class="table-wrap"><table>
-      <thead><tr><th>Time (PT)</th><th>Call</th><th>Contract</th><th>Yes / No</th><th>Why</th></tr></thead>
-      <tbody>${list.map((c) => {
-        const quotes = (c.yes_ask != null || c.no_ask != null) ? ("Yes " + cents(c.yes_ask) + " / No " + cents(c.no_ask)) : "—";
-        return `<tr>
-          <td>${esc(c.t_pt || "")}</td>
-          <td>${esc(c.label || c.action || "—")}</td>
-          <td class="mono">${esc((c.ticker || "—").replace("KXBTC15M-", ""))}</td>
-          <td class="mono">${esc(quotes)}</td>
-          <td>${esc(c.reason || (typeof c === "string" ? c : ""))}</td>
-        </tr>`;
-      }).join("")}</tbody></table></div>`;
+    return `<div class="feed">${list.map(feedCard).join("")}</div>`;
   }
 
   function compactEventList(items, emptyText) {
     if (!items || !items.length) return `<p class="empty">${esc(emptyText)}</p>`;
-    return `<div class="list">${items.map((e) => {
-      const when = e.t_pt || e.entry_time_pt || "";
-      const ticker = (e.ticker || "").replace("KXBTC15M-", "");
-      const quotes = (e.yes_ask != null || e.no_ask != null) ? ("Yes " + cents(e.yes_ask) + " / No " + cents(e.no_ask)) : "";
-      const act = e.label || e.action || ((e.side || "") + (e.status === "open" ? " OPEN" : "")).toUpperCase() || "CHECK";
-      const why = e.reason || e.reason_exit || e.reason_entry || "";
-      const pnl = e.pnl != null ? ` · ${money(e.pnl, true)}` : "";
-      const contracts = e.contracts != null ? (contractsLabel(e.contracts) + (e.entry_price != null ? " @ " + cents(e.entry_price) : "")) : "";
-      return `<div class="row">
-        <div class="row-top">
-          <span class="when">${esc(when)}</span>
-          ${ticker ? `<span class="mono">${esc(ticker)}</span>` : ""}
-          ${contracts ? `<span class="mono">${esc(contracts)}</span>` : ""}
-          ${quotes ? `<span>${esc(quotes)}</span>` : ""}
-          <span class="act">${esc(act)}${esc(pnl)}</span>
-        </div>
-        <div class="row-why">${esc(why)}</div>
-      </div>`;
-    }).join("")}</div>`;
+    return `<div class="feed">${items.map(feedCard).join("")}</div>`;
   }
 
   function sessionChecks(sess) {
@@ -374,8 +611,8 @@
     card.hidden = false;
     $("session-window").textContent = sess.window_label_pt || sess.window_label || "1-hour $40 run";
     $("session-range").textContent = (sess.start_pt && sess.end_pt)
-      ? (sess.start_pt + " → " + sess.end_pt + " · $5 per trade · real Kalshi taker fees")
-      : "$5 per trade · real Kalshi taker fees";
+      ? (sess.start_pt + " → " + sess.end_pt + " · $2–$4 per trade (2× on win, max $8) · real Kalshi taker fees")
+      : "$2–$4 per trade (2× on win, max $8) · real Kalshi taker fees";
     tickSessionBadge();
     if (sessionTimer) clearInterval(sessionTimer);
     sessionTimer = setInterval(tickSessionBadge, 1000);
@@ -456,34 +693,8 @@
   }
 
   function renderRecent(sess) {
-    const checks = sessionChecks(sess).slice(0, 5);
-    const trades = ((sess && sess.trades) || []).slice().sort((a, b) => Date.parse(b.entry_time || 0) - Date.parse(a.entry_time || 0)).slice(0, 3);
-    const items = [];
-    trades.forEach((t) => items.push({
-      t: t.entry_time || t.exit_time,
-      t_pt: t.entry_time_pt,
-      ticker: t.ticker,
-      label: ((t.side || "") + (t.status === "open" ? " · OPEN" : (t.pnl != null ? " · " + (t.pnl >= 0 ? "WIN" : "LOSS") : ""))).toUpperCase(),
-      reason: t.reason_exit || t.reason || t.reason_entry || "",
-      pnl: t.pnl,
-      contracts: t.contracts,
-      entry_price: t.entry_price,
-      yes_ask: null,
-      no_ask: null,
-    }));
-    checks.forEach((c) => items.push(c));
-    items.sort((a, b) => Date.parse(b.t || 0) - Date.parse(a.t || 0));
-    // Prefer unique recent lines: trades first, then checks, max 5
-    const seen = new Set();
-    const uniq = [];
-    for (const it of items) {
-      const key = (it.t || "") + "|" + (it.label || it.action || "") + "|" + (it.ticker || "");
-      if (seen.has(key)) continue;
-      seen.add(key);
-      uniq.push(it);
-      if (uniq.length >= 5) break;
-    }
-    $("recent-list").innerHTML = compactEventList(uniq, "Every 15-minute window still gets a line here, even on a WAIT.");
+    const cards = groupFeedItems(sessionChecks(sess), (sess && sess.trades) || []).slice(0, 6);
+    $("recent-list").innerHTML = compactEventList(cards, "Every 15-minute window still gets a line here, even on a WAIT.");
   }
 
   function renderTrades(live, sess) {
@@ -538,6 +749,78 @@
     $("bt-log").innerHTML = tradeRows(bt.trades, "No backtest trades in this window.", true);
   }
 
+  function renderLearning(data) {
+    const strat = (data && data.strategy) || {};
+    const learning = (data && data.learning) || {};
+    const version = learning.live_version || strat.version || 1;
+    const params = strat.params || {};
+    if ($("learn-version")) $("learn-version").textContent = "v" + version;
+    if ($("learn-updated")) {
+      const when = strat.updated_at_pt || learning.generated_at_pt;
+      const src = strat.source === "hourly-learner" ? "promoted by the hourly learner" : (strat.source === "defaults" ? "starting rules" : (strat.source || ""));
+      $("learn-updated").textContent = [when ? ("Updated " + when) : "", src].filter(Boolean).join(" · ");
+    }
+    const pill = $("learn-pill");
+    if (pill) {
+      const last = learning.decision || (learning.last_run && learning.last_run.decision) || "";
+      const promoted = /PROMOTED/i.test(last);
+      pill.textContent = promoted ? last : (strat.source === "hourly-learner" ? "Learner" : "v" + version);
+      pill.className = "pill " + (promoted ? "PROMOTED" : "KEPT");
+    }
+    if ($("learn-rules")) {
+      $("learn-rules").textContent = strat.plain_english || "Buys Yes/No when the 1-minute trend is clean, BTC is at least $20 from the strike, the ask is 35–72¢, and 2–15 minutes remain.";
+    }
+    const windows = learning.windows;
+    if ($("learn-windows")) $("learn-windows").textContent = windows != null ? Number(windows).toLocaleString("en-US") : "—";
+    if ($("learn-split")) {
+      const tr = learning.train_windows, va = learning.val_windows;
+      $("learn-split").textContent = (tr != null && va != null) ? (tr + " / " + va) : "—";
+    }
+    const last = learning.last_run || {};
+    const liveVal = (last.live && last.live.val) || {};
+    const valPnl = liveVal.net_pnl;
+    const valEl = $("learn-val-pnl");
+    if (valEl) {
+      valEl.textContent = valPnl == null ? "—" : money(valPnl, true);
+      valEl.className = "v " + (valPnl > 0 ? "up" : valPnl < 0 ? "down" : "");
+    }
+    if ($("learn-decision")) {
+      const dec = learning.decision || last.decision || "—";
+      $("learn-decision").textContent = dec.replace(/^PROMOTED\s+/i, "").replace(/^KEPT\s+/i, "Kept ");
+    }
+    const logEl = $("learn-log");
+    if (!logEl) return;
+    const runs = learning.runs || [];
+    if (!runs.length) {
+      logEl.innerHTML = '<p class="empty">The first hourly learning run will land here. It studies settled windows and only promotes a change when unseen P&amp;L is clearly better.</p>';
+      return;
+    }
+    logEl.innerHTML = `<div class="feed">${runs.map((r) => {
+      const promoted = /PROMOTED/i.test(r.decision || "");
+      const live = r.live || {};
+      const best = r.best_candidate || {};
+      const wr = (m) => (m && m.win_rate != null && m.trade_count) ? (m.win_rate.toFixed(1) + "% WR, " + m.trade_count + " trades") : "no trades";
+      const stats = [
+        r.windows != null ? (Number(r.windows).toLocaleString("en-US") + " windows") : null,
+        "Live train " + money((live.train || {}).net_pnl, true) + " / unseen " + money((live.val || {}).net_pnl, true) + " (" + wr(live.val) + ")",
+        best.name ? ("Best tested: " + (best.name === "current" ? "current rules" : best.name) + " · train " + money((best.train || {}).net_pnl, true) + " / unseen " + money((best.val || {}).net_pnl, true) + " (" + wr(best.val) + ")") : null,
+      ].filter(Boolean).join(" · ");
+      return `<article class="feed-card">
+        <div class="feed-top">
+          <div>
+            <div class="feed-when">${esc(shortTimePT(r.t_pt || r.t || ""))}</div>
+            <div class="feed-window">${esc((r.decision || "Hourly check").replace(/→/g, "→"))}</div>
+          </div>
+          <div class="feed-right">
+            <div class="pill sm ${promoted ? "PROMOTED" : "KEPT"}">${esc(promoted ? "PROMOTED" : "KEPT")}</div>
+          </div>
+        </div>
+        <div class="learn-takeaway">${esc(r.takeaway || "")}</div>
+        <div class="learn-stats">${esc(stats)}</div>
+      </article>`;
+    }).join("")}</div>`;
+  }
+
   function render(data) {
     DATA = data;
     const live = data.live || {};
@@ -548,6 +831,7 @@
     renderSignal(live);
     renderRecent(sess);
     renderTrades(live, sess);
+    renderLearning(data);
     renderBacktest(bt);
   }
 
@@ -555,6 +839,16 @@
     const res = await fetch("data.json?t=" + Date.now(), { cache: "no-store" });
     if (!res.ok) throw new Error("Could not load data.json (" + res.status + ")");
     const data = await res.json();
+    if (!data.learning || !data.strategy) {
+      try {
+        const lr = await fetch("learning.json?t=" + Date.now(), { cache: "no-store" });
+        if (lr.ok) {
+          const extra = await lr.json();
+          if (!data.learning && extra.learning) data.learning = extra.learning;
+          if (!data.strategy && extra.strategy) data.strategy = extra.strategy;
+        }
+      } catch (e) { /* learning.json is optional until the first hourly run */ }
+    }
     $("error").hidden = true;
     render(data);
   }

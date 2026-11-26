@@ -1,6 +1,6 @@
 # Kalshi 15-Minute BTC Paper Bot
 
-A live **Buy Yes / Buy No / Wait** signal bot for Kalshi’s 15-minute Bitcoin contract (`KXBTC15M` — “BTC price up in the next 15 mins?”). It runs on GitHub Actions every 5 minutes and publishes a dashboard on GitHub Pages.
+A live **Buy Yes / Buy No / Wait** signal bot for Kalshi’s 15-minute Bitcoin contract (`KXBTC15M` — “BTC price up in the next 15 mins?”). It runs on GitHub Actions every 5 minutes, learns from settled windows every hour, and publishes a dashboard on GitHub Pages.
 
 **Live dashboard:** https://nfm0984-png.github.io/btc-paper-bot/
 
@@ -15,15 +15,14 @@ This bot uses only public market data and simulated money. There are no API keys
 - Grades each ticket against Kalshi’s official Yes/No settlement.
 - Can run a separate **1-hour $40 paper session** (same $2–$4 sizing and 2× press rule) alongside the ongoing $100 book, with a live countdown and a check log of every 5-minute scan.
 - Backtests the same rules on recent settled windows using **real 1-minute Kalshi quotes** plus official settlements — no made-up fills.
+- **Learns every hour** (`learn.py`, `.github/workflows/learn.yml`) on GitHub Actions ($0 Grok Bot usage). It keeps a rolling 7–14 day history of settled windows, walk-forward tests new parameter sets (train on the older ~70%, validate on the newest ~30%), and only promotes a new `data/strategy_config.json` version when unseen P&L is clearly better — enough trades, a positive validation profit, a meaningful edge over the live rules, a reasonable drawdown, and a 3-hour promotion cooldown.
 - The dashboard polls Coinbase every 20 seconds for a live BTC price and 1-minute indicators. Kalshi’s API blocks browser CORS, so contract quotes and paper-trade grading refresh with each Actions run.
 
 ## Strategy (plain English)
 
-**Buy Yes** when all of these are true: 1-minute EMA 9 > 21, close above EMA 50, MACD histogram positive, RSI 52–75, the 5-minute trend agrees, BTC is at least $20 above the strike, Yes is 35¢–72¢, and at least 2 minutes remain.
+Starting rules (**v1**): **Buy Yes** when all of these are true: 1-minute EMA 9 > 21, close above EMA 50, MACD histogram positive, RSI 52–75, the 5-minute trend agrees, BTC is at least $20 above the strike, Yes is 35¢–72¢, and at least 2 minutes remain. **Buy No** is the bearish mirror. The live bot reads the current band and filters from `data/strategy_config.json`, so the hourly learner can tighten or loosen those numbers when unseen results actually improve.
 
-**Buy No** is the bearish mirror.
-
-**Wait** if the tape is choppy, the quotes are too expensive, or the window is almost over. The bot will not buy an 85¢+ Yes just to be “right.”
+**Wait** if the tape is choppy, the quotes are too expensive, or the window is almost over. The bot will not buy a very expensive Yes just to be “right.”
 
 **Exit early** on a take-profit (bid ≥ 80¢ or +15¢ from entry), a 12¢ stop, or a momentum + strike flip. Otherwise hold to official settlement.
 
@@ -33,7 +32,7 @@ This bot uses only public market data and simulated money. There are no API keys
 python3 bot.py
 ```
 
-No third-party Python packages are required (Python 3.11+). The script writes `data/state.json`, `data/backtest.json`, and `docs/data.json`. `.github/workflows/trade.yml` runs it every 5 minutes and GitHub Pages serves `docs/` from `main`.
+No third-party Python packages are required (Python 3.11+). The 5-minute job (`python3 bot.py`) writes `data/state.json`, `data/backtest.json`, and `docs/data.json`. The hourly learner (`python3 learn.py`) writes `data/strategy_config.json`, `data/history_windows.json`, `data/learning_log.json`, and merges a `learning` payload into the dashboard — it never resets the paper books. `.github/workflows/trade.yml` and `learn.yml` use separate concurrency groups and rebase-retry on push so they don’t clobber each other. GitHub Pages serves `docs/` from `main`.
 
 ## Important
 

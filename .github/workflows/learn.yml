@@ -1,0 +1,62 @@
+name: Hourly Learn
+
+on:
+  schedule:
+    - cron: "7 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: hourly-learn
+  cancel-in-progress: false
+
+jobs:
+  learn:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run hourly self-learning tuner
+        run: python3 learn.py
+
+      - name: Commit learning artifacts
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/strategy_config.json data/history_windows.json data/learning_log.json docs/data.json docs/learning.json
+          if git diff --staged --quiet; then
+            echo "No learning changes to commit."
+          else
+            git commit -m "chore: hourly strategy learning $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          fi
+          # Rebase-retry so we never collide with the 5-minute paper-trade workflow.
+          for i in 1 2 3 4 5 6; do
+            if ! git pull --rebase origin main; then
+              echo "Rebase failed (attempt $i); aborting and retrying."
+              git rebase --abort || true
+              sleep $((i * 8))
+              continue
+            fi
+            python3 learn.py --merge-dashboard || true
+            git add data/strategy_config.json data/history_windows.json data/learning_log.json docs/data.json docs/learning.json
+            if ! git diff --staged --quiet; then
+              git commit -m "chore: remerge learning payload after rebase $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            fi
+            if git push origin HEAD:main; then
+              echo "Push succeeded on attempt $i."
+              exit 0
+            fi
+            echo "Push rejected (attempt $i); retrying."
+            sleep $((i * 8))
+          done
+          echo "Failed to push learning commit after retries."
+          exit 1
