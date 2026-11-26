@@ -34,20 +34,21 @@ KALSHI_API = "https://api.elections.kalshi.com/trade-api/v2"
 KALSHI_MARKET_URL = "https://kalshi.com/markets/kxbtc15m/{ticker}"
 
 STARTING_BALANCE = 100.00
-# Variable base stake: $2 normal, $3 strong, $4 top-conviction.
-# Every ticket’s total cost (contracts × price + taker fee) stays in [$2, $4].
-# A 2× press after a win is hard-capped at $4 (never $6 or $8).
-STAKE_NORMAL = 2.00
-STAKE_STRONG = 3.00
-STAKE_TOP = 4.00
-STAKE_MIN = 2.00
-STAKE_PRESS_CAP = 4.00
+# Variable base stake: $4 normal, $6 strong, $8 top-conviction.
+# Every ticket’s total cost (contracts × price + taker fee) stays in [$4, $20].
+# A 2× press after a win is hard-capped at $20 ($4→$8, $6→$12, $8→$16, then $20 max).
+STAKE_NORMAL = 4.00
+STAKE_STRONG = 6.00
+STAKE_TOP = 8.00
+STAKE_MIN = 4.00
+STAKE_PRESS_CAP = 20.00
 STAKE = STAKE_NORMAL  # default / display alias
 SESSION_STARTING = 40.00
 SESSION_STAKE = STAKE_NORMAL
 SESSION_MINUTES = 60
-# Head-to-head $40 race: Version 1 (multi-trade) vs Version 2 (strict / learned rules).
-RACE_STARTING = 40.00
+# Head-to-head $100 race: Version 1 (multi-trade) vs Version 2 (strict / learned rules).
+RACE_STARTING = 100.00
+RACE_BOOK_KEYS = ("v1", "v2", "every15m", "selective")
 V1_ASK_MIN = 0.05
 V1_ASK_MAX = 0.95
 V1_MIN_REMAINING_SEC = 120
@@ -810,7 +811,7 @@ def grade_signal(
     btc_price: float,
     strike: Optional[float],
 ) -> tuple[str, float, list[str]]:
-    """Score a qualifying buy and map it to a $2 / $3 / $4 base stake.
+    """Score a qualifying buy and map it to a $4 / $6 / $8 base stake.
 
     Every buy already passed the hard filters. Extra quality points come from
     a wider EMA 9/21 spread, a larger BTC-vs-strike cushion, a stronger MACD
@@ -1085,7 +1086,7 @@ def _clamp_press_value(value) -> Optional[float]:
     if value is None:
         return None
     try:
-        return round_money(min(STAKE_PRESS_CAP, max(0.0, float(value))))
+        return round_money(min(STAKE_PRESS_CAP, max(STAKE_MIN, float(value))))
     except (TypeError, ValueError):
         return None
 
@@ -1093,7 +1094,7 @@ def _clamp_press_value(value) -> Optional[float]:
 def ensure_press_fields(book: dict) -> dict:
     """Upgrade an existing book/session in place without touching cash or trades.
 
-    Clamps any stored press/last-win stake so nothing can exceed the $4.00 cap.
+    Clamps any stored press/last-win stake into the [$4, $20] band.
     """
     if not isinstance(book, dict):
         return book
@@ -1112,15 +1113,15 @@ def resolve_entry_stake(
     last_win_stake: Optional[float],
     cash: float,
 ) -> tuple[float, bool]:
-    """Return (stake, is_press). Press is 2× the last winning stake, hard-capped at $4 and at cash.
+    """Return (stake, is_press). Press is 2× the last winning stake, hard-capped at $20 and at cash.
 
-    If cash is under the $2.00 minimum, returns (0, False) so the caller skips the trade.
+    If cash is under the $4.00 minimum, returns (0, False) so the caller skips the trade.
     """
     cash = max(0.0, float(cash or 0))
     if cash + 1e-9 < STAKE_MIN:
         return 0.0, False
     if press_next and last_win_stake:
-        last = min(STAKE_PRESS_CAP, max(0.0, float(last_win_stake)))
+        last = min(STAKE_PRESS_CAP, max(STAKE_MIN, float(last_win_stake)))
         target = min(STAKE_PRESS_CAP, round_money(2.0 * last))
         pressed = True
     else:
@@ -1147,7 +1148,7 @@ def next_stake_label(press_next: bool, last_win_stake: Optional[float], cash: Op
     if press_next and last_win_stake:
         stake, _ = resolve_entry_stake(STAKE_NORMAL, True, last_win_stake, cash if cash is not None else STAKE_PRESS_CAP)
         return f"Next trade: 2× press (${stake:.0f})"
-    return "Next stake: $2–$4"
+    return "Next stake: $4–$20"
 
 
 def dedupe_trades(trades: Optional[list]) -> list[dict]:
@@ -1232,6 +1233,71 @@ def default_state() -> dict:
     }
 
 
+def lift_race_bankroll(book: dict, target: float = RACE_STARTING) -> dict:
+    """Raise a race book to a $100 starting balance without wiping trades or P&L.
+
+    Adds the exact delta to cash (and equity, if present) so Amount Bought,
+    contracts, record, and Total Gain/Lost stay the same.
+    """
+    if not isinstance(book, dict):
+        return book
+    try:
+        start = float(book.get("starting_balance") or 0)
+    except (TypeError, ValueError):
+        start = 0.0
+    target = float(target)
+    if start + 1e-9 >= target:
+        return book
+    delta = round_money(target - start)
+    book["starting_balance"] = round_money(target)
+    book["cash"] = round_money(float(book.get("cash") or 0) + delta)
+    if book.get("equity") is not None:
+        try:
+            book["equity"] = round_money(float(book["equity"]) + delta)
+        except (TypeError, ValueError):
+            pass
+    if book.get("equity") is not None:
+        try:
+            book["pnl"] = round_money(float(book["equity"]) - float(book["starting_balance"]))
+        except (TypeError, ValueError):
+            pass
+    if book.get("pnl") is not None:
+        book["net_pnl"] = book["pnl"]
+        try:
+            start_now = float(book["starting_balance"])
+            if start_now:
+                book["pnl_pct"] = round((float(book["pnl"]) / start_now) * 100.0, 2)
+        except (TypeError, ValueError):
+            pass
+    if book.get("stake") is not None:
+        try:
+            if float(book["stake"]) < STAKE_MIN:
+                book["stake"] = STAKE_NORMAL
+        except (TypeError, ValueError):
+            pass
+    book["next_stake_label"] = next_stake_label(
+        bool(book.get("press_next")), book.get("last_win_stake"), book.get("cash")
+    )
+    return book
+
+
+def lift_race(race: dict, target: float = RACE_STARTING) -> dict:
+    """Lift every Version 1 / Version 2 race book (including legacy key aliases)."""
+    if not isinstance(race, dict):
+        return race
+    try:
+        start = float(race.get("starting_balance") or 0)
+    except (TypeError, ValueError):
+        start = 0.0
+    if start + 1e-9 < float(target):
+        race["starting_balance"] = round_money(target)
+    for key in RACE_BOOK_KEYS:
+        if isinstance(race.get(key), dict):
+            lift_race_bankroll(race[key], target)
+            ensure_press_fields(race[key])
+    return race
+
+
 def load_state() -> dict:
     if not STATE_PATH.exists():
         return default_state()
@@ -1246,11 +1312,8 @@ def load_state() -> dict:
     ensure_press_fields(state)
     if isinstance(state.get("session"), dict):
         ensure_press_fields(state["session"])
-    race = state.get("race")
-    if isinstance(race, dict):
-        for key in ("v1", "v2", "every15m", "selective"):
-            if isinstance(race.get(key), dict):
-                ensure_press_fields(race[key])
+    if isinstance(state.get("race"), dict):
+        lift_race(state["race"])
     return state
 
 
@@ -1280,10 +1343,10 @@ def ticket_total(contracts: int, ask: float) -> tuple[float, float, float]:
 
 
 def size_ticket(ask: float, target_stake: float, cash: float) -> Optional[tuple[int, float, float, float]]:
-    """Pick a whole number of contracts whose total cost is in [$2, $4] and ≤ cash.
+    """Pick a whole number of contracts whose total cost is in [$4, $20] and ≤ cash.
 
     Starts with the largest size whose total ≤ the clamped target, then bumps
-    contracts up (while staying ≤ $4 and ≤ cash) if that total would be under $2.
+    contracts up (while staying ≤ $20 and ≤ cash) if that total would be under $4.
     Returns (contracts, cost, fee, total), or None to skip the trade.
     """
     if ask <= 0 or ask >= 1:
@@ -1294,7 +1357,7 @@ def size_ticket(ask: float, target_stake: float, cash: float) -> Optional[tuple[
     target = min(max(float(target_stake), STAKE_MIN), STAKE_PRESS_CAP, round_money(cash))
     if target + 1e-9 < STAKE_MIN:
         return None
-    # Generous upper bound: fees are small, so this covers the $4 cap.
+    # Generous upper bound: fees are small, so this covers the $20 cap.
     max_n = int(min(STAKE_PRESS_CAP, cash) // ask) + 3
     best: Optional[tuple[int, float, float, float]] = None
     for n in range(1, max(1, max_n) + 1):
@@ -1591,8 +1654,8 @@ def run_backtest(
         "trades": list(reversed(trades[-80:])),
         "assumption_note": (
             "Each window is evaluated once, 1 minute after it opens, using the real Kalshi Yes/No "
-            "quotes at that minute and Coinbase 1-minute / 5-minute BTC candles. Trades use a $2–$4 "
-            "base stake by signal strength, then 2× after a win (capped at $4), "
+            "quotes at that minute and Coinbase 1-minute / 5-minute BTC candles. Trades use a $4–$8 "
+            "base stake by signal strength, then 2× after a win (capped at $20), "
             "the official quadratic taker fee, and are held to Kalshi’s official Yes/No settlement. "
             "The live bot can also enter later in a window (on a 5-minute scan) or exit early if momentum flips; "
             "those live extras are not in this backtest."
@@ -2193,7 +2256,7 @@ def run_session(
 
 
 # ---------------------------------------------------------------------------
-# Head-to-head $40 race: Version 1 (multi-trade) vs Version 2 (strict rules)
+# Head-to-head $100 race: Version 1 (multi-trade) vs Version 2 (strict rules)
 # ---------------------------------------------------------------------------
 
 def tradable_v1_ask(ask: Optional[float]) -> bool:
@@ -2516,7 +2579,7 @@ def new_race_book(book_id: str, now: datetime, strategy_version: Optional[int] =
         "losses": 0,
         "trade_count": 0,
         "win_rate": None,
-        "next_stake_label": "Next stake: $2–$4",
+        "next_stake_label": "Next stake: $4–$20",
         "created_at": iso_utc(now),
         "events": [],
     }
@@ -2536,6 +2599,7 @@ def ensure_race(state: dict, now: datetime, strategy_version: Optional[int] = No
     """Upgrade existing state in place. Never resets the $100 book or the 1-hour session."""
     race = state.get("race") if isinstance(state, dict) else None
     if isinstance(race, dict) and isinstance(race.get("v1"), dict) and isinstance(race.get("v2"), dict):
+        lift_race(race)
         for key in ("v1", "v2"):
             book = race[key]
             ensure_press_fields(book)
@@ -2546,7 +2610,7 @@ def ensure_race(state: dict, now: datetime, strategy_version: Optional[int] = No
         return race
     race = new_race(now, strategy_version)
     print(
-        f"  Starting Head-to-Head $40 Race at {race['start_pt']}: "
+        f"  Starting Head-to-Head $100 Race at {race['start_pt']}: "
         "Version 1 Active Multi-Trade vs Version 2 Strict Rules",
         flush=True,
     )
@@ -2962,10 +3026,10 @@ def rules_summary_from_params(p: StrategyParams) -> dict:
             "or momentum and BTC-vs-strike both flip against the position. Otherwise hold to official settlement."
         ),
         "sizing": (
-            "Normal qualifying signal $2, strong $3, top-conviction $4. After a win, the next trade is 2× that "
-            "winning stake, hard-capped at $4 and never more than cash on hand. A $2 win presses to $4; a $3 or $4 "
-            "win stays at $4 — never $6 or $8. A loss resets to $2–$4. Every ticket’s total cost stays in the $2–$4 range. "
-            "The $40 race books, the archived 1-hour run, and the $100 book each track this separately."
+            "Normal qualifying signal $4, strong $6, top-conviction $8. After a win, the next trade is 2× that "
+            "winning stake, hard-capped at $20 and never more than cash on hand. A $4 win presses to $8, a $6 win to $12, "
+            "an $8 win to $16, and further wins cap at $20. A loss resets to $4–$8. Every ticket’s total cost stays in the $4–$20 range. "
+            "The $100 race books, the archived 1-hour $40 run, and the ongoing $100 book each track this separately."
         ),
         "learning": (
             "Every hour a GitHub Action studies the last 7–14 days of settled 15-minute windows, walk-forward "
@@ -2973,11 +3037,11 @@ def rules_summary_from_params(p: StrategyParams) -> dict:
             "better. That run is free — it does not use Grok Bot."
         ),
         "race": (
-            "A live Head-to-Head $40 Race compares two books that start together at $40. "
+            "A live Head-to-Head $100 Race compares two books that start together at $100. "
             "Version 1 (Active Multi-Trade) can take up to 3 tickets in the same 15-minute window — one new entry "
             "per 5-minute check — adding to its side on confirmation or flipping if momentum turns. "
             "Version 2 (Strict Rules) follows the learned strategy config and takes at most one trade per window, "
-            "only when every trend, strike-gap, and price filter passes. Both use $2–$4 sizing and a 2× press, hard-capped at $4."
+            "only when every trend, strike-gap, and price filter passes. Both use $4–$20 sizing and a 2× press, hard-capped at $20."
         ),
     }
 
@@ -3166,7 +3230,7 @@ def main() -> int:
             "metrics": strategy_cfg.get("metrics") or {},
         },
         "learning": load_existing_dashboard().get("learning"),
-        "fee_note": "Every paper trade uses Kalshi’s taker fee, ceil(0.07 × contracts × price × (1 − price)), rounded up to the next cent. The Head-to-Head $40 Race starts two books at $40 together (Version 1 Active Multi-Trade vs Version 2 Strict Rules). The completed 1-hour $40 run and the ongoing $100 book stay in the Trades tab. All books use a $2–$4 base stake by signal strength, then 2× after a win, hard-capped at $4. Every ticket costs at least $2 and at most $4 (including fees).",
+        "fee_note": "Every paper trade uses Kalshi’s taker fee, ceil(0.07 × contracts × price × (1 − price)), rounded up to the next cent. The Head-to-Head $100 Race starts two books at $100 together (Version 1 Active Multi-Trade vs Version 2 Strict Rules). Existing $40 race books are lifted to $100 by adding the cash delta, so prior trades and P&L stay accurate. The completed 1-hour $40 run and the ongoing $100 book stay in the Trades tab. All books use a $4–$8 base stake by signal strength, then 2× after a win, hard-capped at $20. Every ticket costs $4–$20 (including fees).",
         "rules_summary": rules_summary_from_params(params),
     }
     save_json(DASHBOARD_PATH, dashboard)

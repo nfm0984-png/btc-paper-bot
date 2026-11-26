@@ -782,7 +782,7 @@
     const fillBal = (id, book) => {
       const el = $(id);
       if (!el) return;
-      const start = book.starting_balance != null ? book.starting_balance : 40;
+      const start = book.starting_balance != null ? book.starting_balance : 100;
       const equity = book.equity != null ? book.equity : book.cash;
       el.textContent = equity != null ? (money(start) + " → " + money(equity)) : "—";
     };
@@ -797,7 +797,7 @@
       gap.textContent = m == null ? "—" : money(m);
       gap.className = "val " + (m > 0 ? "up" : "");
     }
-    if ($("stat-leader-sub")) $("stat-leader-sub").textContent = race.start_pt ? ("Race started " + race.start_pt) : "Head-to-head $40 race";
+    if ($("stat-leader-sub")) $("stat-leader-sub").textContent = race.start_pt ? ("Race started " + race.start_pt) : "Head-to-head $100 race";
     if ($("stat-gap-sub")) $("stat-gap-sub").textContent = race.leader_text && race.leader !== "tied" ? race.leader_text : "Difference in equity";
   }
 
@@ -811,8 +811,8 @@
     card.hidden = false;
     $("session-window").textContent = sess.window_label_pt || sess.window_label || "1-hour $40 run";
     $("session-range").textContent = (sess.start_pt && sess.end_pt)
-      ? (sess.start_pt + " → " + sess.end_pt + " · $2–$4 per trade (2× on win, max $4) · real Kalshi taker fees")
-      : "$2–$4 per trade (2× on win, max $4) · real Kalshi taker fees";
+      ? (sess.start_pt + " → " + sess.end_pt + " · archived $40 run · real Kalshi taker fees")
+      : "Archived $40 run · real Kalshi taker fees";
     tickSessionBadge();
     if (sessionTimer) clearInterval(sessionTimer);
     sessionTimer = setInterval(tickSessionBadge, 1000);
@@ -830,7 +830,7 @@
     if (sessB) sessB.textContent = money(bookAmountBought(sess));
     const press = $("session-press");
     if (press) {
-      const label = sess.next_stake_label || (sess.press_next ? ("Next trade: 2× press ($" + Math.round(Math.min(4, 2 * (sess.last_win_stake || 0))) + ")") : "Next stake: $2–$4");
+      const label = sess.next_stake_label || (sess.press_next ? ("Next trade: 2× press ($" + Math.round(Math.min(20, 2 * (sess.last_win_stake || 0))) + ")") : "Next stake: $4–$20");
       press.textContent = label;
       press.className = "pill " + (sess.press_next ? "PRESS" : "BASE");
     }
@@ -919,7 +919,7 @@
   function renderRaceBook(id, book, choice, live) {
     book = book || {};
     choice = choice || {};
-    const start = book.starting_balance != null ? book.starting_balance : 40;
+    const start = book.starting_balance != null ? book.starting_balance : 100;
     const equity = book.equity != null ? book.equity : book.cash;
     if ($(id + "-equity")) $(id + "-equity").textContent = money(start) + " → " + money(equity);
     if ($(id + "-bought")) $(id + "-bought").textContent = money(bookAmountBought(book));
@@ -933,7 +933,7 @@
     if ($(id + "-badge") && book.badge) $(id + "-badge").textContent = book.badge;
     const press = $(id + "-press");
     if (press) {
-      const label = book.next_stake_label || "Next stake: $2–$4";
+      const label = book.next_stake_label || "Next stake: $4–$20";
       press.textContent = label;
       press.className = "pill " + (book.press_next ? "PRESS" : "BASE");
     }
@@ -965,7 +965,7 @@
     }
     const cards = groupFeedItems(sessionChecks(book), book.trades || []).slice(0, 8);
     if ($(id + "-recent")) {
-      const list = compactEventList(cards, "The first check in this $40 race will land here.");
+      const list = compactEventList(cards, "The first check in this $100 race will land here.");
       $(id + "-recent").innerHTML = list + viewAllTradesButton(id, book);
     }
   }
@@ -988,8 +988,8 @@
     if ($("v2-checks")) $("v2-checks").innerHTML = checkRows(sessionChecks(v2));
     if ($("race-trades-range")) {
       $("race-trades-range").textContent = race.start_pt
-        ? ("Both books started at $40.00 on " + race.start_pt + ". Version 1 can take up to 3 tickets in a window; Version 2 takes at most one, and only when every strict rule passes.")
-        : "Two books started together at $40. Version 1 can take up to 3 tickets in a window; Version 2 takes at most one, and only when every strict rule passes.";
+        ? ("Both books started together and now each run a $100 bankroll (started " + race.start_pt + "). Version 1 can take up to 3 tickets in a window; Version 2 takes at most one, and only when every strict rule passes.")
+        : "Two books started together at $100. Version 1 can take up to 3 tickets in a window; Version 2 takes at most one, and only when every strict rule passes.";
     }
     const sessTrades = ((sess && sess.trades) || []).slice().sort((a, b) => Date.parse(b.entry_time || 0) - Date.parse(a.entry_time || 0));
     if ($("archive-session-range") && sess && sess.start_pt && sess.end_pt) {
@@ -1010,7 +1010,7 @@
     $("book-pnl-sub").textContent = (live.pnl > 0 ? "Gain " : live.pnl < 0 ? "Lost " : "") + pct(live.pnl_pct) + " from " + money(live.starting_balance) + (live.cash != null ? " · cash " + money(live.cash) : "");
     const bookWin = $("book-win");
     if (bookWin) {
-      const press = live.next_stake_label || (live.press_next ? "Next trade: 2× press" : "Next stake: $2–$4");
+      const press = live.next_stake_label || (live.press_next ? "Next trade: 2× press" : "Next stake: $4–$20");
       bookWin.textContent = (live.win_rate == null ? "No closed trades yet" : (live.win_rate.toFixed(1) + "% after fees")) + " · " + press;
     }
 
@@ -1031,7 +1031,7 @@
       : "Backtest unavailable.";
     $("bt-pnl").textContent = money(bt.net_pnl, true);
     $("bt-pnl").className = "val " + (bt.net_pnl > 0 ? "up" : bt.net_pnl < 0 ? "down" : "");
-    $("bt-eq").textContent = money(bt.starting_balance) + " → " + money(bt.ending_equity) + " · $2–$4 tickets, 2× after a win";
+    $("bt-eq").textContent = money(bt.starting_balance) + " → " + money(bt.ending_equity) + " · $4–$20 tickets, 2× after a win (max $20)";
     $("bt-ret").textContent = pct(bt.return_pct);
     $("bt-ret").className = "val " + (bt.return_pct > 0 ? "up" : bt.return_pct < 0 ? "down" : "");
     $("bt-windows").textContent = (bt.windows_traded || 0) + " trades · " + (bt.windows_skipped || 0) + " stands aside";

@@ -454,7 +454,7 @@ def run_learn() -> int:
     )
 
     grid = candidate_grid(current)
-    print(f"  Testing {len(grid)} parameter sets (fees + $2–$4 / 2× press)…", flush=True)
+    print(f"  Testing {len(grid)} parameter sets (fees + $4–$20 / 2× press)…", flush=True)
 
     scored: list[tuple[str, bot.StrategyParams, dict]] = []
     for name, params in grid:

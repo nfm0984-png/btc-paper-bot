@@ -6,9 +6,9 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta name="theme-color" content="#EA580C" />
   <title>BTC 15-Min Bot</title>
-  <meta name="description" content="Version 1 vs Version 2 head-to-head $40 paper race on Kalshi’s 15-minute Bitcoin contracts." />
+  <meta name="description" content="Version 1 vs Version 2 head-to-head $100 paper race on Kalshi’s 15-minute Bitcoin contracts." />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23F7931A'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-size='18' font-family='Georgia' fill='%231C140A'%3E%E2%82%BF%3C/text%3E%3C/svg%3E" />
-  <link rel="stylesheet" href="style.css?v=20261126-ui6" />
+  <link rel="stylesheet" href="style.css?v=20261126-ui7" />
 </head>
 <body>
   <div class="wrap">
@@ -17,7 +17,7 @@
         <div class="hero-copy">
           <div class="hero-kicker" id="hero-date">Kalshi · KXBTC15M</div>
           <h1>BTC 15-Min Bot</h1>
-          <p class="hero-sub">Version 1 vs Version 2 in a live $40 race on the 15-minute Bitcoin contract. $2–$4 tickets, 2× after a win (max $4), real Kalshi fees.</p>
+          <p class="hero-sub">Version 1 vs Version 2 in a live $100 race on the 15-minute Bitcoin contract. $4–$20 tickets, 2× after a win (max $20), real Kalshi fees.</p>
         </div>
         <div class="hero-live">
           <div class="btc-live-label"><span id="btc-dot" class="dot"></span>Live Bitcoin</div>
@@ -31,18 +31,18 @@
     <div class="stats">
       <div class="stat">
         <div class="lbl">Version 1</div>
-        <div class="val" id="stat-v1-val">$40.00</div>
+        <div class="val" id="stat-v1-val">$100.00</div>
         <div class="sub" id="stat-v1-sub">Active Multi-Trade</div>
       </div>
       <div class="stat">
         <div class="lbl">Version 2</div>
-        <div class="val" id="stat-v2-val">$40.00</div>
+        <div class="val" id="stat-v2-val">$100.00</div>
         <div class="sub" id="stat-v2-sub">Strict Rules</div>
       </div>
       <div class="stat">
         <div class="lbl">Leader</div>
         <div class="val" id="stat-leader-val">Tied</div>
-        <div class="sub" id="stat-leader-sub">Head-to-head $40 race</div>
+        <div class="sub" id="stat-leader-sub">Head-to-head $100 race</div>
       </div>
       <div class="stat">
         <div class="lbl">Gap</div>
@@ -97,15 +97,15 @@
             <div>
               <div class="card-kicker">Version 1</div>
               <div class="card-title">Active Multi-Trade</div>
-              <div class="card-range">$40 start · $2–$4 per trade (2× on win, max $4)</div>
+              <div class="card-range">$100 start · $4–$20 per trade (2× on win, max $20)</div>
             </div>
             <div class="pill-stack">
               <div id="v1-badge" class="pill V1">MULTI-TRADE · UP TO 3 PER WINDOW</div>
-              <div id="v1-press" class="pill BASE">Next stake: $2–$4</div>
+              <div id="v1-press" class="pill BASE">Next stake: $4–$20</div>
             </div>
           </div>
           <div class="metrics">
-            <div class="metric"><div class="k">Balance</div><div class="v" id="v1-equity">$40.00</div></div>
+            <div class="metric"><div class="k">Balance</div><div class="v" id="v1-equity">$100.00</div></div>
             <div class="metric"><div class="k">Amount Bought</div><div class="v" id="v1-bought">$0.00</div></div>
             <div class="metric"><div class="k">Total Gain / Lost</div><div class="v" id="v1-pnl">$0.00</div></div>
             <div class="metric"><div class="k">Contracts</div><div class="v" id="v1-contracts">0</div></div>
@@ -129,15 +129,15 @@
             <div>
               <div class="card-kicker">Version 2</div>
               <div class="card-title">Strict Rules</div>
-              <div class="card-range">$40 start · $2–$4 per trade (2× on win, max $4)</div>
+              <div class="card-range">$100 start · $4–$20 per trade (2× on win, max $20)</div>
             </div>
             <div class="pill-stack">
               <div id="v2-badge" class="pill V2">STRICT RULES · v2</div>
-              <div id="v2-press" class="pill BASE">Next stake: $2–$4</div>
+              <div id="v2-press" class="pill BASE">Next stake: $4–$20</div>
             </div>
           </div>
           <div class="metrics">
-            <div class="metric"><div class="k">Balance</div><div class="v" id="v2-equity">$40.00</div></div>
+            <div class="metric"><div class="k">Balance</div><div class="v" id="v2-equity">$100.00</div></div>
             <div class="metric"><div class="k">Amount Bought</div><div class="v" id="v2-bought">$0.00</div></div>
             <div class="metric"><div class="k">Total Gain / Lost</div><div class="v" id="v2-pnl">$0.00</div></div>
             <div class="metric"><div class="k">Contracts</div><div class="v" id="v2-contracts">0</div></div>
@@ -160,8 +160,8 @@
 
     <section id="panel-trades" class="panel" role="tabpanel" hidden>
       <div class="section-head">
-        <h2>Head-to-head $40 race</h2>
-        <p id="race-trades-range">Two books started together at $40. Version 1 can take up to 3 tickets in a window; Version 2 takes at most one, and only when every strict rule passes.</p>
+        <h2>Head-to-head $100 race</h2>
+        <p id="race-trades-range">Two books started together at $100. Version 1 can take up to 3 tickets in a window; Version 2 takes at most one, and only when every strict rule passes.</p>
       </div>
       <article class="card" id="race-log-card">
         <div class="card-head">
@@ -221,7 +221,7 @@
 
       <div class="section-head" style="margin-top:22px">
         <h2>Ongoing $100 paper book</h2>
-        <p>Separate from the $40 race and the archived 1-hour run. Same $2–$4 sizing and 2× press (max $4), ongoing bankroll.</p>
+        <p>Separate from the $100 race and the archived 1-hour run. Same $4–$20 sizing and 2× press (max $20), ongoing bankroll.</p>
       </div>
       <article class="card">
         <div class="metrics">
@@ -296,16 +296,16 @@
         <h2 style="text-transform:none;font-size:20px;letter-spacing:-0.03em;color:var(--ink)">How the bot trades</h2>
         <p class="note" style="margin-bottom:10px">This is a paper bot for Kalshi’s <strong>KXBTC15M</strong> market — “BTC price up in the next 15 mins?” It never places a real order. Yes wins if the CF Benchmarks BRTI average in the last 60 seconds of the window is at or above the strike. No wins if it finishes below.</p>
         <ol class="rules">
-          <li><strong>Head-to-head $40 race.</strong> Two paper books start at the same moment with $40 each so you can watch which style actually makes more money. Both use a $2–$4 ticket by signal strength and a 2× press after a win, hard-capped at $4, plus real Kalshi taker fees. Every ticket’s total cost (including fees) stays between $2 and $4.</li>
+          <li><strong>Head-to-head $100 race.</strong> Two paper books start at the same moment with $100 each so you can watch which style actually makes more money. Both use $4–$20 per trade ($4 / $6 / $8 by signal strength, then 2× after a win, hard-capped at $20), plus real Kalshi taker fees. Every ticket’s total cost (including fees) stays between $4 and $20.</li>
           <li><strong>Version 1 · Active Multi-Trade</strong> can take more than one trade in the same 15-minute window — up to 3 tickets, one new entry per 5-minute check, as long as at least 2 minutes remain, the ask is 5¢–95¢, and cash allows. It scores Yes vs No from BTC vs strike, EMA 9/21/50, MACD, RSI, the 5-minute trend, and the ask, then adds to its side on confirmation (or a better price) or flips if momentum turns. Every entry gets a one-sentence reason. All open tickets in that window settle together when Kalshi grades the contract.</li>
           <li><strong>Version 2 · Strict Rules</strong> follows the learned strategy in <code>strategy_config.json</code> (currently v2). It takes <strong>at most one trade per 15-minute window</strong>, and only when every trend, strike-gap, and price filter passes. Otherwise it logs WAIT with a one-line reason.</li>
           <li><strong>Buy Yes</strong> (Version 2) when the 1-minute trend is cleanly bullish (EMA 9 above 21, price above EMA 50, MACD histogram positive, RSI in its bullish band), the 5-minute trend agrees, BTC is far enough from the strike, the Yes ask is inside the learned band, and enough time remains.</li>
           <li><strong>Buy No</strong> (Version 2) is the bearish mirror.</li>
           <li><strong>Wait</strong> (Version 2) when those conditions conflict, the EMAs are flat, the window is almost over, or Kalshi’s price is already too expensive.</li>
           <li><strong>Sell early</strong> if the live bid hits ~80¢ or +15¢ from entry (take profit), drops 12¢ (cut loss), or momentum and BTC-vs-strike both flip against you. Otherwise the bot holds to official settlement.</li>
-          <li><strong>Sizing.</strong> A normal qualifying signal buys a <strong>$2</strong> ticket. A strong signal (clearer EMA / MACD / RSI alignment and more distance from the strike) buys <strong>$3</strong>. A top-conviction signal buys <strong>$4</strong>.</li>
-          <li><strong>Double after a win (press).</strong> If a trade hits (wins), the next trade is <strong>2× that winning stake</strong>, hard-capped at <strong>$4</strong> — a $2 win presses to $4; a $3 or $4 win stays at $4, never $6 or $8 — and never more than the cash left in that book. Every ticket’s total cost, including the Kalshi taker fee, is at least $2 and at most $4. If the pressed trade loses, sizing resets to $2–$4. The $40 race books, the archived 1-hour $40 run, and the ongoing $100 book each track this separately.</li>
-          <li><strong>Fees.</strong> Each race book starts at $40. The ongoing book starts at $100. The completed 10:59–11:59 AM PT 1-hour $40 run is archived on the Trades tab. Every ticket uses Kalshi’s real taker fee: ceil(0.07 × contracts × price × (1 − price)).</li>
+          <li><strong>Sizing.</strong> A normal qualifying signal buys a <strong>$4</strong> ticket. A strong signal (clearer EMA / MACD / RSI alignment and more distance from the strike) buys <strong>$6</strong>. A top-conviction signal buys <strong>$8</strong>.</li>
+          <li><strong>Double after a win (press).</strong> If a trade hits (wins), the next trade is <strong>2× that winning stake</strong>, hard-capped at <strong>$20</strong> — $4 → $8, $6 → $12, $8 → $16, then $20 max — and never more than the cash left in that book. Every ticket’s total cost, including the Kalshi taker fee, is at least $4 and at most $20. If the pressed trade loses, sizing resets to $4–$8. The $100 race books, the archived 1-hour $40 run, and the ongoing $100 book each track this separately.</li>
+          <li><strong>Fees.</strong> Each race book starts at $100 (earlier $40 race books were lifted to $100 by adding cash, so past trades and P&amp;L stayed the same). The ongoing book starts at $100. The completed 10:59–11:59 AM PT 1-hour $40 run is archived on the Trades tab. Every ticket uses Kalshi’s real taker fee: ceil(0.07 × contracts × price × (1 − price)).</li>
           <li><strong>Learns every hour.</strong> A GitHub Action pulls newly settled windows, walk-forward tests new parameters on unseen hours (train on the older ~70%, validate on the newest ~30%), and only promotes a change when validation P&amp;L is clearly better — enough trades, a positive unseen profit, a meaningful edge over the live rules, and a 3-hour cooldown so it doesn’t flip-flop on noise. That run is free and does not use Grok Bot.</li>
         </ol>
       </article>
@@ -316,6 +316,6 @@
       <div><a href="https://github.com/nfm0984-png/btc-paper-bot">GitHub repo</a> · Bot runs every 5 minutes · Learns every hour · BTC price polls live every 20 seconds</div>
     </footer>
   </div>
-  <script src="app.js?v=20261126-ui6"></script>
+  <script src="app.js?v=20261126-ui7"></script>
 </body>
 </html>

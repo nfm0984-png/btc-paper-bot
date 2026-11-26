@@ -68,10 +68,10 @@
     "pnl": -4.7,
     "pnl_pct": -4.7,
     "starting_balance": 100.0,
-    "stake": 2.0,
+    "stake": 4.0,
     "press_next": false,
     "last_win_stake": null,
-    "next_stake_label": "Next stake: $2\u2013$4",
+    "next_stake_label": "Next stake: $4\u2013$20",
     "amount_bought": 4.7,
     "contracts_total": 8,
     "position": null,
@@ -299,7 +299,7 @@
     "events": []
   },
   "race": {
-    "starting_balance": 40.0,
+    "starting_balance": 100.0,
     "start": "2026-11-26T20:22:54Z",
     "start_pt": "Nov 26, 2026, 12:22 PM PT",
     "v1": {
@@ -307,9 +307,9 @@
       "name": "Active Multi-Trade",
       "short_name": "Version 1",
       "badge": "MULTI-TRADE \u00b7 UP TO 3 PER WINDOW",
-      "starting_balance": 40.0,
-      "cash": 36.6,
-      "stake": 2.0,
+      "starting_balance": 100.0,
+      "cash": 96.6,
+      "stake": 4.0,
       "press_next": false,
       "last_win_stake": null,
       "position": {
@@ -439,16 +439,16 @@
           "open_count": 1
         }
       ],
-      "equity": 40.58,
+      "equity": 100.58,
       "pnl": 0.58,
-      "pnl_pct": 1.45,
+      "pnl_pct": 0.58,
       "amount_bought": 3.4,
       "contracts_total": 4,
       "wins": 0,
       "losses": 0,
       "trade_count": 0,
       "win_rate": null,
-      "next_stake_label": "Next stake: $2\u2013$4",
+      "next_stake_label": "Next stake: $4\u2013$20",
       "created_at": "2026-11-26T20:22:54Z",
       "events": [
         "Opened NO 4x KXBTC15M-26NOV261530-30 @ 84\u00a2 (bought $3.40, $4 ticket, entry #1 in window)"
@@ -462,9 +462,9 @@
       "name": "Strict Rules",
       "short_name": "Version 2",
       "badge": "STRICT RULES \u00b7 v2",
-      "starting_balance": 40.0,
-      "cash": 40.0,
-      "stake": 2.0,
+      "starting_balance": 100.0,
+      "cash": 100.0,
+      "stake": 4.0,
       "press_next": false,
       "last_win_stake": null,
       "position": null,
@@ -520,7 +520,7 @@
           "open_count": 0
         }
       ],
-      "equity": 40.0,
+      "equity": 100.0,
       "pnl": 0.0,
       "pnl_pct": 0.0,
       "amount_bought": 0.0,
@@ -529,7 +529,7 @@
       "losses": 0,
       "trade_count": 0,
       "win_rate": null,
-      "next_stake_label": "Next stake: $2\u2013$4",
+      "next_stake_label": "Next stake: $4\u2013$20",
       "created_at": "2026-11-26T20:22:54Z",
       "events": [],
       "net_pnl": 0.0,
@@ -4789,13 +4789,13 @@
       }
     ]
   },
-  "fee_note": "Every paper trade uses Kalshi\u2019s taker fee, ceil(0.07 \u00d7 contracts \u00d7 price \u00d7 (1 \u2212 price)), rounded up to the next cent. The Head-to-Head $40 Race starts two books at $40 together (Version 1 Active Multi-Trade vs Version 2 Strict Rules). The completed 1-hour $40 run and the ongoing $100 book stay in the Trades tab. All books use a $2\u2013$4 base stake by signal strength, then 2\u00d7 after a win, capped at $8.",
+  "fee_note": "Every paper trade uses Kalshi\u2019s taker fee, ceil(0.07 \u00d7 contracts \u00d7 price \u00d7 (1 \u2212 price)), rounded up to the next cent. The Head-to-Head $100 Race starts two books at $100 together (Version 1 Active Multi-Trade vs Version 2 Strict Rules). Existing $40 race books are lifted to $100 by adding the cash delta, so prior trades and P&L stay accurate. The completed 1-hour $40 run and the ongoing $100 book stay in the Trades tab. All books use a $4\u2013$8 base stake by signal strength, then 2\u00d7 after a win, hard-capped at $20. Every ticket costs $4\u2013$20 (including fees).",
   "rules_summary": {
     "buy_yes": "1m EMA 9 > 21, close > EMA 50, MACD hist > 0, RSI 52\u201375, 5m trend agrees, BTC at least $20 above the strike, Yes ask 35\u00a2\u201375\u00a2, and 2\u201315 minutes left.",
     "buy_no": "The bearish mirror (EMA 9 < 21, close < EMA 50, MACD hist < 0, RSI 25\u201348, 5m trend agrees, BTC at least $20 below the strike, No ask 35\u00a2\u201375\u00a2).",
     "exits": "Sell early if the bid reaches 80\u00a2 or +15\u00a2 from entry (take profit), drops 12\u00a2 from entry, or momentum and BTC-vs-strike both flip against the position. Otherwise hold to official settlement.",
-    "sizing": "Normal qualifying signal $2, strong $3, top-conviction $4. After a win, the next trade is 2\u00d7 that winning stake, capped at $8 and never more than cash on hand. A loss resets to $2\u2013$4; another win keeps pressing 2\u00d7 up to the $8 cap. The $40 run and $100 book each track this separately.",
+    "sizing": "Normal qualifying signal $4, strong $6, top-conviction $8. After a win, the next trade is 2\u00d7 that winning stake, hard-capped at $20 and never more than cash on hand. A $4 win presses to $8, a $6 win to $12, an $8 win to $16, and further wins cap at $20. A loss resets to $4\u2013$8. Every ticket\u2019s total cost stays in the $4\u2013$20 range. The $100 race books, the archived 1-hour $40 run, and the ongoing $100 book each track this separately.",
     "learning": "Every hour a GitHub Action studies the last 7\u201314 days of settled 15-minute windows, walk-forward tests new parameter sets on unseen hours, and only promotes a change when validation P&L is clearly better. That run is free \u2014 it does not use Grok Bot.",
-    "race": "A live Head-to-Head $40 Race compares two books that start together at $40. Version 1 (Active Multi-Trade) can take up to 3 tickets in the same 15-minute window \u2014 one new entry per 5-minute check \u2014 adding to its side on confirmation or flipping if momentum turns. Version 2 (Strict Rules) follows the learned strategy config and takes at most one trade per window, only when every trend, strike-gap, and price filter passes. Both use $2\u2013$4 sizing and a 2\u00d7 press, capped at $8."
+    "race": "A live Head-to-Head $100 Race compares two books that start together at $100. Version 1 (Active Multi-Trade) can take up to 3 tickets in the same 15-minute window \u2014 one new entry per 5-minute check \u2014 adding to its side on confirmation or flipping if momentum turns. Version 2 (Strict Rules) follows the learned strategy config and takes at most one trade per window, only when every trend, strike-gap, and price filter passes. Both use $4\u2013$20 sizing and a 2\u00d7 press, hard-capped at $20."
   }
 }

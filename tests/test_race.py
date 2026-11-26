@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Head-to-head $40 race: Version 1 multi-trade vs Version 2 strict rules."""
+"""Head-to-head $100 race: Version 1 multi-trade vs Version 2 strict rules."""
 from __future__ import annotations
 
 import sys
@@ -12,6 +12,7 @@ sys.path.insert(0, str(ROOT))
 from bot import (
     Indicators,
     RACE_STARTING,
+    STAKE_NORMAL,
     STAKE_PRESS_CAP,
     apply_press_from_trade,
     ensure_race,
@@ -78,7 +79,7 @@ def test_v1_scores_yes_vs_no_and_writes_choice_reason():
     )
     assert sig.action == "BUY_YES", sig
     assert sig.ask == 0.58
-    assert sig.base_stake in (2.0, 3.0, 4.0)
+    assert sig.base_stake in (4.0, 6.0, 8.0)
     assert "Picked YES @ 58¢" in sig.reason
     assert "above strike" in sig.reason
     # Bearish tape should prefer NO even if Yes is cheap-ish.
@@ -149,7 +150,7 @@ def test_v1_settles_all_open_positions_and_respects_press_and_cash_cap():
     assert len(book["open_positions"]) == 2
     cash_before_settle = book["cash"]
     bought = book["amount_bought"]
-    assert bought > 0 and cash_before_settle < 40
+    assert bought > 0 and cash_before_settle < RACE_STARTING
     settled = [market(now2, ticker=ticker, strike=60400, yes=0.48, no=0.53, remaining=0, result="yes")]
     now3 = now + timedelta(minutes=16)
     # No live market needed to settle.
@@ -162,12 +163,12 @@ def test_v1_settles_all_open_positions_and_respects_press_and_cash_cap():
     assert book["wins"] == 2
     assert book["cash"] > cash_before_settle
     assert book["press_next"] is True
-    # Press is 2× last winning stake, hard-capped at $4, and never more than cash.
+    # Press is 2× last winning stake, hard-capped at $20, and never more than cash.
     last = closed[-1]["stake"]
-    stake, pressed = resolve_entry_stake(2, True, last, book["cash"])
+    stake, pressed = resolve_entry_stake(STAKE_NORMAL, True, last, book["cash"])
     assert pressed is True
-    assert stake == min(4.0, STAKE_PRESS_CAP, round(2 * last, 2), book["cash"])
-    assert stake <= 4.0
+    assert stake == min(STAKE_PRESS_CAP, round(2 * last, 2), book["cash"])
+    assert 4.0 - 1e-9 <= stake <= 20.0 + 1e-9
     # Cash cap: a nearly empty book cannot open a ticket.
     broke = new_race_book("v1", now)
     broke["cash"] = 0.40
@@ -243,6 +244,31 @@ def test_ensure_race_does_not_reset_existing_books():
     assert again["v1"]["cash"] == 36.10
     assert again["v1"]["trades"][0]["ticker"] == "X"
     assert again["start"] == race["start"]
+    # An existing $40 race is lifted to $100 by adding the cash delta; trades stay put.
+    state40 = {
+        "cash": 95.30,
+        "starting_balance": 100.0,
+        "session": state["session"],
+        "trades": state["trades"],
+        "race": {
+            "starting_balance": 40.0,
+            "start": race["start"],
+            "start_pt": race["start_pt"],
+            "v1": {"id": "v1", "starting_balance": 40.0, "cash": 36.60, "equity": 40.58, "pnl": 0.58, "trades": [{"ticker": "KEEP", "status": "open", "amount_bought": 3.4}], "open_positions": []},
+            "v2": {"id": "v2", "starting_balance": 40.0, "cash": 40.0, "equity": 40.0, "pnl": 0.0, "trades": [], "open_positions": []},
+        },
+    }
+    lifted = ensure_race(state40, now + timedelta(hours=2), strategy_version=2)
+    assert lifted["starting_balance"] == 100.0
+    assert lifted["v1"]["starting_balance"] == 100.0
+    assert lifted["v1"]["cash"] == 96.60
+    assert abs(lifted["v1"]["pnl"] - 0.58) < 1e-9
+    assert lifted["v1"]["trades"][0]["ticker"] == "KEEP"
+    assert lifted["v1"]["trades"][0]["amount_bought"] == 3.4
+    assert lifted["v2"]["cash"] == 100.0
+    assert lifted["start"] == race["start"]
+    assert state40["cash"] == 95.30
+    assert state40["session"]["final_balance"] == 35.30
 
 
 if __name__ == "__main__":

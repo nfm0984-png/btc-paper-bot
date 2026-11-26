@@ -1,7 +1,7 @@
 {
   "cash": 95.3,
   "starting_balance": 100.0,
-  "stake": 2.0,
+  "stake": 4.0,
   "press_next": false,
   "last_win_stake": null,
   "position": null,
@@ -221,7 +221,7 @@
     "events": []
   },
   "race": {
-    "starting_balance": 40.0,
+    "starting_balance": 100.0,
     "start": "2026-11-26T20:22:54Z",
     "start_pt": "Nov 26, 2026, 12:22 PM PT",
     "v1": {
@@ -229,9 +229,9 @@
       "name": "Active Multi-Trade",
       "short_name": "Version 1",
       "badge": "MULTI-TRADE \u00b7 UP TO 3 PER WINDOW",
-      "starting_balance": 40.0,
-      "cash": 36.6,
-      "stake": 2.0,
+      "starting_balance": 100.0,
+      "cash": 96.6,
+      "stake": 4.0,
       "press_next": false,
       "last_win_stake": null,
       "position": {
@@ -361,16 +361,16 @@
           "open_count": 1
         }
       ],
-      "equity": 40.58,
+      "equity": 100.58,
       "pnl": 0.58,
-      "pnl_pct": 1.45,
+      "pnl_pct": 0.58,
       "amount_bought": 3.4,
       "contracts_total": 4,
       "wins": 0,
       "losses": 0,
       "trade_count": 0,
       "win_rate": null,
-      "next_stake_label": "Next stake: $2\u2013$4",
+      "next_stake_label": "Next stake: $4\u2013$20",
       "created_at": "2026-11-26T20:22:54Z",
       "events": [
         "Opened NO 4x KXBTC15M-26NOV261530-30 @ 84\u00a2 (bought $3.40, $4 ticket, entry #1 in window)"
@@ -384,9 +384,9 @@
       "name": "Strict Rules",
       "short_name": "Version 2",
       "badge": "STRICT RULES \u00b7 v2",
-      "starting_balance": 40.0,
-      "cash": 40.0,
-      "stake": 2.0,
+      "starting_balance": 100.0,
+      "cash": 100.0,
+      "stake": 4.0,
       "press_next": false,
       "last_win_stake": null,
       "position": null,
@@ -442,7 +442,7 @@
           "open_count": 0
         }
       ],
-      "equity": 40.0,
+      "equity": 100.0,
       "pnl": 0.0,
       "pnl_pct": 0.0,
       "amount_bought": 0.0,
@@ -451,7 +451,7 @@
       "losses": 0,
       "trade_count": 0,
       "win_rate": null,
-      "next_stake_label": "Next stake: $2\u2013$4",
+      "next_stake_label": "Next stake: $4\u2013$20",
       "created_at": "2026-11-26T20:22:54Z",
       "events": [],
       "net_pnl": 0.0,

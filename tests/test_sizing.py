@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Unit/sanity checks for $2-$4 sizing and the 2x press rule (cap $4)."""
+"""Unit/sanity checks for $4-$20 sizing and the 2x press rule (cap $20)."""
 from __future__ import annotations
 import json
 import sys
@@ -69,83 +69,119 @@ def test_grade_normal_strong_top():
 
 
 def test_press_ladder_and_reset():
-    # $2 win -> $4 next; $3 or $4 (or legacy $5) win caps at $4 — never $6 or $8.
-    for won, nxt in ((2, 4), (3, 4), (4, 4), (5, 4)):
+    # $4 win -> $8; $6 -> $12; $8 -> $16; $10 -> $20; $16 or $20 stay capped at $20.
+    for won, nxt in ((4, 8), (6, 12), (8, 16), (10, 20), (16, 20), (20, 20)):
         press, last = apply_press_from_trade(False, None, {"pnl": 1.50, "stake": won})
         assert press is True
         assert last == min(float(won), STAKE_PRESS_CAP)
-        stake, is_press = resolve_entry_stake(STAKE_NORMAL, press, last, cash=40)
+        stake, is_press = resolve_entry_stake(STAKE_NORMAL, press, last, cash=100)
         assert is_press is True
         assert stake == nxt, (won, stake, nxt)
 
-    # After a pressed $4 win, the next press stays capped at $4
-    press, last = apply_press_from_trade(True, 4.0, {"pnl": 3.0, "stake": 4.0})
-    stake, is_press = resolve_entry_stake(STAKE_NORMAL, press, last, cash=40)
-    assert is_press and stake == 4.0
+    # After a pressed $16 win, the next press caps at $20
+    press, last = apply_press_from_trade(True, 16.0, {"pnl": 8.0, "stake": 16.0})
+    stake, is_press = resolve_entry_stake(STAKE_NORMAL, press, last, cash=100)
+    assert is_press and stake == 20.0
 
-    # A stored $8 last-win stake is clamped on load and when resolving
-    book = ensure_press_fields({"press_next": True, "last_win_stake": 8.0, "press_stake": 8.0, "cash": 40})
+    # Stored press values are clamped into [$4, $20] on load
+    book = ensure_press_fields({"press_next": True, "last_win_stake": 2.0, "press_stake": 3.0, "cash": 100})
     assert book["last_win_stake"] == 4.0
     assert book["press_stake"] == 4.0
-    stake, is_press = resolve_entry_stake(STAKE_NORMAL, True, 8.0, cash=40)
-    assert is_press and stake == 4.0
+    high = ensure_press_fields({"press_next": True, "last_win_stake": 40.0, "press_stake": 40.0, "cash": 100})
+    assert high["last_win_stake"] == 20.0
+    assert high["press_stake"] == 20.0
+    stake, is_press = resolve_entry_stake(STAKE_NORMAL, True, 40.0, cash=100)
+    assert is_press and stake == 20.0
 
-    # A loss resets to $2-$4
-    press, last = apply_press_from_trade(True, 4.0, {"pnl": -4.7, "stake": 4.0})
+    # A loss resets to $4–$8
+    press, last = apply_press_from_trade(True, 16.0, {"pnl": -8.0, "stake": 16.0})
     assert press is False and last is None
-    stake, is_press = resolve_entry_stake(STAKE_STRONG, press, last, cash=40)
+    stake, is_press = resolve_entry_stake(STAKE_STRONG, press, last, cash=100)
     assert is_press is False and stake == STAKE_STRONG
 
-    # Cash between $2 and $4 still allows a ticket, limited to cash
-    stake, is_press = resolve_entry_stake(STAKE_NORMAL, True, 4.0, cash=3.25)
-    assert is_press and stake == 3.25
+    # Cash between $4 and $20 still allows a ticket, limited to cash
+    stake, is_press = resolve_entry_stake(STAKE_NORMAL, True, 8.0, cash=10.25)
+    assert is_press and stake == 10.25
 
-    # Cash under $2 skips rather than placing a sub-$2 ticket
-    stake, is_press = resolve_entry_stake(STAKE_NORMAL, False, None, cash=1.50)
+    # Cash under $4 skips rather than placing a sub-$4 ticket
+    stake, is_press = resolve_entry_stake(STAKE_NORMAL, False, None, cash=3.50)
     assert stake == 0 and is_press is False
 
-    assert next_stake_label(True, 3.0, 40).startswith("Next trade: 2× press ($4)")
-    assert next_stake_label(True, 2.0, 40).startswith("Next trade: 2× press ($4)")
-    assert next_stake_label(False, None) == "Next stake: $2–$4"
+    assert next_stake_label(True, 4.0, 100).startswith("Next trade: 2× press ($8)")
+    assert next_stake_label(True, 6.0, 100).startswith("Next trade: 2× press ($12)")
+    assert next_stake_label(True, 8.0, 100).startswith("Next trade: 2× press ($16)")
+    assert next_stake_label(True, 16.0, 100).startswith("Next trade: 2× press ($20)")
+    assert next_stake_label(False, None) == "Next stake: $4–$20"
 
 
-def test_tickets_stay_in_2_to_4_across_prices():
+def test_tickets_stay_in_4_to_20_across_prices():
     market = {"ticker": "KXBTC15M-X", "event_ticker": "E", "title": "t", "close_time": None, "floor_strike": 100}
-    # 10¢ through 90¢, at $2 / $3 / $4 targets, plus the 75¢ bump case from the brief.
-    prices = [round(p / 100.0, 2) for p in range(10, 91, 5)] + [0.75]
+    prices = [round(p / 100.0, 2) for p in range(10, 91, 5)] + [0.75, 0.90]
     for ask in prices:
-        for target in (2.0, 3.0, 4.0):
-            sized = size_ticket(ask, target, cash=40)
+        for target in (4.0, 6.0, 8.0, 20.0):
+            sized = size_ticket(ask, target, cash=100)
             assert sized is not None, (ask, target)
             n, cost, fee, total = sized
             assert n >= 1
             assert STAKE_MIN - 1e-9 <= total <= STAKE_PRESS_CAP + 1e-9, (ask, target, n, total, fee)
-            # Cross-check fee math
             assert abs(fee - kalshi_taker_fee(n, ask)) < 1e-9
-            opened = open_trade(40, market, "yes", ask, "test", utc_now(), stake=target)
+            opened = open_trade(100, market, "yes", ask, "test", utc_now(), stake=target)
             assert opened is not None, (ask, target)
             cash, pos, log = opened
             assert STAKE_MIN - 1e-9 <= pos["amount_bought"] <= STAKE_PRESS_CAP + 1e-9, (ask, target, pos["amount_bought"])
             assert pos["amount_bought"] == total
             assert pos["contracts"] == n
-            assert abs(40 - cash - total) < 1e-9
-    # 75¢: 2 contracts + fee is ~$1.54, so we must bump to 3 so the ticket is ≥ $2
-    two_cost = 2 * 0.75 + kalshi_taker_fee(2, 0.75)
-    three_cost = 3 * 0.75 + kalshi_taker_fee(3, 0.75)
-    assert two_cost < 2.0
-    assert 2.0 <= three_cost <= 4.0
-    n, _, _, total = size_ticket(0.75, 2.0, cash=40)
-    assert n >= 3 and total >= 2.0
-    # Cash under $2: skip
-    assert size_ticket(0.50, 2.0, cash=1.99) is None
-    assert open_trade(1.50, market, "no", 0.50, "test", utc_now(), stake=2) is None
-    # Cash of $2.10 must still produce a ≥$2 ticket or skip — never a $1.54 stub
-    sized = size_ticket(0.75, 2.0, cash=2.10)
-    if sized:
-        assert sized[3] >= 2.0 and sized[3] <= 2.10 + 1e-9
-    # Plenty of cash, $4 target never exceeds $4
-    n, _, _, total = size_ticket(0.40, 4.0, cash=40)
-    assert total <= 4.0 + 1e-9
+            assert abs(100 - cash - total) < 1e-9
+    # 90¢: 4 contracts + fee is under $4, so we bump until the ticket is ≥ $4
+    four_cost = 4 * 0.90 + kalshi_taker_fee(4, 0.90)
+    assert four_cost < 4.0
+    n, _, _, total = size_ticket(0.90, 4.0, cash=100)
+    assert n >= 5 and total >= 4.0
+    # Cash under $4: skip
+    assert size_ticket(0.50, 4.0, cash=3.99) is None
+    assert open_trade(3.50, market, "no", 0.50, "test", utc_now(), stake=4) is None
+    # Plenty of cash, $20 target never exceeds $20
+    n, _, _, total = size_ticket(0.40, 20.0, cash=100)
+    assert total <= 20.0 + 1e-9
+    # $4 floor still holds at a cheap 10¢ ask
+    n, _, _, total = size_ticket(0.10, 4.0, cash=100)
+    assert total >= 4.0 and total <= 20.0
+
+
+def test_lift_race_bankroll_preserves_pnl_and_trades():
+    from bot import lift_race, lift_race_bankroll, RACE_STARTING
+    trade = {"status": "open", "ticker": "T", "side": "no", "contracts": 4, "amount_bought": 3.4, "pnl": -0.08, "entry_time_pt": "Nov 26, 2026, 12:22 PM PT"}
+    book = {
+        "id": "v1",
+        "starting_balance": 40.0,
+        "cash": 36.6,
+        "equity": 40.58,
+        "pnl": 0.58,
+        "amount_bought": 3.4,
+        "contracts_total": 4,
+        "wins": 0,
+        "losses": 0,
+        "trades": [dict(trade)],
+        "open_positions": [dict(trade)],
+    }
+    lift_race_bankroll(book)
+    assert book["starting_balance"] == 100.0
+    assert book["cash"] == 96.6
+    assert book["equity"] == 100.58
+    assert abs(book["pnl"] - 0.58) < 1e-9
+    assert book["amount_bought"] == 3.4
+    assert book["contracts_total"] == 4
+    assert book["trades"][0]["amount_bought"] == 3.4
+    # Idempotent
+    lift_race_bankroll(book)
+    assert book["cash"] == 96.6 and book["starting_balance"] == 100.0
+    race = {"starting_balance": 40.0, "v1": book, "v2": {"starting_balance": 40.0, "cash": 40.0, "equity": 40.0, "pnl": 0.0, "trades": []}}
+    lift_race(race)
+    assert race["starting_balance"] == RACE_STARTING
+    assert race["v2"]["starting_balance"] == 100.0
+    assert race["v2"]["cash"] == 100.0
+    assert race["v2"]["equity"] == 100.0
+    assert race["v2"]["pnl"] == 0.0
 
 
 def test_legacy_state_upgrades_without_reset():
@@ -166,11 +202,11 @@ def test_legacy_state_upgrades_without_reset():
     amount, contracts = book_totals(raw["session"]["trades"], raw["session"]["position"])
     assert contracts == 8
     assert amount == 4.7
-    # A legacy $5 ticket that wins still arms a press hard-capped at $4 (not $8 or $10).
+    # A legacy $5 ticket that wins arms a 2× press ($10), inside the $4–$20 band.
     press, last = apply_press_from_trade(False, None, {"pnl": 3.3, "total_in": 4.7, "stake": 5})
-    assert last == 4.0
-    stake, _ = resolve_entry_stake(2, press, last, cash=35.3)
-    assert stake == 4.0
+    assert last == 5.0
+    stake, _ = resolve_entry_stake(4, press, last, cash=95.3)
+    assert stake == 10.0
 
 
 def test_dedupe_open_then_closed_and_open_trade_records_stake():
@@ -182,17 +218,17 @@ def test_dedupe_open_then_closed_and_open_trade_records_stake():
     assert amount == 4.7 and contracts == 8
 
     market = {"ticker": "KXBTC15M-X", "event_ticker": "E", "title": "t", "close_time": None, "floor_strike": 100}
-    opened = open_trade(40, market, "no", 0.50, "test", utc_now(), stake=3, pressed=False, strength="strong")
+    opened = open_trade(100, market, "no", 0.50, "test", utc_now(), stake=6, pressed=False, strength="strong")
     assert opened is not None
     cash, pos, log = opened
-    assert pos["stake"] == 3.0 and pos["pressed"] is False and pos["strength"] == "strong"
+    assert pos["stake"] == 6.0 and pos["pressed"] is False and pos["strength"] == "strong"
     assert pos["amount_bought"] == pos["total_in"]
     assert log["amount_bought"] == pos["total_in"]
-    # $3 target at 50¢: stay inside $2–$3 after fees (6 contracts would be $3.11, so 5).
-    assert 2.0 <= pos["amount_bought"] <= 3.0 + 1e-9
+    # $6 target at 50¢: stay inside $4–$6 after fees.
+    assert 4.0 <= pos["amount_bought"] <= 6.0 + 1e-9
     assert pos["contracts"] >= 1
     cash2, closed_t = close_trade(cash, pos, exit_price=None, exit_fee=0, result="no", outcome="settlement", reason="win", now=utc_now())
-    assert closed_t["pressed"] is False and closed_t["stake"] == 3.0
+    assert closed_t["pressed"] is False and closed_t["stake"] == 6.0
     assert closed_t["pnl"] > 0
 
 
@@ -200,7 +236,8 @@ if __name__ == "__main__":
     tests = [
         test_grade_normal_strong_top,
         test_press_ladder_and_reset,
-        test_tickets_stay_in_2_to_4_across_prices,
+        test_tickets_stay_in_4_to_20_across_prices,
+        test_lift_race_bankroll_preserves_pnl_and_trades,
         test_legacy_state_upgrades_without_reset,
         test_dedupe_open_then_closed_and_open_trade_records_stake,
     ]
