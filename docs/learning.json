@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-11-26T22:56:48Z",
-  "generated_at_pt": "Nov 26, 2026, 2:56 PM PT",
+  "generated_at": "2026-11-26T23:55:30Z",
+  "generated_at_pt": "Nov 26, 2026, 3:55 PM PT",
   "strategy": {
-    "version": 2,
-    "updated_at": "2026-11-26T20:02:10Z",
-    "updated_at_pt": "Nov 26, 2026, 12:02 PM PT",
+    "version": 3,
+    "updated_at": "2026-11-26T23:55:30Z",
+    "updated_at_pt": "Nov 26, 2026, 3:55 PM PT",
     "source": "hourly-learner",
     "params": {
       "min_entry_cents": 35,
@@ -14,8 +14,8 @@
       "max_mins_left": 15,
       "rsi_bull_min": 52.0,
       "rsi_bull_max": 75.0,
-      "rsi_bear_min": 25.0,
-      "rsi_bear_max": 48.0,
+      "rsi_bear_min": 30.0,
+      "rsi_bear_max": 45.0,
       "require_ema50_align": true,
       "require_5m_align": true,
       "min_volatility_usd": 0.0,
@@ -25,57 +25,57 @@
     "plain_english": "Buys Yes/No when the 1-minute trend is clean, BTC is at least $20 from the strike, the ask is 35\u201375\u00a2, and 2\u201315 minutes remain in the window. Requires the 50-period EMA to agree. Requires the 5-minute trend to agree. No extra chop filter.",
     "metrics": {
       "overall": {
-        "trade_count": 174,
-        "wins": 117,
-        "losses": 57,
-        "win_rate": 67.2,
-        "net_pnl": 43.27,
-        "profit_factor": 1.12,
-        "max_drawdown_pct": 59.39,
-        "ending_equity": 143.27
+        "trade_count": 157,
+        "wins": 108,
+        "losses": 49,
+        "win_rate": 68.8,
+        "net_pnl": 172.66,
+        "profit_factor": 1.249,
+        "max_drawdown_pct": 69.89,
+        "ending_equity": 272.66
       },
       "train": {
-        "trade_count": 126,
-        "wins": 82,
-        "losses": 44,
-        "win_rate": 65.1,
-        "net_pnl": -8.83,
-        "profit_factor": 0.969,
-        "max_drawdown_pct": 59.39,
-        "ending_equity": 91.17
+        "trade_count": 112,
+        "wins": 75,
+        "losses": 37,
+        "win_rate": 67.0,
+        "net_pnl": 53.76,
+        "profit_factor": 1.101,
+        "max_drawdown_pct": 69.89,
+        "ending_equity": 153.76
       },
       "val": {
-        "trade_count": 48,
-        "wins": 35,
-        "losses": 13,
-        "win_rate": 72.9,
-        "net_pnl": 50.92,
-        "profit_factor": 1.676,
-        "max_drawdown_pct": 11.78,
-        "ending_equity": 150.92
+        "trade_count": 45,
+        "wins": 33,
+        "losses": 12,
+        "win_rate": 73.3,
+        "net_pnl": 113.68,
+        "profit_factor": 1.696,
+        "max_drawdown_pct": 22.27,
+        "ending_equity": 213.68
       },
-      "windows": 1327,
-      "train_windows": 928,
+      "windows": 1328,
+      "train_windows": 929,
       "val_windows": 399,
-      "promoted_from": 1,
-      "candidate": "max_entry_75"
+      "promoted_from": 2,
+      "candidate": "rsi_bear_30_45"
     },
-    "last_promoted_at": "2026-11-26T20:02:10Z",
-    "last_promoted_at_pt": "Nov 26, 2026, 12:02 PM PT"
+    "last_promoted_at": "2026-11-26T23:55:30Z",
+    "last_promoted_at_pt": "Nov 26, 2026, 3:55 PM PT"
   },
   "learning": {
-    "generated_at": "2026-11-26T22:56:48Z",
-    "generated_at_pt": "Nov 26, 2026, 2:56 PM PT",
+    "generated_at": "2026-11-26T23:55:30Z",
+    "generated_at_pt": "Nov 26, 2026, 3:55 PM PT",
     "windows": 1328,
     "history_days": 14,
     "train_windows": 929,
     "val_windows": 399,
-    "live_version": 2,
-    "decision": "KEPT v2",
-    "takeaway": "A candidate that changed bull RSI floor from 52 to 55 and bull RSI cap from 75 to 70 looked better on unseen windows (+$135.32 vs live +$105.61), but a promotion landed too recently \u2014 kept v2.",
+    "live_version": 3,
+    "decision": "PROMOTED v2 \u2192 v3",
+    "takeaway": "Changing bear RSI floor from 25 to 30 and bear RSI cap from 48 to 45 improved unseen P&L by +$4.07 after fees (73.3% WR on 45 trades). Promoted v2 \u2192 v3.",
     "last_run": {
-      "t": "2026-11-26T22:56:48Z",
-      "t_pt": "Nov 26, 2026, 2:56 PM PT",
+      "t": "2026-11-26T23:55:30Z",
+      "t_pt": "Nov 26, 2026, 3:55 PM PT",
       "windows": 1328,
       "train_windows": 929,
       "val_windows": 399,
@@ -87,30 +87,30 @@
           "wins": 46,
           "losses": 28,
           "win_rate": 62.2,
-          "net_pnl": -97.8,
+          "net_pnl": -98.0,
           "profit_factor": 0.768,
-          "max_drawdown_pct": 98.18,
-          "ending_equity": 2.2
+          "max_drawdown_pct": 98.44,
+          "ending_equity": 2.0
         },
         "val": {
-          "trade_count": 49,
-          "wins": 35,
+          "trade_count": 50,
+          "wins": 36,
           "losses": 14,
-          "win_rate": 71.4,
-          "net_pnl": 105.61,
-          "profit_factor": 1.554,
+          "win_rate": 72.0,
+          "net_pnl": 109.61,
+          "profit_factor": 1.575,
           "max_drawdown_pct": 22.61,
-          "ending_equity": 205.61
+          "ending_equity": 209.61
         },
         "overall": {
           "trade_count": 74,
           "wins": 46,
           "losses": 28,
           "win_rate": 62.2,
-          "net_pnl": -97.8,
+          "net_pnl": -98.0,
           "profit_factor": 0.768,
-          "max_drawdown_pct": 98.18,
-          "ending_equity": 2.2
+          "max_drawdown_pct": 98.44,
+          "ending_equity": 2.0
         }
       },
       "best_candidate": {
@@ -136,39 +136,164 @@
           "wins": 44,
           "losses": 26,
           "win_rate": 62.9,
-          "net_pnl": -98.06,
+          "net_pnl": -98.03,
           "profit_factor": 0.757,
-          "max_drawdown_pct": 98.4,
-          "ending_equity": 1.94
+          "max_drawdown_pct": 98.47,
+          "ending_equity": 1.97
         },
         "val": {
-          "trade_count": 46,
-          "wins": 35,
+          "trade_count": 47,
+          "wins": 36,
           "losses": 11,
-          "win_rate": 76.1,
-          "net_pnl": 135.32,
-          "profit_factor": 1.841,
+          "win_rate": 76.6,
+          "net_pnl": 143.33,
+          "profit_factor": 1.891,
           "max_drawdown_pct": 21.6,
-          "ending_equity": 235.32
+          "ending_equity": 243.33
         },
         "overall": {
           "trade_count": 70,
           "wins": 44,
           "losses": 26,
           "win_rate": 62.9,
-          "net_pnl": -98.06,
+          "net_pnl": -98.03,
           "profit_factor": 0.757,
-          "max_drawdown_pct": 98.4,
-          "ending_equity": 1.94
+          "max_drawdown_pct": 98.47,
+          "ending_equity": 1.97
         }
       },
-      "promoted_to": null,
-      "promoted_params": null,
-      "decision": "KEPT v2",
-      "takeaway": "A candidate that changed bull RSI floor from 52 to 55 and bull RSI cap from 75 to 70 looked better on unseen windows (+$135.32 vs live +$105.61), but a promotion landed too recently \u2014 kept v2.",
-      "reason": "promotion cooldown still active"
+      "promoted_to": 3,
+      "promoted_params": {
+        "min_entry_cents": 35,
+        "max_entry_cents": 75,
+        "min_strike_gap_usd": 20.0,
+        "min_mins_left": 2,
+        "max_mins_left": 15,
+        "rsi_bull_min": 52.0,
+        "rsi_bull_max": 75.0,
+        "rsi_bear_min": 30.0,
+        "rsi_bear_max": 45.0,
+        "require_ema50_align": true,
+        "require_5m_align": true,
+        "min_volatility_usd": 0.0,
+        "max_chop_ratio": 1.0,
+        "ema_flat_dollars": 8.0
+      },
+      "decision": "PROMOTED v2 \u2192 v3",
+      "takeaway": "Changing bear RSI floor from 25 to 30 and bear RSI cap from 48 to 45 improved unseen P&L by +$4.07 after fees (73.3% WR on 45 trades). Promoted v2 \u2192 v3.",
+      "reason": "unseen P&L +$113.68 vs live +$109.61"
     },
     "runs": [
+      {
+        "t": "2026-11-26T23:55:30Z",
+        "t_pt": "Nov 26, 2026, 3:55 PM PT",
+        "windows": 1328,
+        "train_windows": 929,
+        "val_windows": 399,
+        "candidates_tested": 40,
+        "live_version": 2,
+        "live": {
+          "train": {
+            "trade_count": 74,
+            "wins": 46,
+            "losses": 28,
+            "win_rate": 62.2,
+            "net_pnl": -98.0,
+            "profit_factor": 0.768,
+            "max_drawdown_pct": 98.44,
+            "ending_equity": 2.0
+          },
+          "val": {
+            "trade_count": 50,
+            "wins": 36,
+            "losses": 14,
+            "win_rate": 72.0,
+            "net_pnl": 109.61,
+            "profit_factor": 1.575,
+            "max_drawdown_pct": 22.61,
+            "ending_equity": 209.61
+          },
+          "overall": {
+            "trade_count": 74,
+            "wins": 46,
+            "losses": 28,
+            "win_rate": 62.2,
+            "net_pnl": -98.0,
+            "profit_factor": 0.768,
+            "max_drawdown_pct": 98.44,
+            "ending_equity": 2.0
+          }
+        },
+        "best_candidate": {
+          "name": "rsi_bull_55_70",
+          "params": {
+            "min_entry_cents": 35,
+            "max_entry_cents": 75,
+            "min_strike_gap_usd": 20.0,
+            "min_mins_left": 2,
+            "max_mins_left": 15,
+            "rsi_bull_min": 55.0,
+            "rsi_bull_max": 70.0,
+            "rsi_bear_min": 25.0,
+            "rsi_bear_max": 48.0,
+            "require_ema50_align": true,
+            "require_5m_align": true,
+            "min_volatility_usd": 0.0,
+            "max_chop_ratio": 1.0,
+            "ema_flat_dollars": 8.0
+          },
+          "train": {
+            "trade_count": 70,
+            "wins": 44,
+            "losses": 26,
+            "win_rate": 62.9,
+            "net_pnl": -98.03,
+            "profit_factor": 0.757,
+            "max_drawdown_pct": 98.47,
+            "ending_equity": 1.97
+          },
+          "val": {
+            "trade_count": 47,
+            "wins": 36,
+            "losses": 11,
+            "win_rate": 76.6,
+            "net_pnl": 143.33,
+            "profit_factor": 1.891,
+            "max_drawdown_pct": 21.6,
+            "ending_equity": 243.33
+          },
+          "overall": {
+            "trade_count": 70,
+            "wins": 44,
+            "losses": 26,
+            "win_rate": 62.9,
+            "net_pnl": -98.03,
+            "profit_factor": 0.757,
+            "max_drawdown_pct": 98.47,
+            "ending_equity": 1.97
+          }
+        },
+        "promoted_to": 3,
+        "promoted_params": {
+          "min_entry_cents": 35,
+          "max_entry_cents": 75,
+          "min_strike_gap_usd": 20.0,
+          "min_mins_left": 2,
+          "max_mins_left": 15,
+          "rsi_bull_min": 52.0,
+          "rsi_bull_max": 75.0,
+          "rsi_bear_min": 30.0,
+          "rsi_bear_max": 45.0,
+          "require_ema50_align": true,
+          "require_5m_align": true,
+          "min_volatility_usd": 0.0,
+          "max_chop_ratio": 1.0,
+          "ema_flat_dollars": 8.0
+        },
+        "decision": "PROMOTED v2 \u2192 v3",
+        "takeaway": "Changing bear RSI floor from 25 to 30 and bear RSI cap from 48 to 45 improved unseen P&L by +$4.07 after fees (73.3% WR on 45 trades). Promoted v2 \u2192 v3.",
+        "reason": "unseen P&L +$113.68 vs live +$109.61"
+      },
       {
         "t": "2026-11-26T22:56:48Z",
         "t_pt": "Nov 26, 2026, 2:56 PM PT",
