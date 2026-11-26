@@ -4277,7 +4277,9 @@
       "val_windows": 399,
       "promoted_from": 1,
       "candidate": "max_entry_75"
-    }
+    },
+    "last_promoted_at": "2026-11-26T20:02:10Z",
+    "last_promoted_at_pt": "Nov 26, 2026, 12:02 PM PT"
   },
   "learning": {
     "generated_at": "2026-11-26T20:02:10Z",
