@@ -162,11 +162,12 @@ def test_v1_settles_all_open_positions_and_respects_press_and_cash_cap():
     assert book["wins"] == 2
     assert book["cash"] > cash_before_settle
     assert book["press_next"] is True
-    # Press is 2× last winning stake, capped at $8, and never more than cash.
+    # Press is 2× last winning stake, hard-capped at $4, and never more than cash.
     last = closed[-1]["stake"]
     stake, pressed = resolve_entry_stake(2, True, last, book["cash"])
     assert pressed is True
-    assert stake == min(STAKE_PRESS_CAP, round(2 * last, 2), book["cash"])
+    assert stake == min(4.0, STAKE_PRESS_CAP, round(2 * last, 2), book["cash"])
+    assert stake <= 4.0
     # Cash cap: a nearly empty book cannot open a ticket.
     broke = new_race_book("v1", now)
     broke["cash"] = 0.40

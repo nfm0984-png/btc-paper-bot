@@ -385,3 +385,15 @@ footer a:hover { color: var(--brand-deep); }
   .race-bar-right { width: 100%; justify-content: space-between; }
   .cta.race-cta { flex: 1; }
 }
+
+.filter-pills { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: flex-end; }
+.filter-pills .pill { cursor: pointer; opacity: 0.55; }
+.filter-pills .pill[aria-pressed="true"] { opacity: 1; }
+.log-feed { display: flex; flex-direction: column; gap: 12px; }
+.log-card .feed-badges { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 6px; }
+.log-card .log-facts { display: flex; flex-wrap: wrap; gap: 8px 14px; margin-top: 10px; font-size: 13.5px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink); }
+.log-card .log-facts .k { color: var(--muted); font-weight: 800; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; margin-right: 4px; }
+.more-link.view-all { margin-top: 4px; color: var(--brand-deep); }
+@media (max-width: 640px) {
+  .filter-pills { justify-content: flex-start; margin-top: 10px; }
+}

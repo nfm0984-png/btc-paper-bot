@@ -111,9 +111,43 @@
   let sessionTimer = null;
 
   const TABS = ["live", "trades", "learning", "backtest", "rules"];
+  let TRADE_FILTER = "all";
 
-  function switchTab(id) {
-    const name = String(id || "live").replace(/^tab-/, "");
+  function parseHash() {
+    const h = (location.hash || "#live").slice(1);
+    if (h === "trades-v1" || h === "trades/v1") return { tab: "trades", filter: "v1" };
+    if (h === "trades-v2" || h === "trades/v2") return { tab: "trades", filter: "v2" };
+    if (h === "trades-all" || h === "trades") return { tab: "trades", filter: "all" };
+    if (TABS.includes(h)) return { tab: h, filter: null };
+    return { tab: "live", filter: null };
+  }
+
+  function tradesHash(filter) {
+    if (filter === "v1") return "#trades-v1";
+    if (filter === "v2") return "#trades-v2";
+    return "#trades";
+  }
+
+  function setTradeFilter(filter, opts) {
+    const next = (filter === "v1" || filter === "v2") ? filter : "all";
+    TRADE_FILTER = next;
+    ["all", "v1", "v2"].forEach((id) => {
+      const btn = $("filter-" + id);
+      if (btn) btn.setAttribute("aria-pressed", id === next ? "true" : "false");
+    });
+    if (DATA) renderRaceTradeLog((DATA.live || {}), DATA.race || {});
+    const hash = tradesHash(next);
+    if ((opts && opts.updateHash) !== false && location.hash !== hash) {
+      history.replaceState(null, "", hash);
+    }
+  }
+
+  function switchTab(id, opts) {
+    opts = opts || {};
+    let name = String(id || "live").replace(/^tab-/, "");
+    if (name === "trades-v1" || name === "trades/v1") { name = "trades"; if (opts.filter == null) opts.filter = "v1"; }
+    if (name === "trades-v2" || name === "trades/v2") { name = "trades"; if (opts.filter == null) opts.filter = "v2"; }
+    if (name === "trades-all") name = "trades";
     TABS.forEach((t) => {
       const btn = $("tab-" + t);
       const panel = $("panel-" + t);
@@ -121,18 +155,32 @@
       if (btn) btn.setAttribute("aria-selected", on ? "true" : "false");
       if (panel) panel.hidden = !on;
     });
-    if (location.hash !== "#" + name) {
-      history.replaceState(null, "", "#" + name);
+    if (name === "trades" && opts.filter) setTradeFilter(opts.filter, { updateHash: false });
+    const hash = name === "trades" ? tradesHash(TRADE_FILTER) : ("#" + name);
+    if (location.hash !== hash) {
+      history.replaceState(null, "", hash);
+    }
+    if (opts.scrollTo) {
+      const el = $(String(opts.scrollTo).replace(/^#/, ""));
+      if (el) {
+        requestAnimationFrame(() => el.scrollIntoView({ behavior: "smooth", block: "start" }));
+        return;
+      }
     }
     window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function openFullTradeLog(filter) {
+    switchTab("trades", { filter: filter || "all", scrollTo: "race-log-card" });
+    setTradeFilter(filter || "all");
   }
 
   document.querySelectorAll("nav.tabs button").forEach((b) => {
     b.addEventListener("click", () => switchTab(b.id));
   });
   window.addEventListener("hashchange", () => {
-    const h = (location.hash || "#live").slice(1);
-    if (TABS.includes(h)) switchTab(h);
+    const parsed = parseHash();
+    switchTab(parsed.tab, { filter: parsed.filter || undefined });
   });
 
   function ema(values, period) {
@@ -280,6 +328,151 @@
     return `<div class="table-wrap"><table>
       <thead><tr><th>Time (PT)</th><th>Contract</th><th>Side</th><th>Contracts / entry</th><th>Amount Bought</th><th>Exit / settlement</th><th>Gain / Lost</th><th>Why</th></tr></thead>
       <tbody>${rows}</tbody></table></div>`;
+  }
+
+  function bookTradeList(book, bookId, label) {
+    const rows = dedupeTrades((book && book.trades) || []).map((t) => Object.assign({}, t, {
+      book_id: t.book_id || bookId,
+      book_label: t.book_label || label,
+    }));
+    const opens = (book && book.open_positions && book.open_positions.length)
+      ? book.open_positions
+      : (book && book.position ? [book.position] : []);
+    opens.forEach((p) => {
+      if (!p) return;
+      const key = (p.ticker || "") + "|" + (p.entry_time || "") + "|" + (p.side || "");
+      const exists = rows.some((t) => ((t.ticker || "") + "|" + (t.entry_time || "") + "|" + (t.side || "")) === key);
+      if (!exists) {
+        rows.push(Object.assign({}, p, {
+          status: p.status || "open",
+          book_id: bookId,
+          book_label: label,
+        }));
+      }
+    });
+    return rows;
+  }
+
+  function sortTradesNewestFirst(trades) {
+    return (trades || []).slice().sort((a, b) => {
+      const tb = Date.parse(b.entry_time || b.exit_time || 0);
+      const ta = Date.parse(a.entry_time || a.exit_time || 0);
+      return (Number.isNaN(tb) ? 0 : tb) - (Number.isNaN(ta) ? 0 : ta);
+    });
+  }
+
+  function collectRaceTrades(race) {
+    race = race || {};
+    const v1 = bookTradeList(race.v1 || {}, "v1", "Version 1");
+    const v2 = bookTradeList(race.v2 || {}, "v2", "Version 2");
+    return { v1, v2, all: v1.concat(v2) };
+  }
+
+  function gainLostPill(t, market) {
+    if (!t || t.status === "open" || (t.pnl == null && t.status !== "closed")) {
+      return { cls: "HOLD", text: "OPEN" };
+    }
+    const pnlVal = tradePnl(t, market);
+    if (pnlVal == null) return { cls: "HOLD", text: "OPEN" };
+    if (pnlVal >= 0) return { cls: "WIN", text: "WIN " + money(pnlVal, true) };
+    return { cls: "LOSS", text: "LOSS " + money(pnlVal, true) };
+  }
+
+  function choiceReason(t) {
+    const raw = (t && (t.reason_entry || t.reason)) || "";
+    return plainReason({ reason: raw, reason_entry: raw }) || raw || "";
+  }
+
+  function raceLogDetails(t) {
+    if (!t) return "";
+    const bits = [];
+    if (t.strike != null) bits.push("Strike " + px(t.strike));
+    if (t.expiration_value != null) bits.push("Settlement BTC " + px(t.expiration_value));
+    if (t.result) bits.push("Official result " + String(t.result).toUpperCase());
+    if (t.outcome === "settlement") bits.push("Held to official settlement");
+    else if (t.exit_price != null) bits.push("Exited at " + cents(t.exit_price));
+    if (t.exit_time_pt) bits.push("Exit " + t.exit_time_pt);
+    const inds = t.indicators || t.indicators_1m;
+    if (inds) {
+      const parts = [];
+      if (inds.ema9 != null) parts.push("EMA 9 " + num(inds.ema9, 2));
+      if (inds.ema21 != null) parts.push("EMA 21 " + num(inds.ema21, 2));
+      if (inds.ema50 != null) parts.push("EMA 50 " + num(inds.ema50, 2));
+      if (inds.rsi14 != null) parts.push("RSI 14 " + num(inds.rsi14, 2));
+      if (inds.macd_hist != null) parts.push("MACD hist " + num(inds.macd_hist, 2));
+      if (parts.length) bits.push(parts.join(" · "));
+    }
+    const dump = indicatorDetails(t);
+    if (dump) bits.push(dump);
+    if (t.reason_exit && t.reason_exit !== t.reason && t.reason_exit !== t.reason_entry) bits.push(t.reason_exit);
+    return bits.join(". ");
+  }
+
+  function raceLogCard(t, market) {
+    const when = t.entry_time_pt || shortTimePT(t.entry_time || t.t || "");
+    const window = prettyWindow(t);
+    const ver = (t.book_id === "v2" || /version 2/i.test(t.book_label || "")) ? "v2" : "v1";
+    const verLabel = t.book_label || (ver === "v2" ? "Version 2" : "Version 1");
+    const pill = gainLostPill(t, market);
+    const side = String(t.side || "").toUpperCase();
+    const bought = amountBoughtOf(t);
+    const reason = choiceReason(t);
+    const details = raceLogDetails(t);
+    const detailsHtml = details
+      ? `<details class="details"><summary>Details</summary><div class="feed-details">${esc(details)}</div></details>`
+      : "";
+    return `<article class="feed-card log-card ${esc(ver)}">
+      <div class="feed-top">
+        <div>
+          <div class="feed-when">${esc(when)}</div>
+          ${window ? `<div class="feed-window">${esc(window)}</div>` : ""}
+          <div class="feed-badges">
+            <span class="pill sm ${esc(ver.toUpperCase())}">${esc(verLabel)}</span>
+            ${pressTag(t)}
+          </div>
+        </div>
+        <div class="feed-right">
+          <div class="pill sm ${esc(pill.cls)}">${esc(pill.text)}</div>
+        </div>
+      </div>
+      <div class="log-facts">
+        <span><span class="k">Side</span>${esc(side || "—")} · ${esc(contractsLabel(t.contracts))} @ ${cents(t.entry_price)}</span>
+        <span><span class="k">Amount Bought</span>${esc(money(bought))}</span>
+        <span><span class="k">Gain / Lost</span>${esc(pill.text)}</span>
+      </div>
+      ${reason ? `<div class="feed-line">${esc(reason)}</div>` : ""}
+      ${detailsHtml}
+    </article>`;
+  }
+
+  function renderRaceTradeLog(live, race) {
+    const el = $("race-trade-log");
+    const title = $("race-log-title");
+    if (!el && !title) return;
+    const market = (live && live.market) || {};
+    const bags = collectRaceTrades(race);
+    const filter = TRADE_FILTER === "v1" || TRADE_FILTER === "v2" ? TRADE_FILTER : "all";
+    const source = filter === "v1" ? bags.v1 : filter === "v2" ? bags.v2 : bags.all;
+    const list = sortTradesNewestFirst(source);
+    const label = filter === "v1" ? "Version 1 Trades" : filter === "v2" ? "Version 2 Trades" : "All Trades";
+    if (title) title.textContent = label + " (" + list.length + ")";
+    if (!el) return;
+    if (!list.length) {
+      const empty = filter === "v1"
+        ? "Version 1 hasn’t taken a race trade yet."
+        : filter === "v2"
+          ? "Version 2 is waiting for a strict-rules setup."
+          : "No race trades yet — the full log will land here.";
+      el.innerHTML = `<p class="empty">${esc(empty)}</p>`;
+      return;
+    }
+    el.innerHTML = `<div class="log-feed">${list.map((t) => raceLogCard(t, market)).join("")}</div>`;
+  }
+
+  function viewAllTradesButton(bookId, book) {
+    const n = bookTradeList(book || {}, bookId, bookId === "v2" ? "Version 2" : "Version 1").length;
+    const label = "View all " + n + " trade" + (n === 1 ? "" : "s") + " →";
+    return `<button type="button" class="more-link view-all" data-book="${esc(bookId)}">${esc(label)}</button>`;
   }
 
 
@@ -618,8 +811,8 @@
     card.hidden = false;
     $("session-window").textContent = sess.window_label_pt || sess.window_label || "1-hour $40 run";
     $("session-range").textContent = (sess.start_pt && sess.end_pt)
-      ? (sess.start_pt + " → " + sess.end_pt + " · $2–$4 per trade (2× on win, max $8) · real Kalshi taker fees")
-      : "$2–$4 per trade (2× on win, max $8) · real Kalshi taker fees";
+      ? (sess.start_pt + " → " + sess.end_pt + " · $2–$4 per trade (2× on win, max $4) · real Kalshi taker fees")
+      : "$2–$4 per trade (2× on win, max $4) · real Kalshi taker fees";
     tickSessionBadge();
     if (sessionTimer) clearInterval(sessionTimer);
     sessionTimer = setInterval(tickSessionBadge, 1000);
@@ -637,7 +830,7 @@
     if (sessB) sessB.textContent = money(bookAmountBought(sess));
     const press = $("session-press");
     if (press) {
-      const label = sess.next_stake_label || (sess.press_next ? ("Next trade: 2× press ($" + Math.round(Math.min(8, 2 * (sess.last_win_stake || 0))) + ")") : "Next stake: $2–$4");
+      const label = sess.next_stake_label || (sess.press_next ? ("Next trade: 2× press ($" + Math.round(Math.min(4, 2 * (sess.last_win_stake || 0))) + ")") : "Next stake: $2–$4");
       press.textContent = label;
       press.className = "pill " + (sess.press_next ? "PRESS" : "BASE");
     }
@@ -772,7 +965,8 @@
     }
     const cards = groupFeedItems(sessionChecks(book), book.trades || []).slice(0, 8);
     if ($(id + "-recent")) {
-      $(id + "-recent").innerHTML = compactEventList(cards, "The first check in this $40 race will land here.");
+      const list = compactEventList(cards, "The first check in this $40 race will land here.");
+      $(id + "-recent").innerHTML = list + viewAllTradesButton(id, book);
     }
   }
 
@@ -789,9 +983,8 @@
     const market = live.market || {};
     const v1 = race.v1 || {};
     const v2 = race.v2 || {};
-    if ($("v1-trades")) $("v1-trades").innerHTML = tradeRows(v1.trades, "Version 1 hasn’t taken a race trade yet.", market);
+    renderRaceTradeLog(live, race);
     if ($("v1-checks")) $("v1-checks").innerHTML = checkRows(sessionChecks(v1));
-    if ($("v2-trades")) $("v2-trades").innerHTML = tradeRows(v2.trades, "Version 2 is waiting for a strict-rules setup.", market);
     if ($("v2-checks")) $("v2-checks").innerHTML = checkRows(sessionChecks(v2));
     if ($("race-trades-range")) {
       $("race-trades-range").textContent = race.start_pt
@@ -979,8 +1172,9 @@
   }
 
   async function start() {
-    const h = (location.hash || "#live").slice(1);
-    switchTab(TABS.includes(h) ? h : "live");
+    const parsed = parseHash();
+    if (parsed.filter) TRADE_FILTER = parsed.filter;
+    switchTab(parsed.tab, { filter: parsed.filter || undefined });
     try { await loadDashboard(); }
     catch (err) {
       $("error").hidden = false;
@@ -993,7 +1187,20 @@
 
   $("recent-more")?.addEventListener("click", (e) => {
     e.preventDefault();
-    switchTab("trades");
+    openFullTradeLog("all");
+  });
+  document.addEventListener("click", (e) => {
+    const btn = e.target && e.target.closest && e.target.closest(".view-all[data-book], .filter-pills .pill");
+    if (!btn) return;
+    e.preventDefault();
+    if (btn.classList.contains("view-all")) {
+      openFullTradeLog(btn.getAttribute("data-book") || "all");
+      return;
+    }
+    const id = btn.id || "";
+    if (id === "filter-v1") openFullTradeLog("v1");
+    else if (id === "filter-v2") openFullTradeLog("v2");
+    else if (id === "filter-all") openFullTradeLog("all");
   });
 
   start();
