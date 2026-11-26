@@ -61,11 +61,16 @@
       "t": 1795721095,
       "t_pt": "Nov 26, 2026, 11:24 AM PT",
       "equity": 95.3
+    },
+    {
+      "t": 1795721910,
+      "t_pt": "Nov 26, 2026, 11:38 AM PT",
+      "equity": 95.3
     }
   ],
   "created_at": "2026-11-26T18:33:31Z",
-  "updated_at": "2026-11-26T19:24:55Z",
-  "updated_at_pt": "Nov 26, 2026, 11:24 AM PT",
+  "updated_at": "2026-11-26T19:38:30Z",
+  "updated_at_pt": "Nov 26, 2026, 11:38 AM PT",
   "session": {
     "starting_balance": 40.0,
     "stake": 5.0,
@@ -143,6 +148,18 @@
         "yes_ask": 0.977,
         "no_ask": 0.024,
         "cash": 35.3
+      },
+      {
+        "t": "2026-11-26T19:38:30Z",
+        "t_pt": "Nov 26, 2026, 11:38 AM PT",
+        "ticker": "KXBTC15M-26NOV261445-45",
+        "action": "WAIT",
+        "label": "WAIT \u2014 No Edge",
+        "reason": "EMA 9 > 21 ($60,565 > $60,542); price above the 50-period EMA; MACD histogram is positive; RSI 64; 5-minute trend agrees. BTC +$40.65 vs the $60,543.32 strike, but Yes is already 75\u00a2 \u2014 too expensive (bot only buys 35\u00a2\u201372\u00a2).",
+        "btc_price": 60583.97,
+        "yes_ask": 0.75,
+        "no_ask": 0.26,
+        "cash": 35.3
       }
     ],
     "start": "2026-11-26T18:59:35Z",
@@ -151,8 +168,8 @@
     "end_pt": "Nov 26, 2026, 11:59 AM PT",
     "window_label": "10:59 AM \u2013 11:59 AM PT",
     "status": "LIVE",
-    "status_label": "LIVE \u00b7 34m left",
-    "remaining_sec": 2079,
+    "status_label": "LIVE \u00b7 21m left",
+    "remaining_sec": 1264,
     "equity": 35.3,
     "pnl": -4.7,
     "pnl_pct": -11.75,
@@ -165,10 +182,8 @@
     "completed_at": null,
     "completed_at_pt": null,
     "created_at": "2026-11-26T18:59:35Z",
-    "updated_at": "2026-11-26T19:24:55Z",
-    "updated_at_pt": "Nov 26, 2026, 11:24 AM PT",
-    "events": [
-      "Settled NO on KXBTC15M-26NOV261415-15: Settled YES at BTC 60462.45 vs strike 60416.55. PnL -4.70"
-    ]
+    "updated_at": "2026-11-26T19:38:30Z",
+    "updated_at_pt": "Nov 26, 2026, 11:38 AM PT",
+    "events": []
   }
 }
