@@ -66,11 +66,16 @@
       "t": 1795721910,
       "t_pt": "Nov 26, 2026, 11:38 AM PT",
       "equity": 95.3
+    },
+    {
+      "t": 1795723604,
+      "t_pt": "Nov 26, 2026, 12:06 PM PT",
+      "equity": 95.3
     }
   ],
   "created_at": "2026-11-26T18:33:31Z",
-  "updated_at": "2026-11-26T19:38:30Z",
-  "updated_at_pt": "Nov 26, 2026, 11:38 AM PT",
+  "updated_at": "2026-11-26T20:06:44Z",
+  "updated_at_pt": "Nov 26, 2026, 12:06 PM PT",
   "session": {
     "starting_balance": 40.0,
     "stake": 5.0,
@@ -160,6 +165,25 @@
         "yes_ask": 0.75,
         "no_ask": 0.26,
         "cash": 35.3
+      },
+      {
+        "t": "2026-11-26T20:06:44Z",
+        "t_pt": "Nov 26, 2026, 12:06 PM PT",
+        "ticker": "KXBTC15M-26NOV261515-15",
+        "close_time": "2026-11-26T20:15:00Z",
+        "close_time_pt": "Nov 26, 2026, 12:15 PM PT",
+        "window_label": "12:00 PM \u2013 12:15 PM PT",
+        "action": "WAIT",
+        "label": "WAIT \u2014 Too close to strike",
+        "reason": "Hour ended \u2014 watching only to settle any leftover trade. BTC +$7.04 vs the $60,648.08 strike. That\u2019s inside a $20 band, so settlement could still flip either way.",
+        "btc_price": 60655.12,
+        "strike": 60648.08,
+        "yes_ask": 0.47,
+        "no_ask": 0.54,
+        "side": null,
+        "contracts": null,
+        "entry_price": null,
+        "cash": 35.3
       }
     ],
     "start": "2026-11-26T18:59:35Z",
@@ -167,9 +191,9 @@
     "end": "2026-11-26T19:59:35Z",
     "end_pt": "Nov 26, 2026, 11:59 AM PT",
     "window_label": "10:59 AM \u2013 11:59 AM PT",
-    "status": "LIVE",
-    "status_label": "LIVE \u00b7 21m left",
-    "remaining_sec": 1264,
+    "status": "COMPLETE",
+    "status_label": "COMPLETE",
+    "remaining_sec": 0,
     "equity": 35.3,
     "pnl": -4.7,
     "pnl_pct": -11.75,
@@ -178,12 +202,12 @@
     "losses": 1,
     "win_rate": 0.0,
     "net_pnl": -4.7,
-    "final_balance": null,
-    "completed_at": null,
-    "completed_at_pt": null,
+    "final_balance": 35.3,
+    "completed_at": "2026-11-26T20:06:44Z",
+    "completed_at_pt": "Nov 26, 2026, 12:06 PM PT",
     "created_at": "2026-11-26T18:59:35Z",
-    "updated_at": "2026-11-26T19:38:30Z",
-    "updated_at_pt": "Nov 26, 2026, 11:38 AM PT",
+    "updated_at": "2026-11-26T20:06:44Z",
+    "updated_at_pt": "Nov 26, 2026, 12:06 PM PT",
     "events": []
   }
 }
