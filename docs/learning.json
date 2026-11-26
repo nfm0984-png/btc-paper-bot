@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-26T21:55:14Z",
-  "generated_at_pt": "Nov 26, 2026, 1:55 PM PT",
+  "generated_at": "2026-11-26T22:56:48Z",
+  "generated_at_pt": "Nov 26, 2026, 2:56 PM PT",
   "strategy": {
     "version": 2,
     "updated_at": "2026-11-26T20:02:10Z",
@@ -64,8 +64,8 @@
     "last_promoted_at_pt": "Nov 26, 2026, 12:02 PM PT"
   },
   "learning": {
-    "generated_at": "2026-11-26T21:55:14Z",
-    "generated_at_pt": "Nov 26, 2026, 1:55 PM PT",
+    "generated_at": "2026-11-26T22:56:48Z",
+    "generated_at_pt": "Nov 26, 2026, 2:56 PM PT",
     "windows": 1328,
     "history_days": 14,
     "train_windows": 929,
@@ -74,8 +74,8 @@
     "decision": "KEPT v2",
     "takeaway": "A candidate that changed bull RSI floor from 52 to 55 and bull RSI cap from 75 to 70 looked better on unseen windows (+$135.32 vs live +$105.61), but a promotion landed too recently \u2014 kept v2.",
     "last_run": {
-      "t": "2026-11-26T21:55:14Z",
-      "t_pt": "Nov 26, 2026, 1:55 PM PT",
+      "t": "2026-11-26T22:56:48Z",
+      "t_pt": "Nov 26, 2026, 2:56 PM PT",
       "windows": 1328,
       "train_windows": 929,
       "val_windows": 399,
@@ -87,10 +87,10 @@
           "wins": 46,
           "losses": 28,
           "win_rate": 62.2,
-          "net_pnl": -98.04,
+          "net_pnl": -97.8,
           "profit_factor": 0.768,
-          "max_drawdown_pct": 98.27,
-          "ending_equity": 1.96
+          "max_drawdown_pct": 98.18,
+          "ending_equity": 2.2
         },
         "val": {
           "trade_count": 49,
@@ -107,10 +107,10 @@
           "wins": 46,
           "losses": 28,
           "win_rate": 62.2,
-          "net_pnl": -98.04,
+          "net_pnl": -97.8,
           "profit_factor": 0.768,
-          "max_drawdown_pct": 98.27,
-          "ending_equity": 1.96
+          "max_drawdown_pct": 98.18,
+          "ending_equity": 2.2
         }
       },
       "best_candidate": {
@@ -136,10 +136,10 @@
           "wins": 44,
           "losses": 26,
           "win_rate": 62.9,
-          "net_pnl": -99.83,
-          "profit_factor": 0.753,
-          "max_drawdown_pct": 99.85,
-          "ending_equity": 0.17
+          "net_pnl": -98.06,
+          "profit_factor": 0.757,
+          "max_drawdown_pct": 98.4,
+          "ending_equity": 1.94
         },
         "val": {
           "trade_count": 46,
@@ -156,10 +156,10 @@
           "wins": 44,
           "losses": 26,
           "win_rate": 62.9,
-          "net_pnl": -99.83,
-          "profit_factor": 0.753,
-          "max_drawdown_pct": 99.85,
-          "ending_equity": 0.17
+          "net_pnl": -98.06,
+          "profit_factor": 0.757,
+          "max_drawdown_pct": 98.4,
+          "ending_equity": 1.94
         }
       },
       "promoted_to": null,
@@ -169,6 +169,101 @@
       "reason": "promotion cooldown still active"
     },
     "runs": [
+      {
+        "t": "2026-11-26T22:56:48Z",
+        "t_pt": "Nov 26, 2026, 2:56 PM PT",
+        "windows": 1328,
+        "train_windows": 929,
+        "val_windows": 399,
+        "candidates_tested": 40,
+        "live_version": 2,
+        "live": {
+          "train": {
+            "trade_count": 74,
+            "wins": 46,
+            "losses": 28,
+            "win_rate": 62.2,
+            "net_pnl": -97.8,
+            "profit_factor": 0.768,
+            "max_drawdown_pct": 98.18,
+            "ending_equity": 2.2
+          },
+          "val": {
+            "trade_count": 49,
+            "wins": 35,
+            "losses": 14,
+            "win_rate": 71.4,
+            "net_pnl": 105.61,
+            "profit_factor": 1.554,
+            "max_drawdown_pct": 22.61,
+            "ending_equity": 205.61
+          },
+          "overall": {
+            "trade_count": 74,
+            "wins": 46,
+            "losses": 28,
+            "win_rate": 62.2,
+            "net_pnl": -97.8,
+            "profit_factor": 0.768,
+            "max_drawdown_pct": 98.18,
+            "ending_equity": 2.2
+          }
+        },
+        "best_candidate": {
+          "name": "rsi_bull_55_70",
+          "params": {
+            "min_entry_cents": 35,
+            "max_entry_cents": 75,
+            "min_strike_gap_usd": 20.0,
+            "min_mins_left": 2,
+            "max_mins_left": 15,
+            "rsi_bull_min": 55.0,
+            "rsi_bull_max": 70.0,
+            "rsi_bear_min": 25.0,
+            "rsi_bear_max": 48.0,
+            "require_ema50_align": true,
+            "require_5m_align": true,
+            "min_volatility_usd": 0.0,
+            "max_chop_ratio": 1.0,
+            "ema_flat_dollars": 8.0
+          },
+          "train": {
+            "trade_count": 70,
+            "wins": 44,
+            "losses": 26,
+            "win_rate": 62.9,
+            "net_pnl": -98.06,
+            "profit_factor": 0.757,
+            "max_drawdown_pct": 98.4,
+            "ending_equity": 1.94
+          },
+          "val": {
+            "trade_count": 46,
+            "wins": 35,
+            "losses": 11,
+            "win_rate": 76.1,
+            "net_pnl": 135.32,
+            "profit_factor": 1.841,
+            "max_drawdown_pct": 21.6,
+            "ending_equity": 235.32
+          },
+          "overall": {
+            "trade_count": 70,
+            "wins": 44,
+            "losses": 26,
+            "win_rate": 62.9,
+            "net_pnl": -98.06,
+            "profit_factor": 0.757,
+            "max_drawdown_pct": 98.4,
+            "ending_equity": 1.94
+          }
+        },
+        "promoted_to": null,
+        "promoted_params": null,
+        "decision": "KEPT v2",
+        "takeaway": "A candidate that changed bull RSI floor from 52 to 55 and bull RSI cap from 75 to 70 looked better on unseen windows (+$135.32 vs live +$105.61), but a promotion landed too recently \u2014 kept v2.",
+        "reason": "promotion cooldown still active"
+      },
       {
         "t": "2026-11-26T21:55:14Z",
         "t_pt": "Nov 26, 2026, 1:55 PM PT",
