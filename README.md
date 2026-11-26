@@ -1,34 +1,30 @@
-# BTC Paper Bot
+# Kalshi 15-Minute BTC Paper Bot
 
-A long-only Bitcoin (BTC/USD) **paper-trading** bot that follows an EMA + momentum trend strategy. It runs automatically on GitHub Actions every 30 minutes and publishes a live dashboard on GitHub Pages.
+A live **Buy Yes / Buy No / Wait** signal bot for Kalshi’s 15-minute Bitcoin contract (`KXBTC15M` — “BTC price up in the next 15 mins?”). It runs on GitHub Actions every 5 minutes and publishes a dashboard on GitHub Pages.
 
 **Live dashboard:** https://nfm0984-png.github.io/btc-paper-bot/
 
-This bot uses only public market data and simulated money. There are no API keys, no secrets, and no real orders.
+This bot uses only public market data and simulated money. There are no API keys, no secrets, and no real Kalshi orders.
 
 ## What it does
 
-- Pulls live hourly BTC/USD candles from the Coinbase Exchange public API, with Kraken as a fallback.
-- Enters a paper long when a confirmed uptrend lines up with healthy momentum.
-- Exits on a trend roll-over, a −3% hard stop, or a trailing stop once the trade is up +2%.
-- Charges a realistic **0.10% fee + 0.05% slippage (0.15% per side)** on every buy and sell.
-- Starts with **$1,000** of paper cash and uses 95% of available cash per trade.
-- Keeps a rolling 30–90 day backtest of the exact same rules, clearly separated from the live paper book.
+- Reads the live `KXBTC15M` contract (ticker, strike, time left, Yes/No bid and ask) from Kalshi’s public API.
+- Pairs it with Coinbase 1-minute and 5-minute BTC/USD candles (Kraken fallback) for EMA + momentum indicators.
+- Makes a plain-English call: **BUY YES**, **BUY NO**, **SELL / TAKE PROFIT**, **CUT LOSS**, or **WAIT**.
+- Papers a **$100** book with a flat **$5** stake per trade, using Kalshi’s real quadratic taker fee.
+- Grades each ticket against Kalshi’s official Yes/No settlement.
+- Backtests the same rules on recent settled windows using **real 1-minute Kalshi quotes** plus official settlements — no made-up fills.
+- The dashboard polls Coinbase every 20 seconds for a live BTC price and 1-minute indicators. Kalshi’s API blocks browser CORS, so contract quotes and paper-trade grading refresh with each Actions run.
 
 ## Strategy (plain English)
 
-**Buy when flat** if all of these are true on a *closed* 1-hour candle:
+**Buy Yes** when all of these are true: 1-minute EMA 9 > 21, close above EMA 50, MACD histogram positive, RSI 52–75, the 5-minute trend agrees, BTC is at least $20 above the strike, Yes is 35¢–72¢, and at least 2 minutes remain.
 
-- EMA 12 is above EMA 26
-- Close is above EMA 50
-- MACD histogram (12, 26, 9) is positive
-- RSI 14 is between 52 and 72
+**Buy No** is the bearish mirror.
 
-**Sell back to cash** if any of these happen:
+**Wait** if the tape is choppy, the quotes are too expensive, or the window is almost over. The bot will not buy an 85¢+ Yes just to be “right.”
 
-- EMA 12 crosses back below EMA 26 on a closed hour
-- Price drops 3.0% below the entry fill
-- After a +2.0% unrealized gain, price falls 2.5% off the high since entry
+**Exit early** on a take-profit (bid ≥ 80¢ or +15¢ from entry), a 12¢ stop, or a momentum + strike flip. Otherwise hold to official settlement.
 
 ## How it runs
 
@@ -36,15 +32,8 @@ This bot uses only public market data and simulated money. There are no API keys
 python3 bot.py
 ```
 
-No third-party Python packages are required (Python 3.11+). The script writes:
-
-- `data/state.json` — live paper book (cash, open position, closed trades, equity)
-- `data/backtest.json` — historical test of the same rules
-- `docs/data.json` — dashboard payload
-- `docs/index.html` — the GitHub Pages site
-
-`.github/workflows/trade.yml` runs that script every 30 minutes, commits any book updates, and GitHub Pages serves `docs/` from `main`.
+No third-party Python packages are required (Python 3.11+). The script writes `data/state.json`, `data/backtest.json`, and `docs/data.json`. `.github/workflows/trade.yml` runs it every 5 minutes and GitHub Pages serves `docs/` from `main`.
 
 ## Important
 
-Paper trading only. Not financial advice. A backtest is not a promise of future results. Fees, slippage, and missed fills can look better or worse in live markets than they do in a historical replay.
+Paper trading only. Not financial advice. Kalshi settles these contracts on CF Benchmarks’ BRTI, which can differ slightly from Coinbase’s last price. A backtest is not a promise of future results.

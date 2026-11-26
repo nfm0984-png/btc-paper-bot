@@ -1,23 +1,17 @@
 {
-  "cash": 1000.0,
+  "cash": 100.0,
+  "starting_balance": 100.0,
+  "stake": 5.0,
   "position": null,
   "trades": [],
   "equity_history": [
     {
-      "t": 1795712400,
-      "t_pt": "Nov 26, 2026, 9:00 AM PT",
-      "equity": 1000.0,
-      "price": 60455.42
-    },
-    {
-      "t": 1795717443,
-      "t_pt": "Nov 26, 2026, 10:24 AM PT",
-      "equity": 1000.0,
-      "price": 60493.85
+      "t": 1795717955,
+      "t_pt": "Nov 26, 2026, 10:32 AM PT",
+      "equity": 100.0
     }
   ],
-  "last_processed_ts": 1795712400,
-  "starting_balance": 1000.0,
-  "created_at": "2026-11-26T18:24:03Z",
-  "updated_at": "2026-11-26T18:24:03Z"
+  "created_at": "2026-11-26T18:33:31Z",
+  "updated_at": "2026-11-26T18:32:35Z",
+  "updated_at_pt": "Nov 26, 2026, 10:32 AM PT"
 }

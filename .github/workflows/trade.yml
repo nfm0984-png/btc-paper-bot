@@ -2,7 +2,7 @@ name: Paper Trade
 
 on:
   schedule:
-    - cron: "*/30 * * * *"
+    - cron: "*/5 * * * *"
   workflow_dispatch:
 
 permissions:
@@ -15,6 +15,7 @@ concurrency:
 jobs:
   trade:
     runs-on: ubuntu-latest
+    timeout-minutes: 12
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -24,7 +25,7 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Run paper bot
+      - name: Run Kalshi 15-min paper bot
         run: python3 bot.py
 
       - name: Commit updated paper book
@@ -35,6 +36,6 @@ jobs:
           if git diff --staged --quiet; then
             echo "No paper-book changes to commit."
           else
-            git commit -m "chore: update paper book $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            git commit -m "chore: update Kalshi 15m paper book $(date -u +%Y-%m-%dT%H:%M:%SZ)"
             git push
           fi
