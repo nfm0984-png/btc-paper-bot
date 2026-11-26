@@ -11,9 +11,9 @@ This bot uses only public market data and simulated money. There are no API keys
 - Reads the live `KXBTC15M` contract (ticker, strike, time left, Yes/No bid and ask) from Kalshi’s public API.
 - Pairs it with Coinbase 1-minute and 5-minute BTC/USD candles (Kraken fallback) for EMA + momentum indicators.
 - Makes a plain-English call: **BUY YES**, **BUY NO**, **SELL / TAKE PROFIT**, **CUT LOSS**, or **WAIT**.
-- Papers a **$100** book with a flat **$5** stake per trade, using Kalshi’s real quadratic taker fee.
+- Papers a **$100** book with a **$2–$4** stake by signal strength (and **2× after a win**, capped at **$8**), using Kalshi’s real quadratic taker fee.
 - Grades each ticket against Kalshi’s official Yes/No settlement.
-- Can run a separate **1-hour $40 paper session** ($5 per trade) alongside the ongoing $100 book, with a live countdown and a check log of every 5-minute scan.
+- Can run a separate **1-hour $40 paper session** (same $2–$4 sizing and 2× press rule) alongside the ongoing $100 book, with a live countdown and a check log of every 5-minute scan.
 - Backtests the same rules on recent settled windows using **real 1-minute Kalshi quotes** plus official settlements — no made-up fills.
 - The dashboard polls Coinbase every 20 seconds for a live BTC price and 1-minute indicators. Kalshi’s API blocks browser CORS, so contract quotes and paper-trade grading refresh with each Actions run.
 

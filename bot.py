@@ -34,10 +34,17 @@ KALSHI_API = "https://api.elections.kalshi.com/trade-api/v2"
 KALSHI_MARKET_URL = "https://kalshi.com/markets/kxbtc15m/{ticker}"
 
 STARTING_BALANCE = 100.00
-STAKE = 5.00
+# Variable base stake: $2 normal, $3 strong, $4 top-conviction.
+STAKE_NORMAL = 2.00
+STAKE_STRONG = 3.00
+STAKE_TOP = 4.00
+STAKE_PRESS_CAP = 8.00
+STAKE = STAKE_NORMAL  # default / display alias
 SESSION_STARTING = 40.00
-SESSION_STAKE = 5.00
+SESSION_STAKE = STAKE_NORMAL
 SESSION_MINUTES = 60
+# Trades opened under the old flat-$5 rule have no `stake` field.
+LEGACY_FLAT_STAKE = 5.00
 FEE_RATE = 0.07  # Kalshi quadratic taker fee
 FEE_MULTIPLIER = 1.0
 
@@ -528,6 +535,8 @@ class Signal:
     side: Optional[str] = None  # yes / no
     ask: Optional[float] = None
     bid: Optional[float] = None
+    strength: Optional[str] = None  # normal / strong / top
+    base_stake: Optional[float] = None
 
 
 def _bullish(ind: Indicators, trend: Optional[Indicators]) -> tuple[bool, list[str], list[str]]:
@@ -608,6 +617,80 @@ def _bearish(ind: Indicators, trend: Optional[Indicators]) -> tuple[bool, list[s
     return ok, yes, no
 
 
+def grade_signal(
+    side: Optional[str],
+    ask: Optional[float],
+    ind: Optional[Indicators],
+    trend: Optional[Indicators],
+    btc_price: float,
+    strike: Optional[float],
+) -> tuple[str, float, list[str]]:
+    """Score a qualifying buy and map it to a $2 / $3 / $4 base stake.
+
+    Every buy already passed the hard filters. Extra quality points come from
+    a wider EMA 9/21 spread, a larger BTC-vs-strike cushion, a stronger MACD
+    histogram, RSI in the heart of its band, a better-value ask, and a clear
+    5-minute trend. 0–1 points = normal $2, 2 = strong $3, 3+ = top $4.
+    """
+    points = 0
+    notes: list[str] = []
+    if ind and ind.ready:
+        ema_spread = abs((ind.ema9 or 0) - (ind.ema21 or 0))
+        if ema_spread >= 25:
+            points += 1
+            notes.append(f"EMA 9/21 spread ${ema_spread:,.0f}")
+        macd = abs(ind.macd_hist or 0)
+        if macd >= 8:
+            points += 1
+            notes.append(f"MACD hist {macd:,.1f}")
+        rsi = ind.rsi14
+        if rsi is not None:
+            if side == "yes" and 56 <= rsi <= 70:
+                points += 1
+                notes.append(f"RSI {rsi:.0f} in the heart of the bullish band")
+            elif side == "no" and 30 <= rsi <= 44:
+                points += 1
+                notes.append(f"RSI {rsi:.0f} in the heart of the bearish band")
+    if strike is not None:
+        dist = abs(float(btc_price) - float(strike))
+        if dist >= 50:
+            points += 1
+            notes.append(f"BTC ${dist:,.0f} from the strike")
+    if ask is not None and 0.35 <= float(ask) <= 0.58:
+        points += 1
+        notes.append(f"ask {cents_label(ask)} leaves upside")
+    if trend and trend.ready:
+        t_spread = abs((trend.ema9 or 0) - (trend.ema21 or 0))
+        agrees = (side == "yes" and (trend.ema9 or 0) >= (trend.ema21 or 0)) or (
+            side == "no" and (trend.ema9 or 0) <= (trend.ema21 or 0)
+        )
+        if agrees and t_spread >= 20:
+            points += 1
+            notes.append(f"5-minute trend is clearly aligned (${t_spread:,.0f} EMA spread)")
+    if points >= 3:
+        return "top", STAKE_TOP, notes
+    if points >= 2:
+        return "strong", STAKE_STRONG, notes
+    return "normal", STAKE_NORMAL, notes
+
+
+def apply_strength(
+    sig: Signal,
+    ind: Optional[Indicators],
+    trend: Optional[Indicators],
+    btc_price: float,
+    strike: Optional[float],
+) -> Signal:
+    grade, stake, notes = grade_signal(sig.side, sig.ask, ind, trend, btc_price, strike)
+    sig.strength = grade
+    sig.base_stake = stake
+    if notes:
+        sig.reason = sig.reason + f" {grade.capitalize()} signal (${stake:.0f} ticket)" + (": " + "; ".join(notes) + "." if notes else ".")
+    else:
+        sig.reason = sig.reason + f" {grade.capitalize()} signal (${stake:.0f} ticket)."
+    return sig
+
+
 def make_signal(
     *,
     ind_1m: Optional[Indicators],
@@ -679,7 +762,10 @@ def make_signal(
                 f"{'; '.join(bull_yes)}. {dist_txt}, but Yes ask is only {cents_label(yes_ask)} (below the 35¢ floor — something looks off).",
             )
         reason = f"{'; '.join(bull_yes)}. {dist_txt}, Yes ask {cents_label(yes_ask)} — Buy Yes."
-        return Signal("BUY_YES", f"BUY YES @ {cents_label(yes_ask)}", reason, side="yes", ask=yes_ask, bid=yes_bid)
+        return apply_strength(
+            Signal("BUY_YES", f"BUY YES @ {cents_label(yes_ask)}", reason, side="yes", ask=yes_ask, bid=yes_bid),
+            ind_1m, ind_5m, btc_price, strike,
+        )
 
     if bear_ok and dist < 0:
         if no_ask is None:
@@ -697,7 +783,10 @@ def make_signal(
                 f"{'; '.join(bear_yes)}. {dist_txt}, but No ask is only {cents_label(no_ask)} (below the 35¢ floor — something looks off).",
             )
         reason = f"{'; '.join(bear_yes)}. {dist_txt}, No ask {cents_label(no_ask)} — Buy No."
-        return Signal("BUY_NO", f"BUY NO @ {cents_label(no_ask)}", reason, side="no", ask=no_ask, bid=no_bid)
+        return apply_strength(
+            Signal("BUY_NO", f"BUY NO @ {cents_label(no_ask)}", reason, side="no", ask=no_ask, bid=no_bid),
+            ind_1m, ind_5m, btc_price, strike,
+        )
 
     bits = []
     if dist > 0 and not bull_ok:
@@ -771,11 +860,137 @@ def _exit_signal(
 # Paper book
 # ---------------------------------------------------------------------------
 
+def inferred_stake(obj: Optional[dict]) -> float:
+    """Stake used for a trade or position. Legacy tickets with no field were $5."""
+    if obj and obj.get("stake") is not None:
+        try:
+            return round_money(float(obj["stake"]))
+        except (TypeError, ValueError):
+            pass
+    return LEGACY_FLAT_STAKE
+
+
+def ensure_press_fields(book: dict) -> dict:
+    """Upgrade an existing book/session in place without touching cash or trades."""
+    if not isinstance(book, dict):
+        return book
+    book.setdefault("press_next", False)
+    book.setdefault("last_win_stake", None)
+    book.setdefault("stake", STAKE)
+    return book
+
+
+def resolve_entry_stake(
+    base_stake: float,
+    press_next: bool,
+    last_win_stake: Optional[float],
+    cash: float,
+) -> tuple[float, bool]:
+    """Return (stake, is_press). Press is 2× the last winning stake, capped at $8 and at cash."""
+    if press_next and last_win_stake:
+        target = min(STAKE_PRESS_CAP, round_money(2.0 * float(last_win_stake)))
+        pressed = True
+    else:
+        target = float(base_stake if base_stake is not None else STAKE_NORMAL)
+        pressed = False
+    cash = max(0.0, float(cash or 0))
+    target = min(round_money(target), round_money(cash))
+    return target, pressed and target > 0
+
+
+def apply_press_from_trade(press_next: bool, last_win_stake: Optional[float], trade: dict) -> tuple[bool, Optional[float]]:
+    """Update press state after a trade settles or exits. A win arms 2×; a loss resets."""
+    pnl = trade.get("pnl")
+    if pnl is None:
+        return press_next, last_win_stake
+    stake = inferred_stake(trade)
+    if float(pnl) > 0:
+        return True, stake
+    return False, None
+
+
+def next_stake_label(press_next: bool, last_win_stake: Optional[float], cash: Optional[float] = None) -> str:
+    if press_next and last_win_stake:
+        stake, _ = resolve_entry_stake(STAKE_NORMAL, True, last_win_stake, cash if cash is not None else STAKE_PRESS_CAP)
+        return f"Next trade: 2× press (${stake:.0f})"
+    return "Next stake: $2–$4"
+
+
+def dedupe_trades(trades: Optional[list]) -> list[dict]:
+    """If an open ticket and its closed record both exist, keep the closed one."""
+    rows = [t for t in (trades or []) if t]
+    best: dict[str, dict] = {}
+    order: list[str] = []
+    for t in rows:
+        key = f"{t.get('ticker')}|{t.get('entry_time')}|{t.get('side')}"
+        prev = best.get(key)
+        if prev is None:
+            best[key] = t
+            order.append(key)
+        elif t.get("status") == "closed" or (prev.get("status") != "closed" and t.get("pnl") is not None):
+            best[key] = t
+    return [best[k] for k in order]
+
+
+def upsert_closed_trade(trades: list[dict], closed: dict) -> list[dict]:
+    key_ticker = closed.get("ticker")
+    key_time = closed.get("entry_time")
+    key_side = closed.get("side")
+    for i, t in enumerate(trades):
+        if t.get("ticker") == key_ticker and t.get("entry_time") == key_time and t.get("side") == key_side:
+            trades[i] = closed
+            return trades
+    trades.append(closed)
+    return trades
+
+
+def book_totals(trades: Optional[list], position: Optional[dict] = None) -> tuple[float, int]:
+    rows = dedupe_trades(trades)
+    if not rows and position:
+        rows = [position]
+    amount = round_money(sum(float(t.get("amount_bought") or t.get("total_in") or 0) for t in rows))
+    contracts = int(sum(int(t.get("contracts") or 0) for t in rows))
+    return amount, contracts
+
+
+def decorate_position(position: Optional[dict], yes_bid: Optional[float], no_bid: Optional[float]) -> Optional[dict]:
+    if not position:
+        return position
+    pos = dict(position)
+    total_in = round_money(float(pos.get("total_in") or pos.get("amount_bought") or 0))
+    pos["amount_bought"] = total_in
+    pos["stake"] = inferred_stake(pos)
+    bid = yes_bid if pos.get("side") == "yes" else no_bid
+    if bid is not None and pos.get("contracts") is not None:
+        pos["mark"] = round_money(int(pos["contracts"]) * float(bid))
+        pos["pnl"] = round_money(pos["mark"] - total_in)
+        pos["pnl_kind"] = "unrealized"
+    return pos
+
+
+def decorate_trade(trade: dict, yes_bid: Optional[float] = None, no_bid: Optional[float] = None) -> dict:
+    t = dict(trade)
+    total_in = t.get("amount_bought") or t.get("total_in")
+    if total_in is not None:
+        t["amount_bought"] = round_money(float(total_in))
+    t["stake"] = inferred_stake(t)
+    if t.get("status") == "open" and t.get("pnl") is None:
+        bid = yes_bid if t.get("side") == "yes" else no_bid
+        if bid is not None and t.get("contracts") is not None and t.get("amount_bought") is not None:
+            t["pnl"] = round_money(int(t["contracts"]) * float(bid) - float(t["amount_bought"]))
+            t["pnl_kind"] = "unrealized"
+    elif t.get("pnl") is not None:
+        t.setdefault("pnl_kind", "settled")
+    return t
+
+
 def default_state() -> dict:
     return {
         "cash": STARTING_BALANCE,
         "starting_balance": STARTING_BALANCE,
         "stake": STAKE,
+        "press_next": False,
+        "last_win_stake": None,
         "position": None,
         "trades": [],
         "equity_history": [],
@@ -794,6 +1009,9 @@ def load_state() -> dict:
     state.setdefault("position", None)
     state.setdefault("trades", [])
     state.setdefault("equity_history", [])
+    ensure_press_fields(state)
+    if isinstance(state.get("session"), dict):
+        ensure_press_fields(state["session"])
     return state
 
 
@@ -815,7 +1033,18 @@ def mark_equity(cash: float, position: Optional[dict], yes_bid: Optional[float],
     return round_money(cash + float(position["contracts"]) * bid)
 
 
-def open_trade(cash: float, market: dict, side: str, ask: float, reason: str, now: datetime, stake: float = STAKE) -> Optional[tuple[float, dict, dict]]:
+def open_trade(
+    cash: float,
+    market: dict,
+    side: str,
+    ask: float,
+    reason: str,
+    now: datetime,
+    stake: float = STAKE,
+    *,
+    pressed: bool = False,
+    strength: Optional[str] = None,
+) -> Optional[tuple[float, dict, dict]]:
     if ask <= 0 or ask >= 1:
         return None
     contracts = int(float(stake) // ask)
@@ -842,6 +1071,10 @@ def open_trade(cash: float, market: dict, side: str, ask: float, reason: str, no
         "entry_fee": fee,
         "cost": cost,
         "total_in": total,
+        "amount_bought": total,
+        "stake": round_money(float(stake)),
+        "pressed": bool(pressed),
+        "strength": strength,
         "entry_time": iso_utc(now),
         "entry_time_pt": fmt_pt(now),
         "close_time": market.get("close_time"),
@@ -863,6 +1096,10 @@ def open_trade(cash: float, market: dict, side: str, ask: float, reason: str, no
         "strike": position["strike"],
         "running_balance": cash_after,
         "total_in": total,
+        "amount_bought": total,
+        "stake": position["stake"],
+        "pressed": bool(pressed),
+        "strength": strength,
     }
     return cash_after, position, log
 
@@ -914,6 +1151,11 @@ def close_trade(
         "kalshi_url": position.get("kalshi_url") or contract_url(position["ticker"]),
         "running_balance": cash_after,
         "total_in": position.get("total_in"),
+        "amount_bought": position.get("amount_bought") or position.get("total_in"),
+        "stake": inferred_stake(position),
+        "pressed": bool(position.get("pressed")),
+        "strength": position.get("strength"),
+        "pnl_kind": "settled",
     }
     return cash_after, trade
 
@@ -969,6 +1211,8 @@ def run_backtest(
     scanned = 0
     skipped = 0
     skip_reasons: dict[str, int] = {}
+    press_next = False
+    last_win_stake = None
 
     for m in markets:
         open_ts = to_ts(m["open_time"])
@@ -1002,7 +1246,12 @@ def run_backtest(
             skip_reasons[key] = skip_reasons.get(key, 0) + 1
             equity.append({"t": decision_ts, "t_pt": fmt_pt(decision_ts), "equity": round_money(cash)})
             continue
-        opened = open_trade(cash, m, sig.side or "yes", float(sig.ask), sig.reason, parse_iso(decision_ts))
+        base = float(sig.base_stake or STAKE_NORMAL)
+        entry_stake, pressed = resolve_entry_stake(base, press_next, last_win_stake, cash)
+        opened = open_trade(
+            cash, m, sig.side or "yes", float(sig.ask), sig.reason, parse_iso(decision_ts),
+            stake=entry_stake, pressed=pressed, strength=sig.strength,
+        )
         if not opened:
             skipped += 1
             skip_reasons["not enough cash / size"] = skip_reasons.get("not enough cash / size", 0) + 1
@@ -1021,6 +1270,7 @@ def run_backtest(
             expiration_value=dollars(m.get("expiration_value")),
         )
         trades.append(trade)
+        press_next, last_win_stake = apply_press_from_trade(press_next, last_win_stake, trade)
         equity.append({"t": to_ts(close_dt), "t_pt": fmt_pt(close_dt), "equity": cash})
 
     stats = trade_stats(trades)
@@ -1059,7 +1309,8 @@ def run_backtest(
         "trades": list(reversed(trades[-80:])),
         "assumption_note": (
             "Each window is evaluated once, 1 minute after it opens, using the real Kalshi Yes/No "
-            "quotes at that minute and Coinbase 1-minute / 5-minute BTC candles. Trades use a $5 stake, "
+            "quotes at that minute and Coinbase 1-minute / 5-minute BTC candles. Trades use a $2–$4 "
+            "base stake by signal strength, then 2× after a win (capped at $8), "
             "the official quadratic taker fee, and are held to Kalshi’s official Yes/No settlement. "
             "The live bot can also enter later in a window (on a 5-minute scan) or exit early if momentum flips; "
             "those live extras are not in this backtest."
@@ -1148,8 +1399,10 @@ def step_paper_book(
     now: datetime,
     *,
     allow_new_entries: bool,
-    stake: float,
-) -> tuple[float, Optional[dict], list[dict], list[str], Signal, Optional[float], Optional[float]]:
+    stake: float = STAKE,
+    press_next: bool = False,
+    last_win_stake: Optional[float] = None,
+) -> tuple[float, Optional[dict], list[dict], list[str], Signal, Optional[float], Optional[float], bool, Optional[float]]:
     """Apply settlements, early exits, and optional new entries to one paper book."""
     if position:
         pos_m = find_market(position["ticker"], settled, [market] if market else [])
@@ -1173,7 +1426,8 @@ def step_paper_book(
                     now=parse_iso(pos_m.get("settlement_ts") or now),
                     expiration_value=dollars(pos_m.get("expiration_value")),
                 )
-                trades.append(trade)
+                upsert_closed_trade(trades, trade)
+                press_next, last_win_stake = apply_press_from_trade(press_next, last_win_stake, trade)
                 events.append(
                     f"Settled {position['side'].upper()} on {position['ticker']}: {trade['reason_exit']} PnL {trade['pnl']:+.2f}"
                 )
@@ -1212,7 +1466,8 @@ def step_paper_book(
                 reason=sig.reason,
                 now=now,
             )
-            trades.append(trade)
+            upsert_closed_trade(trades, trade)
+            press_next, last_win_stake = apply_press_from_trade(press_next, last_win_stake, trade)
             events.append(
                 f"{sig.action} {position['side'].upper()} on {position['ticker']} @ {cents_label(sig.bid)} PnL {trade['pnl']:+.2f}"
             )
@@ -1232,12 +1487,19 @@ def step_paper_book(
         )
 
     if allow_new_entries and position is None and market and sig.action in ("BUY_YES", "BUY_NO") and sig.ask is not None:
-        opened = open_trade(cash, market, sig.side or "yes", float(sig.ask), sig.reason, now, stake=stake)
+        base = float(sig.base_stake or stake or STAKE_NORMAL)
+        entry_stake, pressed = resolve_entry_stake(base, press_next, last_win_stake, cash)
+        opened = open_trade(
+            cash, market, sig.side or "yes", float(sig.ask), sig.reason, now,
+            stake=entry_stake, pressed=pressed, strength=sig.strength,
+        )
         if opened:
             cash, position, log = opened
             trades.append(log)
+            press_tag = " 2× PRESS" if pressed else ""
             events.append(
-                f"Opened {position['side'].upper()} {position['contracts']}x {position['ticker']} @ {cents_label(position['entry_price'])} (fee ${position['entry_fee']:.2f})"
+                f"Opened {position['side'].upper()} {position['contracts']}x {position['ticker']} @ {cents_label(position['entry_price'])} "
+                f"(bought ${position['total_in']:.2f}, ${position['stake']:.0f} ticket{press_tag}, fee ${position['entry_fee']:.2f})"
             )
             sig = Signal(
                 "HOLD",
@@ -1246,13 +1508,17 @@ def step_paper_book(
                 side=position["side"],
                 ask=sig.ask,
                 bid=yes_bid if position["side"] == "yes" else no_bid,
+                strength=sig.strength,
+                base_stake=sig.base_stake,
             )
         else:
-            events.append("Signal fired but not enough paper cash to buy a $5 ticket after fees.")
+            events.append("Signal fired but not enough paper cash to size the ticket after fees.")
             sig = Signal(
                 "WAIT",
                 "WAIT — No Trade",
-                sig.reason + " Not enough paper cash to size a $5 ticket after fees.",
+                sig.reason + " Not enough paper cash to size the ticket after fees.",
+                strength=sig.strength,
+                base_stake=sig.base_stake,
             )
     elif (not allow_new_entries) and position is None and sig.action in ("BUY_YES", "BUY_NO"):
         # Keep the underlying signal for the check log; caller will mark it as skipped.
@@ -1272,7 +1538,7 @@ def step_paper_book(
             position=position,
         )
 
-    return cash, position, trades, events, sig, yes_bid, no_bid
+    return cash, position, trades, events, sig, yes_bid, no_bid, press_next, last_win_stake
 
 
 def run_live(
@@ -1285,7 +1551,8 @@ def run_live(
     now: datetime,
 ) -> tuple[dict, Signal, list[str]]:
     events: list[str] = []
-    cash, position, trades, events, sig, yes_bid, no_bid = step_paper_book(
+    ensure_press_fields(state)
+    cash, position, trades, events, sig, yes_bid, no_bid, press_next, last_win_stake = step_paper_book(
         float(state["cash"]),
         state.get("position"),
         list(state.get("trades") or []),
@@ -1298,6 +1565,8 @@ def run_live(
         now,
         allow_new_entries=True,
         stake=float(state.get("stake") or STAKE),
+        press_next=bool(state.get("press_next")),
+        last_win_stake=state.get("last_win_stake"),
     )
     equity_history = list(state.get("equity_history") or [])
     equity = mark_equity(cash, position, yes_bid, no_bid)
@@ -1309,7 +1578,9 @@ def run_live(
         "cash": round_money(cash),
         "starting_balance": float(state.get("starting_balance") or STARTING_BALANCE),
         "stake": STAKE,
-        "position": position,
+        "press_next": bool(press_next),
+        "last_win_stake": last_win_stake,
+        "position": decorate_position(position, yes_bid, no_bid),
         "trades": trades,
         "equity_history": equity_history,
         "created_at": state.get("created_at") or iso_utc(now),
@@ -1325,6 +1596,8 @@ def new_session(now: datetime) -> dict:
     return {
         "starting_balance": SESSION_STARTING,
         "stake": SESSION_STAKE,
+        "press_next": False,
+        "last_win_stake": None,
         "cash": SESSION_STARTING,
         "position": None,
         "trades": [],
@@ -1374,7 +1647,8 @@ def run_session(
     end = parse_iso(sess["end"])
     allow_new = now < end
     events: list[str] = []
-    cash, position, trades, events, sig, yes_bid, no_bid = step_paper_book(
+    ensure_press_fields(sess)
+    cash, position, trades, events, sig, yes_bid, no_bid, press_next, last_win_stake = step_paper_book(
         float(sess.get("cash") or SESSION_STARTING),
         sess.get("position"),
         list(sess.get("trades") or []),
@@ -1387,6 +1661,8 @@ def run_session(
         now,
         allow_new_entries=allow_new,
         stake=float(sess.get("stake") or SESSION_STAKE),
+        press_next=bool(sess.get("press_next")),
+        last_win_stake=sess.get("last_win_stake"),
     )
 
     action = sig.action
@@ -1418,6 +1694,9 @@ def run_session(
     checks = checks[-40:]
 
     start_bal = float(sess.get("starting_balance") or SESSION_STARTING)
+    position = decorate_position(position, yes_bid, no_bid)
+    trades = [decorate_trade(t, yes_bid, no_bid) for t in trades]
+    amount_bought, contracts_total = book_totals(trades, position)
     equity = mark_equity(cash, position, yes_bid, no_bid)
     stats = trade_stats(trades)
     remaining = int((end - now).total_seconds())
@@ -1438,9 +1717,14 @@ def run_session(
     out = {
         "starting_balance": start_bal,
         "stake": float(sess.get("stake") or SESSION_STAKE),
+        "press_next": bool(press_next),
+        "last_win_stake": last_win_stake,
+        "next_stake_label": next_stake_label(press_next, last_win_stake, cash),
         "cash": round_money(cash),
         "position": position,
         "trades": trades,
+        "amount_bought": amount_bought,
+        "contracts_total": contracts_total,
         "checks": checks,
         "start": sess["start"],
         "start_pt": sess.get("start_pt") or fmt_pt(sess["start"]),
@@ -1552,8 +1836,10 @@ def main() -> int:
     state = load_state()
     # If an older hourly-spot state is still on disk, start a fresh $100 Kalshi book.
     if float(state.get("starting_balance") or 0) != STARTING_BALANCE or "stake" not in state:
-        print("  Starting a fresh $100 / $5-per-trade Kalshi paper book (previous state was a different bot).", flush=True)
+        print("  Starting a fresh $100 Kalshi paper book (previous state was a different bot).", flush=True)
         state = default_state()
+    else:
+        ensure_press_fields(state)
 
     new_state, sig, events = run_live(state, market, settled, ind_1m, ind_5m, btc_price, now)
     session = run_session(state, market, settled, ind_1m, ind_5m, btc_price, now)
@@ -1561,15 +1847,21 @@ def main() -> int:
     save_json(STATE_PATH, new_state)
 
     mp = market_payload(market, now)
-    stats = trade_stats(new_state["trades"])
+    yes_bid = mp["yes_bid"] if mp else None
+    no_bid = mp["no_bid"] if mp else None
+    new_state["position"] = decorate_position(new_state.get("position"), yes_bid, no_bid)
+    live_trades = [decorate_trade(t, yes_bid, no_bid) for t in (new_state.get("trades") or [])]
+    new_state["trades"] = live_trades
+    stats = trade_stats(live_trades)
     start = float(new_state["starting_balance"])
     equity = mark_equity(
         new_state["cash"],
         new_state["position"],
-        mp["yes_bid"] if mp else None,
-        mp["no_bid"] if mp else None,
+        yes_bid,
+        no_bid,
     )
     pnl = round_money(equity - start)
+    book_bought, book_contracts = book_totals(live_trades, new_state.get("position"))
     strike = mp["strike"] if mp else None
     dist = (btc_price - strike) if strike is not None else None
 
@@ -1610,6 +1902,11 @@ def main() -> int:
             "pnl_pct": round((pnl / start) * 100.0, 2) if start else 0.0,
             "starting_balance": start,
             "stake": STAKE,
+            "press_next": bool(new_state.get("press_next")),
+            "last_win_stake": new_state.get("last_win_stake"),
+            "next_stake_label": next_stake_label(bool(new_state.get("press_next")), new_state.get("last_win_stake"), new_state["cash"]),
+            "amount_bought": book_bought,
+            "contracts_total": book_contracts,
             "position": new_state["position"],
             "equity_history": new_state["equity_history"],
             "trades": list(reversed(new_state["trades"][-50:])),
@@ -1618,11 +1915,12 @@ def main() -> int:
         },
         "session": session,
         "backtest": backtest,
-        "fee_note": "Every paper trade uses Kalshi’s taker fee, ceil(0.07 × contracts × price × (1 − price)), rounded up to the next cent. The ongoing book starts at $100; the separate 1-hour session starts at $40. Both use a $5 stake.",
+        "fee_note": "Every paper trade uses Kalshi’s taker fee, ceil(0.07 × contracts × price × (1 − price)), rounded up to the next cent. The ongoing book starts at $100; the separate 1-hour session starts at $40. Both use a $2–$4 base stake by signal strength, then 2× after a win, capped at $8.",
         "rules_summary": {
             "buy_yes": "1m EMA 9 > 21, close > EMA 50, MACD hist > 0, RSI 52–75, 5m trend agrees, BTC at least $20 above the strike, Yes ask 35¢–72¢, and ≥ 2 minutes left.",
             "buy_no": "The bearish mirror (EMA 9 < 21, close < EMA 50, MACD hist < 0, RSI 25–48, 5m trend agrees, BTC at least $20 below the strike, No ask 35¢–72¢).",
             "exits": "Sell early if the bid reaches 80¢ or +15¢ from entry (take profit), drops 12¢ from entry, or momentum and BTC-vs-strike both flip against the position. Otherwise hold to official settlement.",
+            "sizing": "Normal qualifying signal $2, strong $3, top-conviction $4. After a win, the next trade is 2× that winning stake, capped at $8 and never more than cash on hand. A loss resets to $2–$4; another win keeps pressing 2× up to the $8 cap. The $40 run and $100 book each track this separately.",
         },
     }
     save_json(DASHBOARD_PATH, dashboard)

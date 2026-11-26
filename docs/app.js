@@ -33,18 +33,67 @@
     const c = Number(n) || 0;
     return c + (c === 1 ? " contract" : " contracts");
   }
-  function openTradeLine(p, prefix) {
+  function dedupeTrades(trades) {
+    const best = new Map();
+    const order = [];
+    (trades || []).forEach((t) => {
+      if (!t) return;
+      const key = (t.ticker || "") + "|" + (t.entry_time || "") + "|" + (t.side || "");
+      const prev = best.get(key);
+      if (!prev) { best.set(key, t); order.push(key); }
+      else if (t.status === "closed" || (prev.status !== "closed" && t.pnl != null)) best.set(key, t);
+    });
+    return order.map((k) => best.get(k));
+  }
+  function amountBoughtOf(t) {
+    if (!t) return 0;
+    const n = t.amount_bought != null ? t.amount_bought : t.total_in;
+    return n == null ? 0 : Number(n);
+  }
+  function bookAmountBought(book) {
+    if (!book) return 0;
+    if (book.amount_bought != null) return Number(book.amount_bought);
+    const rows = dedupeTrades(book.trades || []);
+    if (!rows.length && book.position) return amountBoughtOf(book.position);
+    return rows.reduce((s, t) => s + amountBoughtOf(t), 0);
+  }
+  function bookContracts(book) {
+    if (!book) return 0;
+    if (book.contracts_total != null) return Number(book.contracts_total);
+    const rows = dedupeTrades(book.trades || []);
+    if (!rows.length && book.position) return Number(book.position.contracts || 0);
+    return rows.reduce((s, t) => s + (Number(t.contracts) || 0), 0);
+  }
+  function tradePnl(t, market) {
+    if (!t) return null;
+    if (t.status !== "open" && t.pnl != null) return Number(t.pnl);
+    const bid = market ? (t.side === "yes" ? market.yes_bid : market.no_bid) : null;
+    const bought = amountBoughtOf(t);
+    if ((t.status === "open" || t.pnl == null) && bid != null && t.contracts != null && bought) {
+      return Number(t.contracts) * Number(bid) - bought;
+    }
+    return t.pnl == null ? null : Number(t.pnl);
+  }
+  function pressTag(t) {
+    return t && t.pressed ? '<span class="tag">2× PRESS</span>' : "";
+  }
+  function openTradeLine(p, prefix, market) {
     if (!p) return "";
     const side = (p.side || "").toUpperCase();
-    const head = prefix ? `<strong>${esc(prefix)}</strong> ` : "<strong>Open trade</strong> · ";
+    const bought = amountBoughtOf(p);
+    const pnl = tradePnl(p, market);
+    const head = prefix ? `<strong>${esc(prefix)}</strong>` : "<strong>Open trade</strong>";
     const bits = [
       side ? esc(side) : null,
       contractsLabel(p.contracts) + " @ " + cents(p.entry_price),
-      p.entry_fee != null ? (money(p.entry_fee) + " fee") : null,
       p.ticker ? esc(p.ticker) : null,
       p.entry_time_pt ? ("entered " + esc(p.entry_time_pt)) : null,
     ].filter(Boolean);
-    return head + bits.join(" · ");
+    const facts = [
+      bought ? `<span class="fact-bought">Bought ${esc(money(bought))}</span>` : null,
+      pnl != null ? `<span class="${pnl >= 0 ? "up" : "down"}">${pnl >= 0 ? "Gain" : "Lost"} ${esc(money(pnl, true))}</span>` : null,
+    ].filter(Boolean).join(" · ");
+    return `${head}${pressTag(p)} · ${bits.join(" · ")}<div class="open-facts">${facts}</div>`;
   }
   function longDatePt(d) {
     try {
@@ -205,29 +254,31 @@
     el.innerHTML = `<svg class="chart-svg" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">${grid}${area ? `<path d="${area}" fill="rgba(234,88,12,0.10)" />` : ""}<path d="${path}" fill="none" stroke="#EA580C" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" /></svg>`;
   }
 
-  function tradeRows(trades, emptyText, withFee) {
-    if (!trades || !trades.length) return `<p class="empty">${esc(emptyText)}</p>`;
-    const rows = trades.slice().map((t) => {
+  function tradeRows(trades, emptyText, market) {
+    const list = dedupeTrades(trades);
+    if (!list.length) return `<p class="empty">${esc(emptyText)}</p>`;
+    const rows = list.map((t) => {
       const side = (t.side || "").toUpperCase();
-      const pnl = t.pnl == null ? "—" : `<span class="${t.pnl >= 0 ? "up" : "down"}">${money(t.pnl, true)}</span>`;
-      const fee = Number(t.entry_fee || 0) + Number(t.exit_fee || 0);
+      const pnlVal = tradePnl(t, market);
+      const pnl = pnlVal == null ? "—" : `<span class="${pnlVal >= 0 ? "up" : "down"}">${pnlVal >= 0 ? "Gain" : "Lost"} ${money(pnlVal, true)}</span>`;
+      const bought = amountBoughtOf(t);
       const exit = t.status === "open"
         ? "Open"
         : (t.outcome === "settlement" ? ("Settled " + String(t.result || "").toUpperCase()) : ("Exit " + cents(t.exit_price)));
       const why = t.reason_exit || t.reason || t.reason_entry || "";
       return `<tr>
         <td>${esc(t.entry_time_pt || "")}</td>
-        <td class="mono">${esc((t.ticker || "").replace("KXBTC15M-", ""))}</td>
+        <td class="mono">${esc((t.ticker || "").replace("KXBTC15M-", ""))}${pressTag(t)}</td>
         <td>${esc(side)}</td>
         <td class="mono">${esc(contractsLabel(t.contracts))} @ ${cents(t.entry_price)}</td>
+        <td class="mono">Bought ${esc(money(bought))}</td>
         <td>${esc(exit)}</td>
-        ${withFee ? `<td class="mono">${money(fee)}</td>` : ""}
         <td>${pnl}</td>
         <td>${esc(why)}</td>
       </tr>`;
     }).join("");
     return `<div class="table-wrap"><table>
-      <thead><tr><th>Time (PT)</th><th>Contract</th><th>Side</th><th>Contracts / entry</th><th>Exit / settlement</th>${withFee ? "<th>Fee</th>" : ""}<th>PnL</th><th>Why</th></tr></thead>
+      <thead><tr><th>Time (PT)</th><th>Contract</th><th>Side</th><th>Contracts / entry</th><th>Amount Bought</th><th>Exit / settlement</th><th>Gain / Lost</th><th>Why</th></tr></thead>
       <tbody>${rows}</tbody></table></div>`;
   }
 
@@ -296,20 +347,22 @@
       : "";
 
     const start = sess && (sess.starting_balance != null ? sess.starting_balance : 40);
-    const equity = sess ? (sess.equity != null ? sess.equity : sess.cash) : null;
+    const equity = sess ? (sess.final_balance != null && sess.status === "COMPLETE" ? sess.final_balance : (sess.equity != null ? sess.equity : sess.cash)) : null;
     $("stat-balance-val").textContent = equity != null ? (money(start) + " → " + money(equity)) : "—";
     const balSub = $("stat-balance-sub");
     if (balSub) {
-      const n = sess ? totalContracts(sess) : 0;
+      const n = sess ? bookContracts(sess) : 0;
       balSub.textContent = n ? (contractsLabel(n) + " traded") : "Start → current balance";
     }
+    const boughtEl = $("stat-bought-val");
+    if (boughtEl) boughtEl.textContent = sess ? money(bookAmountBought(sess)) : "—";
     const pnl = $("stat-pnl-val");
-    pnl.textContent = sess ? money(sess.pnl, true) : "—";
-    pnl.className = "val " + (sess && sess.pnl > 0 ? "up" : sess && sess.pnl < 0 ? "down" : "");
-    $("stat-pnl-sub").textContent = sess ? pct(sess.pnl_pct) : "";
+    const pnlVal = sess ? sess.pnl : null;
+    pnl.textContent = sess ? money(pnlVal, true) : "—";
+    pnl.className = "val " + (pnlVal > 0 ? "up" : pnlVal < 0 ? "down" : "");
+    $("stat-pnl-sub").textContent = sess ? ((pnlVal > 0 ? "Gain" : pnlVal < 0 ? "Lost" : "Flat") + " · " + pct(sess.pnl_pct)) : "";
     $("stat-record-val").textContent = sess ? ((sess.wins || 0) + "–" + (sess.losses || 0)) : "—";
     $("stat-record-sub").textContent = sess && sess.window_label ? sess.window_label : "1-hour $40 run";
-    $("stat-call-val").textContent = live.call_label || live.call || "—";
   }
 
   function renderSession(sess) {
@@ -333,16 +386,23 @@
     const pnl = $("sess-pnl");
     pnl.textContent = money(sess.pnl, true);
     pnl.className = "v " + (sess.pnl > 0 ? "up" : sess.pnl < 0 ? "down" : "");
-    $("sess-ret").textContent = pct(sess.pnl_pct);
-    $("sess-ret").className = "v " + (sess.pnl_pct > 0 ? "up" : sess.pnl_pct < 0 ? "down" : "");
     $("sess-record").textContent = (sess.wins || 0) + "–" + (sess.losses || 0);
     const sessC = $("sess-contracts");
-    if (sessC) sessC.textContent = String(totalContracts(sess));
+    if (sessC) sessC.textContent = String(bookContracts(sess));
+    const sessB = $("sess-bought");
+    if (sessB) sessB.textContent = money(bookAmountBought(sess));
+    const press = $("session-press");
+    if (press) {
+      const label = sess.next_stake_label || (sess.press_next ? ("Next trade: 2× press ($" + Math.round(Math.min(8, 2 * (sess.last_win_stake || 0))) + ")") : "Next stake: $2–$4");
+      press.textContent = label;
+      press.className = "pill " + (sess.press_next ? "PRESS" : "BASE");
+    }
 
     const posEl = $("session-open");
+    const market = (DATA && DATA.live && DATA.live.market) || {};
     if (sess.position) {
       posEl.hidden = false;
-      posEl.innerHTML = openTradeLine(sess.position, "Open trade");
+      posEl.innerHTML = openTradeLine(sess.position, "Open trade", market);
     } else {
       posEl.hidden = true;
       posEl.innerHTML = "";
@@ -428,29 +488,35 @@
 
   function renderTrades(live, sess) {
     const sessTrades = ((sess && sess.trades) || []).slice().sort((a, b) => Date.parse(b.entry_time || 0) - Date.parse(a.entry_time || 0));
-    $("session-trades").innerHTML = tradeRows(sessTrades, "No $40-session trades yet this hour. WAIT checks still appear in the activity log below.", true);
+    const market = live.market || {};
+    $("session-trades").innerHTML = tradeRows(sessTrades, "No $40-session trades yet this hour. WAIT checks still appear in the activity log below.", market);
     $("session-checks").innerHTML = checkRows(sessionChecks(sess));
 
     $("book-equity").textContent = money(live.equity);
-    $("book-cash").textContent = money(live.cash);
+    const bookBought = $("book-bought");
+    if (bookBought) bookBought.textContent = money(bookAmountBought(live));
     const bp = $("book-pnl");
     bp.textContent = money(live.pnl, true);
     bp.className = "v " + (live.pnl > 0 ? "up" : live.pnl < 0 ? "down" : "");
-    $("book-pnl-sub").textContent = pct(live.pnl_pct) + " from " + money(live.starting_balance);
     $("book-record").textContent = (live.wins || 0) + "–" + (live.losses || 0);
     const bookC = $("book-contracts");
-    if (bookC) bookC.textContent = String(totalContracts(live));
-    $("book-win").textContent = live.win_rate == null ? "No closed trades yet" : (live.win_rate.toFixed(1) + "% after fees");
+    if (bookC) bookC.textContent = String(bookContracts(live));
+    $("book-pnl-sub").textContent = (live.pnl > 0 ? "Gain " : live.pnl < 0 ? "Lost " : "") + pct(live.pnl_pct) + " from " + money(live.starting_balance) + (live.cash != null ? " · cash " + money(live.cash) : "");
+    const bookWin = $("book-win");
+    if (bookWin) {
+      const press = live.next_stake_label || (live.press_next ? "Next trade: 2× press" : "Next stake: $2–$4");
+      bookWin.textContent = (live.win_rate == null ? "No closed trades yet" : (live.win_rate.toFixed(1) + "% after fees")) + " · " + press;
+    }
 
     const pos = $("book-open");
     if (live.position) {
       pos.hidden = false;
-      pos.innerHTML = openTradeLine(live.position, "Open $100 book");
+      pos.innerHTML = openTradeLine(live.position, "Open $100 book", market);
     } else {
       pos.hidden = true;
       pos.innerHTML = "";
     }
-    $("book-trades").innerHTML = tradeRows(live.trades, "No $100-book trades yet.", true);
+    $("book-trades").innerHTML = tradeRows(live.trades, "No $100-book trades yet.", market);
   }
 
   function renderBacktest(bt) {
@@ -459,7 +525,7 @@
       : "Backtest unavailable.";
     $("bt-pnl").textContent = money(bt.net_pnl, true);
     $("bt-pnl").className = "val " + (bt.net_pnl > 0 ? "up" : bt.net_pnl < 0 ? "down" : "");
-    $("bt-eq").textContent = money(bt.starting_balance) + " → " + money(bt.ending_equity) + " · $5 tickets";
+    $("bt-eq").textContent = money(bt.starting_balance) + " → " + money(bt.ending_equity) + " · $2–$4 tickets, 2× after a win";
     $("bt-ret").textContent = pct(bt.return_pct);
     $("bt-ret").className = "val " + (bt.return_pct > 0 ? "up" : bt.return_pct < 0 ? "down" : "");
     $("bt-windows").textContent = (bt.windows_traded || 0) + " trades · " + (bt.windows_skipped || 0) + " stands aside";
