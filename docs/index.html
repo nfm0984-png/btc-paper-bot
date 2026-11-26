@@ -192,17 +192,10 @@
     <div id="error" hidden class="err"></div>
 
     <section id="panel-live" class="panel" role="tabpanel">
-      <div id="call" class="call WAIT">
-        <div class="kicker" id="call-kicker">Current call</div>
-        <div class="label" id="call-label">Loading…</div>
-        <p class="reason" id="reason">Fetching the latest Kalshi 15-minute contract and BTC indicators.</p>
-        <div class="call-meta" id="call-meta"></div>
-      </div>
-
       <div id="session-card" class="session-card LIVE">
         <div class="session-head">
           <div>
-            <div class="kicker">1-Hour $40 Run</div>
+            <div class="kicker">1-Hour $40 Live Run</div>
             <div class="session-window" id="session-window">Loading session…</div>
             <p class="fee" id="session-range" style="margin-top:6px"></p>
           </div>
@@ -223,9 +216,16 @@
           <div id="session-trades"></div>
         </div>
         <div class="box" style="box-shadow:none;margin:14px 0 0">
-          <h2>Check log (every 5-minute scan)</h2>
+          <h2>Activity log (every 5-minute scan)</h2>
           <div id="session-checks"></div>
         </div>
+      </div>
+
+      <div id="call" class="call WAIT">
+        <div class="kicker" id="call-kicker">Current call</div>
+        <div class="label" id="call-label">Loading…</div>
+        <p class="reason" id="reason">Fetching the latest Kalshi 15-minute contract and BTC indicators.</p>
+        <div class="call-meta" id="call-meta"></div>
       </div>
 
       <div class="hero-row">
@@ -533,15 +533,45 @@
       if (!checks || !checks.length) return '<p class="empty">The bot will log every 5-minute check here, including WAIT / skip reasons, so you can see it watching the window.</p>';
       const rows = checks.slice().reverse().map(c => {
         const call = c.label || c.action || "—";
+        const quotes = (c.yes_ask != null || c.no_ask != null)
+          ? ("Yes " + cents(c.yes_ask) + " / No " + cents(c.no_ask))
+          : "—";
         return `<tr>
           <td>${c.t_pt || ""}</td>
           <td>${call}</td>
           <td class="mono">${(c.ticker || "—").replace("KXBTC15M-","")}</td>
+          <td class="mono">${quotes}</td>
           <td>${c.reason || ""}</td>
         </tr>`;
       }).join("");
       return `<div style="overflow:auto"><table class="check-log">
-        <thead><tr><th>Time (PT)</th><th>Call</th><th>Contract</th><th>Why</th></tr></thead>
+        <thead><tr><th>Time (PT)</th><th>Call</th><th>Contract</th><th>Yes / No</th><th>Why</th></tr></thead>
+        <tbody>${rows}</tbody></table></div>`;
+    }
+
+    function sessionTradeTable(trades) {
+      if (!trades || !trades.length) {
+        return '<p class="empty">No session trades yet. If the bot stands aside, that still shows up in the activity log below.</p>';
+      }
+      const rows = trades.slice().reverse().map(t => {
+        const side = (t.side || "").toUpperCase();
+        const pnl = t.pnl == null ? "—" : `<span class="${t.pnl>=0?"up":"down"}">${money(t.pnl,true)}</span>`;
+        const fee = Number(t.entry_fee || 0) + Number(t.exit_fee || 0);
+        const exit = t.status === "open" ? "Open" : (t.outcome === "settlement" ? ("Settled " + String(t.result||"").toUpperCase()) : ("Exit " + cents(t.exit_price)));
+        const why = t.reason_exit || t.reason || t.reason_entry || "";
+        return `<tr>
+          <td>${t.entry_time_pt || ""}</td>
+          <td class="mono">${(t.ticker||"").replace("KXBTC15M-","")}</td>
+          <td>${side}</td>
+          <td class="mono">${cents(t.entry_price)} × ${t.contracts||""}</td>
+          <td>${exit}</td>
+          <td class="mono">${money(fee)}</td>
+          <td>${pnl}</td>
+          <td>${why}</td>
+        </tr>`;
+      }).join("");
+      return `<div style="overflow:auto"><table>
+        <thead><tr><th>Time (PT)</th><th>Contract</th><th>Side</th><th>Entry</th><th>Exit / settlement</th><th>Fee</th><th>PnL</th><th>Why</th></tr></thead>
         <tbody>${rows}</tbody></table></div>`;
     }
 
@@ -580,7 +610,7 @@
         $("session-open-grid").innerHTML = items.map(([k,v]) => `<div><div class="k">${k}</div><div class="v">${v}</div></div>`).join("");
       } else openCard.hidden = true;
 
-      $("session-trades").innerHTML = tradeTable(sess.trades, "No session trades yet. If the bot stands aside, that still shows up in the check log below.");
+      $("session-trades").innerHTML = sessionTradeTable(sess.trades);
       $("session-checks").innerHTML = checkTable(sess.checks);
     }
 
