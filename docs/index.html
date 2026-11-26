@@ -90,6 +90,34 @@
     .call-meta { display: flex; flex-wrap: wrap; gap: 10px 18px; margin-top: 16px; color: var(--muted); font-size: 13.5px; }
     .call-meta a { color: var(--amber-2); }
     .countdown { font-family: "IBM Plex Mono", monospace; color: var(--text); font-size: 15px; }
+    .session-card {
+      border-radius: 24px; padding: 22px 24px; margin-bottom: 16px;
+      border: 1px solid var(--line-strong); box-shadow: var(--shadow);
+      background:
+        linear-gradient(180deg, rgba(247,147,26,0.16), var(--card));
+    }
+    .session-card.SETTLING { background: linear-gradient(180deg, rgba(247,147,26,0.10), var(--card)); }
+    .session-card.COMPLETE { background: linear-gradient(180deg, rgba(62,230,135,0.10), var(--card)); border-color: rgba(62,230,135,0.28); }
+    .session-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
+    .session-head .kicker { color: var(--muted); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 6px; }
+    .session-window { font-family: "Syne", sans-serif; font-weight: 800; font-size: clamp(20px, 3vw, 28px); letter-spacing: -0.02em; }
+    .session-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      border-radius: 999px; padding: 10px 16px; font-weight: 700;
+      letter-spacing: 0.06em; font-size: 13px; border: 1px solid transparent;
+      font-family: "IBM Plex Mono", monospace; white-space: nowrap;
+    }
+    .session-badge.LIVE { background: var(--green-dim); color: var(--green); border-color: rgba(62,230,135,0.35); }
+    .session-badge.SETTLING { background: var(--amber-dim); color: var(--amber-2); border-color: var(--line-strong); }
+    .session-badge.COMPLETE { background: var(--green-dim); color: var(--green); border-color: rgba(62,230,135,0.28); }
+    .session-badge .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; box-shadow: 0 0 10px currentColor; }
+    .section-label {
+      color: var(--muted); font-size: 12px; letter-spacing: 0.12em;
+      text-transform: uppercase; font-weight: 600; margin: 8px 0 12px;
+    }
+    .check-log { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .check-log th, .check-log td { text-align: left; padding: 8px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    .check-log th { color: var(--muted); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; }
     .hero-row { display: grid; grid-template-columns: 1.2fr 1fr; gap: 12px; margin-bottom: 16px; }
     .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
     .card, .box {
@@ -171,6 +199,35 @@
         <div class="call-meta" id="call-meta"></div>
       </div>
 
+      <div id="session-card" class="session-card LIVE">
+        <div class="session-head">
+          <div>
+            <div class="kicker">1-Hour $40 Run</div>
+            <div class="session-window" id="session-window">Loading session…</div>
+            <p class="fee" id="session-range" style="margin-top:6px"></p>
+          </div>
+          <div id="session-badge" class="session-badge LIVE"><span class="dot"></span><span id="session-badge-text">LIVE</span></div>
+        </div>
+        <div class="cards" id="session-stats">
+          <div class="card"><div class="lbl">Starting</div><div class="val" id="sess-start-bal">$40.00</div><div class="sub">$5 per trade · after fees</div></div>
+          <div class="card"><div class="lbl">Current Balance</div><div class="val" id="sess-equity">—</div><div class="sub" id="sess-cash"></div></div>
+          <div class="card"><div class="lbl">Net PnL</div><div class="val" id="sess-pnl">—</div><div class="sub" id="sess-pnl-sub"></div></div>
+          <div class="card"><div class="lbl">Record</div><div class="val" id="sess-record">0–0</div><div class="sub" id="sess-win"></div></div>
+        </div>
+        <div class="box" id="session-open" hidden style="box-shadow:none;margin:12px 0 0">
+          <h2>Open session trade</h2>
+          <div class="pos-grid" id="session-open-grid"></div>
+        </div>
+        <div class="box" style="box-shadow:none;margin:14px 0 0">
+          <h2>Session trade log</h2>
+          <div id="session-trades"></div>
+        </div>
+        <div class="box" style="box-shadow:none;margin:14px 0 0">
+          <h2>Check log (every 5-minute scan)</h2>
+          <div id="session-checks"></div>
+        </div>
+      </div>
+
       <div class="hero-row">
         <div class="card">
           <div class="lbl"><span id="btc-dot" class="live-dot"></span>Live Bitcoin (BTC/USD)</div>
@@ -192,6 +249,7 @@
         <p class="fee" id="ind-time"></p>
       </div>
 
+      <div class="section-label">Ongoing $100 paper book (separate from the 1-hour $40 run)</div>
       <div class="cards">
         <div class="card"><div class="lbl">Paper Equity</div><div class="val" id="equity">—</div><div class="sub" id="cash-sub"></div></div>
         <div class="card"><div class="lbl">Net PnL (after fees)</div><div class="val" id="pnl">—</div><div class="sub" id="pnl-sub"></div></div>
@@ -282,6 +340,8 @@
     let liveBtc = null;
     let liveInd = null;
     let closeTimer = null;
+    let sessionTimer = null;
+    const DASH_V = "s40-1h";
 
     function switchTab(id) {
       document.querySelectorAll("nav.tabs button").forEach((b) => {
@@ -446,12 +506,91 @@
       }
     }
 
+    function sessionBadgeLabel(sess) {
+      const status = (sess && sess.status) || "LIVE";
+      if (status === "COMPLETE") return "COMPLETE";
+      const endIso = sess && sess.end;
+      if (!endIso) return status;
+      const sec = Math.floor((Date.parse(endIso) - Date.now()) / 1000);
+      if (status === "SETTLING" || sec <= 0) return "SETTLING";
+      const m = Math.floor(sec / 60), s = Math.max(0, sec % 60);
+      return "LIVE · " + m + "m " + String(s).padStart(2, "0") + "s left";
+    }
+
+    function tickSessionBadge(sess) {
+      const badge = $("session-badge");
+      const text = $("session-badge-text");
+      if (!badge || !text || !sess) return;
+      let status = sess.status || "LIVE";
+      const sec = sess.end ? Math.floor((Date.parse(sess.end) - Date.now()) / 1000) : 0;
+      if (status === "LIVE" && sec <= 0) status = sess.position ? "SETTLING" : "COMPLETE";
+      badge.className = "session-badge " + status;
+      $("session-card").className = "session-card " + status;
+      text.textContent = sessionBadgeLabel(Object.assign({}, sess, { status: status }));
+    }
+
+    function checkTable(checks) {
+      if (!checks || !checks.length) return '<p class="empty">The bot will log every 5-minute check here, including WAIT / skip reasons, so you can see it watching the window.</p>';
+      const rows = checks.slice().reverse().map(c => {
+        const call = c.label || c.action || "—";
+        return `<tr>
+          <td>${c.t_pt || ""}</td>
+          <td>${call}</td>
+          <td class="mono">${(c.ticker || "—").replace("KXBTC15M-","")}</td>
+          <td>${c.reason || ""}</td>
+        </tr>`;
+      }).join("");
+      return `<div style="overflow:auto"><table class="check-log">
+        <thead><tr><th>Time (PT)</th><th>Call</th><th>Contract</th><th>Why</th></tr></thead>
+        <tbody>${rows}</tbody></table></div>`;
+    }
+
+    function renderSession(sess) {
+      if (!sess) {
+        $("session-window").textContent = "Session not started yet";
+        return;
+      }
+      $("session-window").textContent = sess.window_label || "1-hour $40 run";
+      $("session-range").textContent = (sess.start_pt && sess.end_pt)
+        ? (sess.start_pt + " → " + sess.end_pt + " · $40 start · $5 tickets · Kalshi taker fees")
+        : "";
+      $("sess-start-bal").textContent = money(sess.starting_balance != null ? sess.starting_balance : 40);
+      $("sess-equity").textContent = money(sess.final_balance != null && sess.status === "COMPLETE" ? sess.final_balance : sess.equity);
+      $("sess-cash").textContent = "Cash " + money(sess.cash);
+      const pnl = $("sess-pnl");
+      pnl.textContent = money(sess.pnl, true);
+      pnl.className = "val " + (sess.pnl>0?"up":sess.pnl<0?"down":"");
+      $("sess-pnl-sub").textContent = pct(sess.pnl_pct);
+      $("sess-record").textContent = (sess.wins||0) + "–" + (sess.losses||0);
+      $("sess-win").textContent = sess.win_rate == null ? "No closed trades yet" : (sess.win_rate.toFixed(1) + "% win rate");
+      tickSessionBadge(sess);
+      if (sessionTimer) clearInterval(sessionTimer);
+      sessionTimer = setInterval(function() { tickSessionBadge(sess); }, 1000);
+
+      const openCard = $("session-open");
+      if (sess.position) {
+        openCard.hidden = false;
+        const p = sess.position;
+        const items = [
+          ["Side", (p.side||"").toUpperCase() + " × " + p.contracts],
+          ["Entry", cents(p.entry_price) + " + " + money(p.entry_fee) + " fee"],
+          ["Contract", p.ticker || ""],
+          ["Entered", p.entry_time_pt || ""],
+        ];
+        $("session-open-grid").innerHTML = items.map(([k,v]) => `<div><div class="k">${k}</div><div class="v">${v}</div></div>`).join("");
+      } else openCard.hidden = true;
+
+      $("session-trades").innerHTML = tradeTable(sess.trades, "No session trades yet. If the bot stands aside, that still shows up in the check log below.");
+      $("session-checks").innerHTML = checkTable(sess.checks);
+    }
+
     function render(data) {
       DATA = data;
       const live = data.live || {};
       const bt = data.backtest || {};
       $("updated").textContent = data.generated_at_pt || "—";
       applyCall(live);
+      renderSession(data.session);
 
       const btc = liveBtc != null ? liveBtc : live.btc_price;
       $("btc-price").textContent = px(btc);
@@ -522,7 +661,7 @@
     }
 
     async function loadDashboard() {
-      const res = await fetch("data.json?t=" + Date.now(), { cache: "no-store" });
+      const res = await fetch("data.json?v=" + DASH_V + "&t=" + Date.now(), { cache: "no-store" });
       if (!res.ok) throw new Error("Could not load data.json (" + res.status + ")");
       const data = await res.json();
       $("error").hidden = true;
@@ -561,7 +700,7 @@
       }
       pollCoinbase();
       setInterval(pollCoinbase, 20000);
-      setInterval(() => { loadDashboard().catch(() => {}); }, 60 * 1000);
+      setInterval(() => { loadDashboard().catch(() => {}); }, 30 * 1000);
     }
     start();
   </script>

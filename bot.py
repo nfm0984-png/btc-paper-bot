@@ -35,6 +35,9 @@ KALSHI_MARKET_URL = "https://kalshi.com/markets/kxbtc15m/{ticker}"
 
 STARTING_BALANCE = 100.00
 STAKE = 5.00
+SESSION_STARTING = 40.00
+SESSION_STAKE = 5.00
+SESSION_MINUTES = 60
 FEE_RATE = 0.07  # Kalshi quadratic taker fee
 FEE_MULTIPLIER = 1.0
 
@@ -84,6 +87,16 @@ def fmt_pt(ts: str | int | float | datetime) -> str:
     dt = parse_iso(ts).astimezone(PT)
     hour = dt.strftime("%I").lstrip("0") or "0"
     return f"{dt.strftime('%b')} {dt.day}, {dt.year}, {hour}:{dt.strftime('%M %p')} PT"
+
+
+def fmt_pt_short(ts: str | int | float | datetime) -> str:
+    dt = parse_iso(ts).astimezone(PT)
+    hour = dt.strftime("%I").lstrip("0") or "0"
+    return f"{hour}:{dt.strftime('%M %p')}"
+
+
+def session_window_label(start: str | datetime, end: str | datetime) -> str:
+    return f"{fmt_pt_short(start)} – {fmt_pt_short(end)} PT"
 
 
 def iso_utc(ts: str | int | float | datetime) -> str:
@@ -802,10 +815,10 @@ def mark_equity(cash: float, position: Optional[dict], yes_bid: Optional[float],
     return round_money(cash + float(position["contracts"]) * bid)
 
 
-def open_trade(cash: float, market: dict, side: str, ask: float, reason: str, now: datetime) -> Optional[tuple[float, dict, dict]]:
+def open_trade(cash: float, market: dict, side: str, ask: float, reason: str, now: datetime, stake: float = STAKE) -> Optional[tuple[float, dict, dict]]:
     if ask <= 0 or ask >= 1:
         return None
-    contracts = int(STAKE // ask)
+    contracts = int(float(stake) // ask)
     if contracts < 1:
         return None
     fee = kalshi_taker_fee(contracts, ask)
@@ -848,6 +861,8 @@ def open_trade(cash: float, market: dict, side: str, ask: float, reason: str, no
         "entry_time_pt": position["entry_time_pt"],
         "reason": reason,
         "strike": position["strike"],
+        "running_balance": cash_after,
+        "total_in": total,
     }
     return cash_after, position, log
 
@@ -897,6 +912,8 @@ def close_trade(
         "reason_entry": position.get("reason"),
         "reason_exit": reason,
         "kalshi_url": position.get("kalshi_url") or contract_url(position["ticker"]),
+        "running_balance": cash_after,
+        "total_in": position.get("total_in"),
     }
     return cash_after, trade
 
@@ -1118,25 +1135,24 @@ def market_payload(market: Optional[dict], now: datetime) -> Optional[dict]:
     }
 
 
-def run_live(
-    state: dict,
+def step_paper_book(
+    cash: float,
+    position: Optional[dict],
+    trades: list[dict],
+    events: list[str],
     market: Optional[dict],
     settled: list[dict],
     ind_1m: Optional[Indicators],
     ind_5m: Optional[Indicators],
     btc_price: float,
     now: datetime,
-) -> tuple[dict, Signal, list[str]]:
-    events: list[str] = []
-    cash = float(state["cash"])
-    position = state.get("position")
-    trades = list(state.get("trades") or [])
-    equity_history = list(state.get("equity_history") or [])
-
-    # Settle or early-close an open position if its market is done or the signal says sell.
+    *,
+    allow_new_entries: bool,
+    stake: float,
+) -> tuple[float, Optional[dict], list[dict], list[str], Signal, Optional[float], Optional[float]]:
+    """Apply settlements, early exits, and optional new entries to one paper book."""
     if position:
         pos_m = find_market(position["ticker"], settled, [market] if market else [])
-        # Also try a dedicated fetch if we didn't see it in the lists.
         if pos_m is None:
             try:
                 data = http_get_json(f"{KALSHI_API}/markets/{urllib.parse.quote(position['ticker'])}")
@@ -1158,7 +1174,9 @@ def run_live(
                     expiration_value=dollars(pos_m.get("expiration_value")),
                 )
                 trades.append(trade)
-                events.append(f"Settled {position['side'].upper()} on {position['ticker']}: {trade['reason_exit']} PnL {trade['pnl']:+.2f}")
+                events.append(
+                    f"Settled {position['side'].upper()} on {position['ticker']}: {trade['reason_exit']} PnL {trade['pnl']:+.2f}"
+                )
                 position = None
 
     live_mp = market_payload(market, now) if market else None
@@ -1169,7 +1187,6 @@ def run_live(
     strike = live_mp["strike"] if live_mp else (position or {}).get("strike")
     remaining = live_mp["remaining_sec"] if live_mp else None
 
-    # If the open position is still in this (or its) window, maybe exit early.
     if position and market and market.get("ticker") == position["ticker"]:
         sig = make_signal(
             ind_1m=ind_1m,
@@ -1196,11 +1213,10 @@ def run_live(
                 now=now,
             )
             trades.append(trade)
-            events.append(f"{sig.action} {position['side'].upper()} on {position['ticker']} @ {cents_label(sig.bid)} PnL {trade['pnl']:+.2f}")
+            events.append(
+                f"{sig.action} {position['side'].upper()} on {position['ticker']} @ {cents_label(sig.bid)} PnL {trade['pnl']:+.2f}"
+            )
             position = None
-        else:
-            # Still holding; return this HOLD/WAIT signal later.
-            pass
     else:
         sig = make_signal(
             ind_1m=ind_1m,
@@ -1215,13 +1231,14 @@ def run_live(
             position=position,
         )
 
-    # New entry — only when flat, in a live window, and the call is a buy.
-    if position is None and market and sig.action in ("BUY_YES", "BUY_NO") and sig.ask is not None:
-        opened = open_trade(cash, market, sig.side or "yes", float(sig.ask), sig.reason, now)
+    if allow_new_entries and position is None and market and sig.action in ("BUY_YES", "BUY_NO") and sig.ask is not None:
+        opened = open_trade(cash, market, sig.side or "yes", float(sig.ask), sig.reason, now, stake=stake)
         if opened:
             cash, position, log = opened
             trades.append(log)
-            events.append(f"Opened {position['side'].upper()} {position['contracts']}x {position['ticker']} @ {cents_label(position['entry_price'])} (fee ${position['entry_fee']:.2f})")
+            events.append(
+                f"Opened {position['side'].upper()} {position['contracts']}x {position['ticker']} @ {cents_label(position['entry_price'])} (fee ${position['entry_fee']:.2f})"
+            )
             sig = Signal(
                 "HOLD",
                 f"HOLD {position['side'].upper()} @ {cents_label(position['entry_price'])}",
@@ -1231,11 +1248,17 @@ def run_live(
                 bid=yes_bid if position["side"] == "yes" else no_bid,
             )
         else:
-            events.append("Signal fired but not enough paper cash to buy $5 of contracts after fees.")
-            sig = Signal("WAIT", "WAIT — No Trade", sig.reason + " Not enough paper cash to size a $5 ticket after fees.")
+            events.append("Signal fired but not enough paper cash to buy a $5 ticket after fees.")
+            sig = Signal(
+                "WAIT",
+                "WAIT — No Trade",
+                sig.reason + " Not enough paper cash to size a $5 ticket after fees.",
+            )
+    elif (not allow_new_entries) and position is None and sig.action in ("BUY_YES", "BUY_NO"):
+        # Keep the underlying signal for the check log; caller will mark it as skipped.
+        pass
 
     if position and sig.action not in ("TAKE_PROFIT", "CUT_LOSS", "HOLD"):
-        # Recompute hold text now that we may have just opened, or are still in.
         sig = make_signal(
             ind_1m=ind_1m,
             ind_5m=ind_5m,
@@ -1249,9 +1272,36 @@ def run_live(
             position=position,
         )
 
+    return cash, position, trades, events, sig, yes_bid, no_bid
+
+
+def run_live(
+    state: dict,
+    market: Optional[dict],
+    settled: list[dict],
+    ind_1m: Optional[Indicators],
+    ind_5m: Optional[Indicators],
+    btc_price: float,
+    now: datetime,
+) -> tuple[dict, Signal, list[str]]:
+    events: list[str] = []
+    cash, position, trades, events, sig, yes_bid, no_bid = step_paper_book(
+        float(state["cash"]),
+        state.get("position"),
+        list(state.get("trades") or []),
+        events,
+        market,
+        settled,
+        ind_1m,
+        ind_5m,
+        btc_price,
+        now,
+        allow_new_entries=True,
+        stake=float(state.get("stake") or STAKE),
+    )
+    equity_history = list(state.get("equity_history") or [])
     equity = mark_equity(cash, position, yes_bid, no_bid)
     equity_history.append({"t": int(now.timestamp()), "t_pt": fmt_pt(now), "equity": equity})
-    # Keep the live curve from growing forever.
     if len(equity_history) > 2000:
         equity_history = equity_history[-2000:]
 
@@ -1265,8 +1315,166 @@ def run_live(
         "created_at": state.get("created_at") or iso_utc(now),
         "updated_at": iso_utc(now),
         "updated_at_pt": fmt_pt(now),
+        "session": state.get("session"),
     }
     return new_state, sig, events
+
+
+def new_session(now: datetime) -> dict:
+    end = now + timedelta(minutes=SESSION_MINUTES)
+    return {
+        "starting_balance": SESSION_STARTING,
+        "stake": SESSION_STAKE,
+        "cash": SESSION_STARTING,
+        "position": None,
+        "trades": [],
+        "checks": [],
+        "start": iso_utc(now),
+        "start_pt": fmt_pt(now),
+        "end": iso_utc(end),
+        "end_pt": fmt_pt(end),
+        "window_label": session_window_label(now, end),
+        "status": "LIVE",
+        "status_label": f"LIVE · {SESSION_MINUTES}m left",
+        "remaining_sec": SESSION_MINUTES * 60,
+        "equity": SESSION_STARTING,
+        "pnl": 0.0,
+        "pnl_pct": 0.0,
+        "final_balance": None,
+        "completed_at": None,
+        "completed_at_pt": None,
+        "created_at": iso_utc(now),
+    }
+
+
+def run_session(
+    state: dict,
+    market: Optional[dict],
+    settled: list[dict],
+    ind_1m: Optional[Indicators],
+    ind_5m: Optional[Indicators],
+    btc_price: float,
+    now: datetime,
+) -> dict:
+    sess = state.get("session")
+    if not sess or not sess.get("start") or not sess.get("end"):
+        sess = new_session(now)
+        print(
+            f"  Starting 1-hour ${SESSION_STARTING:.0f} session: {sess['window_label']}",
+            flush=True,
+        )
+
+    # Already locked — do not reopen or change the book.
+    if sess.get("status") == "COMPLETE" and sess.get("final_balance") is not None:
+        sess = dict(sess)
+        sess["remaining_sec"] = 0
+        sess["status_label"] = "COMPLETE"
+        return sess
+
+    end = parse_iso(sess["end"])
+    allow_new = now < end
+    events: list[str] = []
+    cash, position, trades, events, sig, yes_bid, no_bid = step_paper_book(
+        float(sess.get("cash") or SESSION_STARTING),
+        sess.get("position"),
+        list(sess.get("trades") or []),
+        events,
+        market,
+        settled,
+        ind_1m,
+        ind_5m,
+        btc_price,
+        now,
+        allow_new_entries=allow_new,
+        stake=float(sess.get("stake") or SESSION_STAKE),
+    )
+
+    action = sig.action
+    label = sig.label
+    reason = sig.reason
+    if not allow_new and action in ("BUY_YES", "BUY_NO"):
+        action = "SKIP"
+        label = "SKIP — Session window ended"
+        reason = f"The 1-hour $40 window has ended, so no new trade was opened. Signal was: {sig.reason}"
+    elif not allow_new and position is None and action == "WAIT":
+        reason = "Hour ended — watching only to settle any leftover trade. " + sig.reason
+
+    mp = market_payload(market, now) if market else None
+    checks = list(sess.get("checks") or [])
+    checks.append(
+        {
+            "t": iso_utc(now),
+            "t_pt": fmt_pt(now),
+            "ticker": (mp or {}).get("ticker") or (position or {}).get("ticker"),
+            "action": action,
+            "label": label,
+            "reason": reason,
+            "btc_price": round_px(btc_price, 2),
+            "yes_ask": (mp or {}).get("yes_ask"),
+            "no_ask": (mp or {}).get("no_ask"),
+            "cash": round_money(cash),
+        }
+    )
+    checks = checks[-40:]
+
+    start_bal = float(sess.get("starting_balance") or SESSION_STARTING)
+    equity = mark_equity(cash, position, yes_bid, no_bid)
+    stats = trade_stats(trades)
+    remaining = int((end - now).total_seconds())
+    if remaining > 0:
+        status = "LIVE"
+        mm = remaining // 60
+        status_label = f"LIVE · {mm}m left"
+    elif position:
+        status = "SETTLING"
+        status_label = "SETTLING"
+        remaining = 0
+    else:
+        status = "COMPLETE"
+        status_label = "COMPLETE"
+        remaining = 0
+        equity = round_money(cash)
+
+    out = {
+        "starting_balance": start_bal,
+        "stake": float(sess.get("stake") or SESSION_STAKE),
+        "cash": round_money(cash),
+        "position": position,
+        "trades": trades,
+        "checks": checks,
+        "start": sess["start"],
+        "start_pt": sess.get("start_pt") or fmt_pt(sess["start"]),
+        "end": sess["end"],
+        "end_pt": sess.get("end_pt") or fmt_pt(sess["end"]),
+        "window_label": sess.get("window_label") or session_window_label(sess["start"], sess["end"]),
+        "status": status,
+        "status_label": status_label,
+        "remaining_sec": max(0, remaining),
+        "equity": equity,
+        "pnl": round_money(equity - start_bal),
+        "pnl_pct": round(((equity - start_bal) / start_bal) * 100.0, 2) if start_bal else 0.0,
+        "trade_count": stats["trade_count"],
+        "wins": stats["wins"],
+        "losses": stats["losses"],
+        "win_rate": stats["win_rate"],
+        "net_pnl": stats["net_pnl"] if not position else round_money(equity - start_bal),
+        "final_balance": sess.get("final_balance"),
+        "completed_at": sess.get("completed_at"),
+        "completed_at_pt": sess.get("completed_at_pt"),
+        "created_at": sess.get("created_at") or sess["start"],
+        "updated_at": iso_utc(now),
+        "updated_at_pt": fmt_pt(now),
+        "events": events,
+    }
+    if status == "COMPLETE" and out["final_balance"] is None:
+        out["final_balance"] = round_money(cash)
+        out["equity"] = round_money(cash)
+        out["pnl"] = round_money(cash - start_bal)
+        out["pnl_pct"] = round(((cash - start_bal) / start_bal) * 100.0, 2) if start_bal else 0.0
+        out["net_pnl"] = out["pnl"]
+        out["completed_at"] = iso_utc(now)
+        out["completed_at_pt"] = fmt_pt(now)
+    return out
 
 
 # ---------------------------------------------------------------------------
@@ -1348,6 +1556,8 @@ def main() -> int:
         state = default_state()
 
     new_state, sig, events = run_live(state, market, settled, ind_1m, ind_5m, btc_price, now)
+    session = run_session(state, market, settled, ind_1m, ind_5m, btc_price, now)
+    new_state["session"] = session
     save_json(STATE_PATH, new_state)
 
     mp = market_payload(market, now)
@@ -1406,8 +1616,9 @@ def main() -> int:
             **stats,
             "events": events,
         },
+        "session": session,
         "backtest": backtest,
-        "fee_note": "Every paper trade uses Kalshi’s taker fee, ceil(0.07 × contracts × price × (1 − price)), rounded up to the next cent. Stake is $5 per trade on a $100 starting book.",
+        "fee_note": "Every paper trade uses Kalshi’s taker fee, ceil(0.07 × contracts × price × (1 − price)), rounded up to the next cent. The ongoing book starts at $100; the separate 1-hour session starts at $40. Both use a $5 stake.",
         "rules_summary": {
             "buy_yes": "1m EMA 9 > 21, close > EMA 50, MACD hist > 0, RSI 52–75, 5m trend agrees, BTC at least $20 above the strike, Yes ask 35¢–72¢, and ≥ 2 minutes left.",
             "buy_no": "The bearish mirror (EMA 9 < 21, close < EMA 50, MACD hist < 0, RSI 25–48, 5m trend agrees, BTC at least $20 below the strike, No ask 35¢–72¢).",
@@ -1419,9 +1630,16 @@ def main() -> int:
     print(f"  Contract: {mp['ticker'] if mp else 'none'} | strike {strike} | BTC ${btc_price:,.2f}", flush=True)
     print(f"  CALL: {sig.label}", flush=True)
     print(f"  {sig.reason}", flush=True)
-    print(f"  Paper equity ${equity:,.2f} (cash ${new_state['cash']:,.2f}) | {stats['wins']}W-{stats['losses']}L", flush=True)
+    print(f"  $100 book equity ${equity:,.2f} (cash ${new_state['cash']:,.2f}) | {stats['wins']}W-{stats['losses']}L", flush=True)
+    print(
+        f"  $40 session: {session['status_label']} | {session['window_label']} | "
+        f"equity ${session['equity']:,.2f} | {session.get('wins', 0)}W-{session.get('losses', 0)}L | {session.get('events') or ['no new session trades']}",
+        flush=True,
+    )
     for ev in events:
         print(f"  EVENT {ev}", flush=True)
+    for ev in session.get("events") or []:
+        print(f"  SESSION {ev}", flush=True)
     print(f"  Wrote {STATE_PATH.relative_to(ROOT)}, {BACKTEST_PATH.relative_to(ROOT)}, {DASHBOARD_PATH.relative_to(ROOT)}", flush=True)
     return 0
 

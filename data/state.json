@@ -14,9 +14,58 @@
       "t": 1795718054,
       "t_pt": "Nov 26, 2026, 10:34 AM PT",
       "equity": 100.0
+    },
+    {
+      "t": 1795719575,
+      "t_pt": "Nov 26, 2026, 10:59 AM PT",
+      "equity": 100.0
     }
   ],
   "created_at": "2026-11-26T18:33:31Z",
-  "updated_at": "2026-11-26T18:34:14Z",
-  "updated_at_pt": "Nov 26, 2026, 10:34 AM PT"
+  "updated_at": "2026-11-26T18:59:35Z",
+  "updated_at_pt": "Nov 26, 2026, 10:59 AM PT",
+  "session": {
+    "starting_balance": 40.0,
+    "stake": 5.0,
+    "cash": 40.0,
+    "position": null,
+    "trades": [],
+    "checks": [
+      {
+        "t": "2026-11-26T18:59:35Z",
+        "t_pt": "Nov 26, 2026, 10:59 AM PT",
+        "ticker": "KXBTC15M-26NOV261400-00",
+        "action": "WAIT",
+        "label": "WAIT \u2014 Too close to expiry",
+        "reason": "Only 0:25 left in this window. The bot stands aside under 2 minutes.",
+        "btc_price": 60400.49,
+        "yes_ask": 0.001,
+        "no_ask": 1.0,
+        "cash": 40.0
+      }
+    ],
+    "start": "2026-11-26T18:59:35Z",
+    "start_pt": "Nov 26, 2026, 10:59 AM PT",
+    "end": "2026-11-26T19:59:35Z",
+    "end_pt": "Nov 26, 2026, 11:59 AM PT",
+    "window_label": "10:59 AM \u2013 11:59 AM PT",
+    "status": "LIVE",
+    "status_label": "LIVE \u00b7 59m left",
+    "remaining_sec": 3599,
+    "equity": 40.0,
+    "pnl": 0.0,
+    "pnl_pct": 0.0,
+    "trade_count": 0,
+    "wins": 0,
+    "losses": 0,
+    "win_rate": null,
+    "net_pnl": 0.0,
+    "final_balance": null,
+    "completed_at": null,
+    "completed_at_pt": null,
+    "created_at": "2026-11-26T18:59:35Z",
+    "updated_at": "2026-11-26T18:59:35Z",
+    "updated_at_pt": "Nov 26, 2026, 10:59 AM PT",
+    "events": []
+  }
 }
