@@ -6,9 +6,9 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta name="theme-color" content="#EA580C" />
   <title>BTC 15-Min Bot</title>
-  <meta name="description" content="Live Buy Yes / Buy No / Wait signals for Kalshi’s 15-minute Bitcoin contracts, with a $40 one-hour paper run." />
+  <meta name="description" content="Version 1 vs Version 2 head-to-head $40 paper race on Kalshi’s 15-minute Bitcoin contracts." />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23F7931A'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-size='18' font-family='Georgia' fill='%231C140A'%3E%E2%82%BF%3C/text%3E%3C/svg%3E" />
-  <link rel="stylesheet" href="style.css?v=20261126-ui4" />
+  <link rel="stylesheet" href="style.css?v=20261126-ui5" />
 </head>
 <body>
   <div class="wrap">
@@ -17,7 +17,7 @@
         <div class="hero-copy">
           <div class="hero-kicker" id="hero-date">Kalshi · KXBTC15M</div>
           <h1>BTC 15-Min Bot</h1>
-          <p class="hero-sub">Paper Buy / Sell / Wait signals for the 15-minute Bitcoin contract. $2–$4 tickets, 2× after a win, real Kalshi fees.</p>
+          <p class="hero-sub">Version 1 vs Version 2 in a live $40 race on the 15-minute Bitcoin contract. $2–$4 tickets, 2× after a win, real Kalshi fees.</p>
         </div>
         <div class="hero-live">
           <div class="btc-live-label"><span id="btc-dot" class="dot"></span>Live Bitcoin</div>
@@ -30,24 +30,24 @@
 
     <div class="stats">
       <div class="stat">
-        <div class="lbl">$40 run</div>
-        <div class="val" id="stat-balance-val">—</div>
-        <div class="sub" id="stat-balance-sub">Start → current balance</div>
+        <div class="lbl">Version 1</div>
+        <div class="val" id="stat-v1-val">$40.00</div>
+        <div class="sub" id="stat-v1-sub">Active Multi-Trade</div>
       </div>
       <div class="stat">
-        <div class="lbl">Amount Bought</div>
-        <div class="val" id="stat-bought-val">—</div>
-        <div class="sub" id="stat-bought-sub">Total spent in this hour, including fees</div>
+        <div class="lbl">Version 2</div>
+        <div class="val" id="stat-v2-val">$40.00</div>
+        <div class="sub" id="stat-v2-sub">Strict Rules</div>
       </div>
       <div class="stat">
-        <div class="lbl">Total Gain / Lost</div>
-        <div class="val" id="stat-pnl-val">—</div>
-        <div class="sub" id="stat-pnl-sub"></div>
+        <div class="lbl">Leader</div>
+        <div class="val" id="stat-leader-val">Tied</div>
+        <div class="sub" id="stat-leader-sub">Head-to-head $40 race</div>
       </div>
       <div class="stat">
-        <div class="lbl">Record</div>
-        <div class="val" id="stat-record-val">—</div>
-        <div class="sub" id="stat-record-sub">1-hour $40 run</div>
+        <div class="lbl">Gap</div>
+        <div class="val" id="stat-gap-val">$0.00</div>
+        <div class="sub" id="stat-gap-sub">Difference in equity</div>
       </div>
     </div>
 
@@ -62,34 +62,22 @@
     <div id="error" hidden class="err"></div>
 
     <section id="panel-live" class="panel" role="tabpanel">
-      <article id="session-card" class="card session-card">
-        <div class="card-head">
-          <div>
-            <div class="card-kicker">1-Hour $40 Run</div>
-            <div class="card-title" id="session-window">Starting…</div>
-            <div class="card-range" id="session-range"></div>
+      <article id="race-bar" class="card race-bar">
+        <div class="race-bar-main">
+          <div class="race-bar-copy">
+            <div class="card-kicker">Current 15-min window</div>
+            <div class="card-title" id="race-window">Starting…</div>
+            <div class="card-range">
+              <span class="countdown" id="race-countdown"></span>
+              <span class="race-dot">·</span>
+              <span id="race-btc-vs">BTC vs strike</span>
+            </div>
           </div>
-          <div class="pill-stack">
-            <div id="session-pill" class="pill LIVE">LIVE</div>
-            <div id="session-press" class="pill BASE">Next stake: $2–$4</div>
+          <div class="race-bar-right">
+            <div id="race-leader" class="pill LEADER">Tied</div>
+            <a class="cta race-cta" id="kalshi-cta" hidden target="_blank" rel="noopener">Open on Kalshi ↗</a>
           </div>
         </div>
-        <div class="metrics">
-          <div class="metric"><div class="k">Balance</div><div class="v" id="sess-equity">$40.00</div></div>
-          <div class="metric"><div class="k">Amount Bought</div><div class="v" id="sess-bought">$0.00</div></div>
-          <div class="metric"><div class="k">Total Gain / Lost</div><div class="v" id="sess-pnl">$0.00</div></div>
-          <div class="metric"><div class="k">Contracts</div><div class="v" id="sess-contracts">0</div></div>
-          <div class="metric"><div class="k">Record</div><div class="v" id="sess-record">0–0</div></div>
-        </div>
-        <div id="session-open" class="open-line" hidden></div>
-      </article>
-
-      <article id="signal-card" class="card signal-card WAIT">
-        <div class="card-kicker">Current Signal</div>
-        <div class="signal-action" id="signal-action">Loading…</div>
-        <div class="signal-meta" id="signal-meta"></div>
-        <p class="signal-reason" id="signal-reason">Fetching the latest Kalshi 15-minute contract and BTC indicators.</p>
-        <a class="cta" id="kalshi-cta" hidden target="_blank" rel="noopener">Open on Kalshi ↗</a>
         <details class="details">
           <summary>Details</summary>
           <div class="inds" id="signal-inds"></div>
@@ -97,18 +85,125 @@
         </details>
       </article>
 
-      <article class="card">
-        <h2>Recent checks &amp; trades</h2>
-        <div id="recent-list"></div>
-        <button type="button" class="more-link" id="recent-more">See the full $40-session log and the $100 book →</button>
-      </article>
+      <nav class="split-jump" aria-label="Jump to a version">
+        <a href="#col-v1">Version 1</a>
+        <a href="#col-v2">Version 2</a>
+      </nav>
+
+      <div class="split">
+      <section id="col-v1" class="split-col v1">
+        <article class="card session-card race-book v1-card">
+          <div class="card-head">
+            <div>
+              <div class="card-kicker">Version 1</div>
+              <div class="card-title">Active Multi-Trade</div>
+              <div class="card-range">$40 start · $2–$4 per trade (2× on win, max $8)</div>
+            </div>
+            <div class="pill-stack">
+              <div id="v1-badge" class="pill V1">MULTI-TRADE · UP TO 3 PER WINDOW</div>
+              <div id="v1-press" class="pill BASE">Next stake: $2–$4</div>
+            </div>
+          </div>
+          <div class="metrics">
+            <div class="metric"><div class="k">Balance</div><div class="v" id="v1-equity">$40.00</div></div>
+            <div class="metric"><div class="k">Amount Bought</div><div class="v" id="v1-bought">$0.00</div></div>
+            <div class="metric"><div class="k">Total Gain / Lost</div><div class="v" id="v1-pnl">$0.00</div></div>
+            <div class="metric"><div class="k">Contracts</div><div class="v" id="v1-contracts">0</div></div>
+            <div class="metric"><div class="k">Record</div><div class="v" id="v1-record">0–0</div></div>
+          </div>
+          <div class="choice-box" id="v1-choice">
+            <div class="card-kicker">Current window choice</div>
+            <div class="choice-action" id="v1-choice-label">Loading…</div>
+            <p class="choice-reason" id="v1-choice-reason">Waiting for the latest 5-minute check.</p>
+          </div>
+          <div id="v1-open" class="open-line">Waiting for setup</div>
+        </article>
+        <article class="card">
+          <h2>Recent checks &amp; trades</h2>
+          <div id="v1-recent"></div>
+        </article>
+      </section>
+      <section id="col-v2" class="split-col v2">
+        <article class="card session-card race-book v2-card">
+          <div class="card-head">
+            <div>
+              <div class="card-kicker">Version 2</div>
+              <div class="card-title">Strict Rules</div>
+              <div class="card-range">$40 start · $2–$4 per trade (2× on win, max $8)</div>
+            </div>
+            <div class="pill-stack">
+              <div id="v2-badge" class="pill V2">STRICT RULES · v2</div>
+              <div id="v2-press" class="pill BASE">Next stake: $2–$4</div>
+            </div>
+          </div>
+          <div class="metrics">
+            <div class="metric"><div class="k">Balance</div><div class="v" id="v2-equity">$40.00</div></div>
+            <div class="metric"><div class="k">Amount Bought</div><div class="v" id="v2-bought">$0.00</div></div>
+            <div class="metric"><div class="k">Total Gain / Lost</div><div class="v" id="v2-pnl">$0.00</div></div>
+            <div class="metric"><div class="k">Contracts</div><div class="v" id="v2-contracts">0</div></div>
+            <div class="metric"><div class="k">Record</div><div class="v" id="v2-record">0–0</div></div>
+          </div>
+          <div class="choice-box" id="v2-choice">
+            <div class="card-kicker">Current window choice</div>
+            <div class="choice-action" id="v2-choice-label">Loading…</div>
+            <p class="choice-reason" id="v2-choice-reason">Waiting for the latest 5-minute check.</p>
+          </div>
+          <div id="v2-open" class="open-line">Waiting for setup</div>
+        </article>
+        <article class="card">
+          <h2>Recent checks &amp; trades</h2>
+          <div id="v2-recent"></div>
+        </article>
+      </section>
+      </div>
     </section>
 
     <section id="panel-trades" class="panel" role="tabpanel" hidden>
       <div class="section-head">
-        <h2>1-Hour $40 run</h2>
-        <p>Every trade and every 5-minute check from this hour, including WAIT windows.</p>
+        <h2>Head-to-head $40 race</h2>
+        <p id="race-trades-range">Two books started together at $40. Version 1 can take up to 3 tickets in a window; Version 2 takes at most one, and only when every strict rule passes.</p>
       </div>
+      <article class="card">
+        <h2>Version 1 · Active Multi-Trade</h2>
+        <div id="v1-trades"></div>
+      </article>
+      <article class="card">
+        <h2>Version 1 activity</h2>
+        <div id="v1-checks"></div>
+      </article>
+      <article class="card" style="margin-top:8px">
+        <h2>Version 2 · Strict Rules</h2>
+        <div id="v2-trades"></div>
+      </article>
+      <article class="card">
+        <h2>Version 2 activity</h2>
+        <div id="v2-checks"></div>
+      </article>
+
+      <div class="section-head" style="margin-top:22px">
+        <h2>Archived 1-Hour $40 run</h2>
+        <p id="archive-session-range">The completed 10:59–11:59 AM PT run is kept here so nothing is lost.</p>
+      </div>
+      <article id="session-card" class="card session-card">
+        <div class="card-head">
+          <div>
+            <div class="card-kicker">1-Hour $40 Run</div>
+            <div class="card-title" id="session-window">10:59 AM – 11:59 AM PT</div>
+            <div class="card-range" id="session-range"></div>
+          </div>
+          <div class="pill-stack">
+            <div id="session-pill" class="pill COMPLETE">COMPLETE</div>
+          </div>
+        </div>
+        <div class="metrics">
+          <div class="metric"><div class="k">Balance</div><div class="v" id="sess-equity">—</div></div>
+          <div class="metric"><div class="k">Amount Bought</div><div class="v" id="sess-bought">—</div></div>
+          <div class="metric"><div class="k">Total Gain / Lost</div><div class="v" id="sess-pnl">—</div></div>
+          <div class="metric"><div class="k">Contracts</div><div class="v" id="sess-contracts">0</div></div>
+          <div class="metric"><div class="k">Record</div><div class="v" id="sess-record">—</div></div>
+        </div>
+        <div id="session-open" class="open-line" hidden></div>
+      </article>
       <article class="card">
         <h2>Session trades</h2>
         <div id="session-trades"></div>
@@ -120,7 +215,7 @@
 
       <div class="section-head" style="margin-top:22px">
         <h2>Ongoing $100 paper book</h2>
-        <p>Separate from the 1-hour $40 run. Same rules, ongoing bankroll.</p>
+        <p>Separate from the $40 race and the archived 1-hour run. Same $2–$4 sizing and 2× press rule, ongoing bankroll.</p>
       </div>
       <article class="card">
         <div class="metrics">
@@ -195,13 +290,16 @@
         <h2 style="text-transform:none;font-size:20px;letter-spacing:-0.03em;color:var(--ink)">How the bot trades</h2>
         <p class="note" style="margin-bottom:10px">This is a paper bot for Kalshi’s <strong>KXBTC15M</strong> market — “BTC price up in the next 15 mins?” It never places a real order. Yes wins if the CF Benchmarks BRTI average in the last 60 seconds of the window is at or above the strike. No wins if it finishes below.</p>
         <ol class="rules">
-          <li><strong>Buy Yes</strong> when the 1-minute trend is cleanly bullish (EMA 9 above 21, price above EMA 50, MACD histogram positive, RSI 52–75), the 5-minute trend agrees, BTC is at least $20 above the strike, the Yes ask is 35¢–72¢, and at least 2 minutes remain.</li>
-          <li><strong>Buy No</strong> is the bearish mirror (EMA 9 below 21, price below EMA 50, MACD negative, RSI 25–48, BTC at least $20 below the strike, No ask 35¢–72¢).</li>
-          <li><strong>Wait</strong> when those conditions conflict, the EMAs are flat, the window has under 2 minutes left, or Kalshi’s price is already too expensive (above 72¢).</li>
+          <li><strong>Head-to-head $40 race.</strong> Two paper books start at the same moment with $40 each so you can watch which style actually makes more money. Both use a $2–$4 ticket by signal strength and a 2× press after a win, capped at $8, plus real Kalshi taker fees.</li>
+          <li><strong>Version 1 · Active Multi-Trade</strong> can take more than one trade in the same 15-minute window — up to 3 tickets, one new entry per 5-minute check, as long as at least 2 minutes remain, the ask is 5¢–95¢, and cash allows. It scores Yes vs No from BTC vs strike, EMA 9/21/50, MACD, RSI, the 5-minute trend, and the ask, then adds to its side on confirmation (or a better price) or flips if momentum turns. Every entry gets a one-sentence reason. All open tickets in that window settle together when Kalshi grades the contract.</li>
+          <li><strong>Version 2 · Strict Rules</strong> follows the learned strategy in <code>strategy_config.json</code> (currently v2). It takes <strong>at most one trade per 15-minute window</strong>, and only when every trend, strike-gap, and price filter passes. Otherwise it logs WAIT with a one-line reason.</li>
+          <li><strong>Buy Yes</strong> (Version 2) when the 1-minute trend is cleanly bullish (EMA 9 above 21, price above EMA 50, MACD histogram positive, RSI in its bullish band), the 5-minute trend agrees, BTC is far enough from the strike, the Yes ask is inside the learned band, and enough time remains.</li>
+          <li><strong>Buy No</strong> (Version 2) is the bearish mirror.</li>
+          <li><strong>Wait</strong> (Version 2) when those conditions conflict, the EMAs are flat, the window is almost over, or Kalshi’s price is already too expensive.</li>
           <li><strong>Sell early</strong> if the live bid hits ~80¢ or +15¢ from entry (take profit), drops 12¢ (cut loss), or momentum and BTC-vs-strike both flip against you. Otherwise the bot holds to official settlement.</li>
           <li><strong>Sizing.</strong> A normal qualifying signal buys a <strong>$2</strong> ticket. A strong signal (clearer EMA / MACD / RSI alignment and more distance from the strike) buys <strong>$3</strong>. A top-conviction signal buys <strong>$4</strong>.</li>
-          <li><strong>Double after a win (press).</strong> If a trade hits (wins), the next trade is <strong>2× that winning stake</strong> — $2 → $4, $3 → $6, $4 → $8 — capped at <strong>$8</strong> and never more than the cash left in that book. If the pressed trade loses, sizing resets to $2–$4. If it wins, the bot keeps pressing 2×, still capped at $8. The 1-hour $40 run and the ongoing $100 book each track this separately.</li>
-          <li><strong>Fees.</strong> The 1-hour run starts at $40. The ongoing book starts at $100. Every ticket uses Kalshi’s real taker fee: ceil(0.07 × contracts × price × (1 − price)).</li>
+          <li><strong>Double after a win (press).</strong> If a trade hits (wins), the next trade is <strong>2× that winning stake</strong> — $2 → $4, $3 → $6, $4 → $8 — capped at <strong>$8</strong> and never more than the cash left in that book. If the pressed trade loses, sizing resets to $2–$4. If it wins, the bot keeps pressing 2×, still capped at $8. The $40 race books, the archived 1-hour $40 run, and the ongoing $100 book each track this separately.</li>
+          <li><strong>Fees.</strong> Each race book starts at $40. The ongoing book starts at $100. The completed 10:59–11:59 AM PT 1-hour $40 run is archived on the Trades tab. Every ticket uses Kalshi’s real taker fee: ceil(0.07 × contracts × price × (1 − price)).</li>
           <li><strong>Learns every hour.</strong> A GitHub Action pulls newly settled windows, walk-forward tests new parameters on unseen hours (train on the older ~70%, validate on the newest ~30%), and only promotes a change when validation P&amp;L is clearly better — enough trades, a positive unseen profit, a meaningful edge over the live rules, and a 3-hour cooldown so it doesn’t flip-flop on noise. That run is free and does not use Grok Bot.</li>
         </ol>
       </article>
@@ -212,6 +310,6 @@
       <div><a href="https://github.com/nfm0984-png/btc-paper-bot">GitHub repo</a> · Bot runs every 5 minutes · Learns every hour · BTC price polls live every 20 seconds</div>
     </footer>
   </div>
-  <script src="app.js?v=20261126-ui4"></script>
+  <script src="app.js?v=20261126-ui5"></script>
 </body>
 </html>

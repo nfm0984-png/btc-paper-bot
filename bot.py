@@ -43,6 +43,12 @@ STAKE = STAKE_NORMAL  # default / display alias
 SESSION_STARTING = 40.00
 SESSION_STAKE = STAKE_NORMAL
 SESSION_MINUTES = 60
+# Head-to-head $40 race: Version 1 (multi-trade) vs Version 2 (strict / learned rules).
+RACE_STARTING = 40.00
+V1_ASK_MIN = 0.05
+V1_ASK_MAX = 0.95
+V1_MIN_REMAINING_SEC = 120
+V1_MAX_TRADES_PER_WINDOW = 3
 # Trades opened under the old flat-$5 rule have no `stake` field.
 LEGACY_FLAT_STAKE = 5.00
 FEE_RATE = 0.07  # Kalshi quadratic taker fee
@@ -1701,6 +1707,7 @@ def step_paper_book(
     last_win_stake: Optional[float] = None,
     params: Optional[StrategyParams] = None,
     features: Optional[dict] = None,
+    max_trades_per_window: Optional[int] = None,
 ) -> tuple[float, Optional[dict], list[dict], list[str], Signal, Optional[float], Optional[float], bool, Optional[float]]:
     """Apply settlements, early exits, and optional new entries to one paper book."""
     params = params or StrategyParams()
@@ -1791,7 +1798,31 @@ def step_paper_book(
             features=features,
         )
 
-    if allow_new_entries and position is None and market and sig.action in ("BUY_YES", "BUY_NO") and sig.ask is not None:
+    ticker = (market or {}).get("ticker")
+    window_trades = 0
+    if ticker:
+        window_trades = sum(1 for t in trades if t.get("ticker") == ticker)
+        if position and position.get("ticker") == ticker:
+            # An open ticket may already be in trades; don't double-count.
+            window_trades = max(window_trades, 1)
+    window_full = (
+        max_trades_per_window is not None
+        and ticker is not None
+        and window_trades >= int(max_trades_per_window)
+    )
+    if window_full and position is None and sig.action in ("BUY_YES", "BUY_NO"):
+        sig = Signal(
+            "WAIT",
+            "WAIT — Already traded this window",
+            "Strict Rules already used its one trade in this 15-minute window, so it stands aside until the next contract.",
+            side=sig.side,
+            ask=sig.ask,
+            bid=sig.bid,
+            strength=sig.strength,
+            base_stake=sig.base_stake,
+        )
+
+    if allow_new_entries and (not window_full) and position is None and market and sig.action in ("BUY_YES", "BUY_NO") and sig.ask is not None:
         base = float(sig.base_stake or stake or STAKE_NORMAL)
         entry_stake, pressed = resolve_entry_stake(base, press_next, last_win_stake, cash)
         opened = open_trade(
@@ -1898,6 +1929,7 @@ def run_live(
         "updated_at": iso_utc(now),
         "updated_at_pt": fmt_pt(now),
         "session": state.get("session"),
+        "race": state.get("race"),
     }
     return new_state, sig, events
 
@@ -2089,6 +2121,743 @@ def run_session(
 # Main
 # ---------------------------------------------------------------------------
 
+
+
+# ---------------------------------------------------------------------------
+# Head-to-head $40 race: Version 1 (multi-trade) vs Version 2 (strict rules)
+# ---------------------------------------------------------------------------
+
+def tradable_v1_ask(ask: Optional[float]) -> bool:
+    return ask is not None and V1_ASK_MIN - 1e-12 <= float(ask) <= V1_ASK_MAX + 1e-12
+
+
+def dist_phrase(btc_price: float, strike: Optional[float]) -> str:
+    if strike is None:
+        return "the strike isn’t posted yet"
+    dist = float(btc_price) - float(strike)
+    if dist >= 0:
+        return f"BTC is +${dist:,.0f} above strike"
+    return f"BTC is −${abs(dist):,.0f} below strike"
+
+
+def score_side(
+    side: str,
+    ind: Optional[Indicators],
+    trend: Optional[Indicators],
+    btc_price: float,
+    strike: Optional[float],
+    ask: Optional[float],
+) -> tuple[float, int]:
+    """Return (score, alignment_count 0–6) for Yes or No. Higher score wins."""
+    score = 0.0
+    aligns = 0
+    dist = (float(btc_price) - float(strike)) if strike is not None else 0.0
+    favored = (side == "yes" and dist > 0) or (side == "no" and dist < 0)
+    if strike is not None:
+        if favored:
+            score += 2.0 + min(abs(dist) / 25.0, 3.0)
+            aligns += 1
+        else:
+            score -= 1.0 + min(abs(dist) / 25.0, 3.0)
+    if ind and ind.ready:
+        ema_up = (ind.ema9 or 0) > (ind.ema21 or 0)
+        if (side == "yes" and ema_up) or (side == "no" and not ema_up):
+            score += 2.0
+            aligns += 1
+            if abs((ind.ema9 or 0) - (ind.ema21 or 0)) >= 15:
+                score += 0.5
+        else:
+            score -= 2.0
+        if ind.ema50 is not None and ind.close is not None:
+            above50 = ind.close > ind.ema50
+            if (side == "yes" and above50) or (side == "no" and not above50):
+                score += 1.5
+                aligns += 1
+            else:
+                score -= 1.0
+        macd_up = (ind.macd_hist or 0) > 0
+        if (side == "yes" and macd_up) or (side == "no" and not macd_up):
+            score += 1.5
+            aligns += 1
+        else:
+            score -= 1.0
+        rsi = ind.rsi14
+        if rsi is not None:
+            if side == "yes":
+                if rsi >= 55:
+                    score += 1.5
+                    aligns += 1
+                elif rsi >= 50:
+                    score += 0.4
+                else:
+                    score -= 1.2
+            else:
+                if rsi <= 45:
+                    score += 1.5
+                    aligns += 1
+                elif rsi <= 50:
+                    score += 0.4
+                else:
+                    score -= 1.2
+    if trend and trend.ready:
+        t_up = (trend.ema9 or 0) >= (trend.ema21 or 0)
+        if (side == "yes" and t_up) or (side == "no" and not t_up):
+            score += 1.5
+            aligns += 1
+        else:
+            score -= 1.0
+    if tradable_v1_ask(ask):
+        score += (0.70 - float(ask)) * 3.0
+    elif ask is not None:
+        score -= 8.0
+    return score, aligns
+
+
+def v1_strength(aligns: int, margin: float) -> tuple[str, float]:
+    if aligns >= 5 and margin >= 2.0:
+        return "top", STAKE_TOP
+    if aligns >= 3 and margin >= 1.0:
+        return "strong", STAKE_STRONG
+    return "normal", STAKE_NORMAL
+
+
+def _trend_bits(side: str, ind: Optional[Indicators], trend: Optional[Indicators]) -> list[str]:
+    bits: list[str] = []
+    if ind and ind.ready:
+        if side == "yes" and (ind.ema9 or 0) > (ind.ema21 or 0):
+            bits.append("1m trending up")
+        elif side == "no" and (ind.ema9 or 0) < (ind.ema21 or 0):
+            bits.append("1m trending down")
+        if ind.rsi14 is not None:
+            if side == "no" and ind.rsi14 <= 48:
+                bits.append(f"RSI cooled to {ind.rsi14:.0f}")
+            elif side == "yes" and ind.rsi14 >= 52:
+                bits.append(f"RSI {ind.rsi14:.0f}")
+    if trend and trend.ready:
+        if side == "yes" and (trend.ema9 or 0) >= (trend.ema21 or 0):
+            bits.append("5m trending up")
+        elif side == "no" and (trend.ema9 or 0) <= (trend.ema21 or 0):
+            bits.append("5m trending down")
+    return bits
+
+
+def make_v1_signal(
+    *,
+    ind_1m: Optional[Indicators],
+    ind_5m: Optional[Indicators],
+    btc_price: float,
+    strike: Optional[float],
+    yes_ask: Optional[float],
+    yes_bid: Optional[float],
+    no_ask: Optional[float],
+    no_bid: Optional[float],
+    remaining_sec: Optional[int],
+    open_positions: Optional[list] = None,
+    window_trade_count: int = 0,
+    last_entry: Optional[dict] = None,
+    ticker: Optional[str] = None,
+) -> Signal:
+    """Version 1: pick a side every window; may add or flip up to 3 times per contract."""
+    positions = [p for p in (open_positions or []) if p and (not ticker or p.get("ticker") == ticker)]
+    if remaining_sec is not None and remaining_sec <= 0:
+        return Signal("WAIT", "WAIT — Window closed", "This 15-minute window has closed. Waiting for the next contract.")
+    if remaining_sec is not None and remaining_sec < V1_MIN_REMAINING_SEC:
+        mm, ss = divmod(max(0, remaining_sec), 60)
+        label = "HOLD" if positions else "WAIT"
+        return Signal(
+            "HOLD" if positions else "WAIT",
+            ("HOLD open trades — " if positions else "") + "Too close to expiry",
+            f"Only {mm}:{ss:02d} left in this window, so Version 1 won’t open another ticket.",
+            side=(positions[-1].get("side") if positions else None),
+        )
+    yes_ok, no_ok = tradable_v1_ask(yes_ask), tradable_v1_ask(no_ask)
+    if not yes_ok and not no_ok:
+        return Signal(
+            "HOLD" if positions else "WAIT",
+            "WAIT — No tradable ask",
+            "Neither Yes nor No is between 5¢ and 95¢, so Version 1 stands aside.",
+            side=(positions[-1].get("side") if positions else None),
+        )
+    if strike is None:
+        return Signal("WAIT", "WAIT — No Trade", "The contract strike is not posted yet.")
+
+    yes_score, yes_al = score_side("yes", ind_1m, ind_5m, btc_price, strike, yes_ask)
+    no_score, no_al = score_side("no", ind_1m, ind_5m, btc_price, strike, no_ask)
+    if not yes_ok:
+        yes_score = -999.0
+    if not no_ok:
+        no_score = -999.0
+
+    if yes_score >= no_score:
+        pick, ask, bid, score, other, aligns = "yes", yes_ask, yes_bid, yes_score, no_score, yes_al
+    else:
+        pick, ask, bid, score, other, aligns = "no", no_ask, no_bid, no_score, yes_score, no_al
+    margin = float(score) - float(other)
+    strength, stake = v1_strength(aligns, margin)
+    lean = " (choppy lean)" if strength == "normal" and aligns <= 2 else ""
+    dist_txt = dist_phrase(btc_price, strike)
+    bits = _trend_bits(pick, ind_1m, ind_5m)
+    entry_n = int(window_trade_count) + 1
+
+    if window_trade_count >= V1_MAX_TRADES_PER_WINDOW:
+        reason = f"Already have {window_trade_count} trades in this window — holding to settlement. {dist_txt}."
+        if positions:
+            side = positions[-1].get("side")
+            return Signal("HOLD", f"HOLD {len(positions)} open · cap reached", reason, side=side, bid=bid)
+        return Signal("WAIT", "WAIT — Window cap reached", reason)
+
+    kind = "first"
+    enter = True
+    last_side = None
+    if last_entry and last_entry.get("side"):
+        last_side = last_entry.get("side")
+    elif positions:
+        last_side = positions[-1].get("side")
+
+    if window_trade_count > 0 and last_side:
+        flipped = pick != last_side and margin >= 0.8
+        confirm = False
+        if pick == last_side:
+            better_ask = False
+            if last_entry and last_entry.get("entry_price") is not None and ask is not None:
+                better_ask = float(ask) <= float(last_entry["entry_price"]) - 0.01
+            stronger = margin >= 1.0 and aligns >= 3
+            confirm = better_ask or stronger or aligns >= 4
+        if flipped:
+            kind, enter = "flip", True
+        elif confirm:
+            kind, enter = "add", True
+        else:
+            kind, enter = "watch", False
+
+    if not enter:
+        reason = f"Watching this window — {dist_txt}, no confirmation or flip yet."
+        if positions:
+            side = positions[-1].get("side")
+            return Signal("HOLD", f"HOLD {side.upper() if side else 'open'} · watching", reason, side=side, bid=bid)
+        return Signal("WAIT", "WAIT — Watching", reason)
+
+    with_txt = ""
+    if bits and kind == "first":
+        with_txt = " with " + " & ".join(bits[:2])
+    if kind == "first":
+        reason = f"Picked {pick.upper()} @ {cents_label(ask)}{lean} — {dist_txt}{with_txt}."
+    elif kind == "add":
+        broke = dist_txt.replace("BTC is ", "BTC broke ")
+        reason = f"Entry #{entry_n} in window: {broke}, adding {pick.upper()} @ {cents_label(ask)}."
+    else:
+        reason = (
+            f"Entry #{entry_n} in window: momentum flipped, buying {pick.upper()} @ {cents_label(ask)} — {dist_txt}."
+        )
+    action = "BUY_YES" if pick == "yes" else "BUY_NO"
+    return Signal(
+        action,
+        f"BUY {pick.upper()} @ {cents_label(ask)}",
+        reason,
+        side=pick,
+        ask=ask,
+        bid=bid,
+        strength=strength,
+        base_stake=stake,
+    )
+
+
+def window_trade_count(trades: list[dict], ticker: Optional[str], open_positions: Optional[list] = None) -> int:
+    if not ticker:
+        return 0
+    n = sum(1 for t in trades if t.get("ticker") == ticker)
+    if n == 0 and open_positions:
+        n = sum(1 for p in open_positions if p and p.get("ticker") == ticker)
+    return n
+
+
+def last_entry_for(trades: list[dict], ticker: Optional[str], open_positions: Optional[list] = None) -> Optional[dict]:
+    if not ticker:
+        return None
+    for t in reversed(list(trades or [])):
+        if t.get("ticker") == ticker:
+            return t
+    for p in reversed(list(open_positions or [])):
+        if p and p.get("ticker") == ticker:
+            return p
+    return None
+
+
+def positions_of(book: dict) -> list[dict]:
+    opens = [p for p in (book.get("open_positions") or []) if p]
+    if opens:
+        return list(opens)
+    if book.get("position"):
+        return [book["position"]]
+    return []
+
+
+def mark_equity_multi(cash: float, positions: list[dict], yes_bid: Optional[float], no_bid: Optional[float]) -> float:
+    eq = float(cash)
+    for pos in positions:
+        bid = yes_bid if pos.get("side") == "yes" else no_bid
+        if bid is None:
+            eq += float(pos.get("cost") or pos.get("total_in") or 0)
+        else:
+            eq += int(pos.get("contracts") or 0) * float(bid)
+    return round_money(eq)
+
+
+def crisp_signal_reason(sig: Signal) -> str:
+    raw = " ".join(str(sig.reason or "").split())
+    if not raw:
+        return sig.label
+    if len(raw) <= 180 and "EMA 9" not in raw and "MACD histogram" not in raw:
+        return raw
+    # Prefer the human sentence after the indicator dump.
+    parts = [s.strip() for s in raw.split(".") if s.strip()]
+    human = [s for s in parts if "EMA 9" not in s and "MACD" not in s and not s.startswith("RSI ")]
+    if human:
+        line = human[-1] + "."
+        return line if len(line) <= 200 else line[:197] + "…"
+    return raw[:177] + "…" if len(raw) > 180 else raw
+
+
+def new_race_book(book_id: str, now: datetime, strategy_version: Optional[int] = None) -> dict:
+    if book_id == "v1":
+        name, short, badge = "Active Multi-Trade", "Version 1", "MULTI-TRADE · UP TO 3 PER WINDOW"
+    else:
+        ver = int(strategy_version or 2)
+        name, short, badge = "Strict Rules", "Version 2", f"STRICT RULES · v{ver}"
+    return {
+        "id": book_id,
+        "name": name,
+        "short_name": short,
+        "badge": badge,
+        "starting_balance": RACE_STARTING,
+        "cash": RACE_STARTING,
+        "stake": STAKE_NORMAL,
+        "press_next": False,
+        "last_win_stake": None,
+        "position": None,
+        "open_positions": [],
+        "trades": [],
+        "checks": [],
+        "equity": RACE_STARTING,
+        "pnl": 0.0,
+        "pnl_pct": 0.0,
+        "amount_bought": 0.0,
+        "contracts_total": 0,
+        "wins": 0,
+        "losses": 0,
+        "trade_count": 0,
+        "win_rate": None,
+        "next_stake_label": "Next stake: $2–$4",
+        "created_at": iso_utc(now),
+        "events": [],
+    }
+
+
+def new_race(now: datetime, strategy_version: Optional[int] = None) -> dict:
+    return {
+        "starting_balance": RACE_STARTING,
+        "start": iso_utc(now),
+        "start_pt": fmt_pt(now),
+        "v1": new_race_book("v1", now),
+        "v2": new_race_book("v2", now, strategy_version),
+    }
+
+
+def ensure_race(state: dict, now: datetime, strategy_version: Optional[int] = None) -> dict:
+    """Upgrade existing state in place. Never resets the $100 book or the 1-hour session."""
+    race = state.get("race") if isinstance(state, dict) else None
+    if isinstance(race, dict) and isinstance(race.get("v1"), dict) and isinstance(race.get("v2"), dict):
+        for key in ("v1", "v2"):
+            book = race[key]
+            ensure_press_fields(book)
+            if "open_positions" not in book:
+                book["open_positions"] = [book["position"]] if book.get("position") else []
+            book.setdefault("checks", [])
+            book.setdefault("id", key)
+        return race
+    race = new_race(now, strategy_version)
+    print(
+        f"  Starting Head-to-Head $40 Race at {race['start_pt']}: "
+        "Version 1 Active Multi-Trade vs Version 2 Strict Rules",
+        flush=True,
+    )
+    return race
+
+
+def settle_open_positions(
+    cash: float,
+    positions: list[dict],
+    trades: list[dict],
+    events: list[str],
+    settled: list[dict],
+    extra_markets: list,
+    now: datetime,
+) -> tuple[float, list[dict], list[dict], list[str], list[dict], bool, Optional[float]]:
+    press_next = False
+    last_win_stake: Optional[float] = None
+    # press is applied by the caller from the returned closed trades; we just close here.
+    still: list[dict] = []
+    closed: list[dict] = []
+    for position in positions:
+        pos_m = find_market(position["ticker"], settled, extra_markets)
+        if pos_m is None:
+            try:
+                data = http_get_json(f"{KALSHI_API}/markets/{urllib.parse.quote(position['ticker'])}")
+                pos_m = data.get("market") or data
+            except Exception as exc:
+                events.append(f"Could not refresh open market {position['ticker']}: {exc}")
+                still.append(position)
+                continue
+        if pos_m and (pos_m.get("result") in ("yes", "no") or pos_m.get("status") in ("finalized", "settled", "determined")):
+            if pos_m.get("result") in ("yes", "no"):
+                cash, trade = close_trade(
+                    cash,
+                    position,
+                    exit_price=None,
+                    exit_fee=0.0,
+                    result=pos_m["result"],
+                    outcome="settlement",
+                    reason=(
+                        f"Settled {pos_m['result'].upper()} at BTC "
+                        f"{dollars(pos_m.get('expiration_value')) or 'n/a'} vs strike {position.get('strike')}."
+                    ),
+                    now=parse_iso(pos_m.get("settlement_ts") or now),
+                    expiration_value=dollars(pos_m.get("expiration_value")),
+                )
+                upsert_closed_trade(trades, trade)
+                closed.append(trade)
+                events.append(
+                    f"Settled {position['side'].upper()} on {position['ticker']}: {trade['reason_exit']} PnL {trade['pnl']:+.2f}"
+                )
+                continue
+        still.append(position)
+    return cash, still, trades, events, closed, press_next, last_win_stake
+
+
+def append_race_check(
+    book: dict,
+    sig: Signal,
+    market: Optional[dict],
+    now: datetime,
+    btc_price: float,
+    *,
+    book_id: str,
+) -> None:
+    mp = market_payload(market, now) if market else None
+    ticker = (mp or {}).get("ticker") or ((book.get("position") or {}) if False else None)
+    ticker = (mp or {}).get("ticker")
+    if not ticker:
+        opens = positions_of(book)
+        ticker = opens[-1]["ticker"] if opens else None
+    close_time = (mp or {}).get("close_time")
+    if not close_time:
+        opens = positions_of(book)
+        if opens:
+            close_time = opens[-1].get("close_time")
+    opens = positions_of(book)
+    last_pos = opens[-1] if opens else None
+    check = {
+        "t": iso_utc(now),
+        "t_pt": fmt_pt(now),
+        "ticker": ticker,
+        "close_time": close_time,
+        "close_time_pt": (mp or {}).get("close_time_pt") or (fmt_pt(close_time) if close_time else None),
+        "window_label": contract_window_label(close_time) if close_time else None,
+        "action": sig.action,
+        "label": sig.label,
+        "reason": crisp_signal_reason(sig),
+        "reason_full": sig.reason,
+        "btc_price": round_px(btc_price, 2),
+        "strike": (mp or {}).get("strike") or (last_pos or {}).get("strike"),
+        "yes_ask": (mp or {}).get("yes_ask"),
+        "no_ask": (mp or {}).get("no_ask"),
+        "side": sig.side or (last_pos or {}).get("side"),
+        "ask": sig.ask,
+        "contracts": (last_pos or {}).get("contracts") if sig.action in ("HOLD", "BUY_YES", "BUY_NO") else None,
+        "entry_price": (last_pos or {}).get("entry_price") if last_pos else None,
+        "cash": round_money(book.get("cash") or 0),
+        "book_id": book_id,
+        "book_label": book.get("short_name") or book_id,
+        "open_count": len(opens),
+    }
+    checks = list(book.get("checks") or [])
+    checks.append(check)
+    book["checks"] = checks[-80:]
+
+
+def finalize_race_book(book: dict, yes_bid: Optional[float], no_bid: Optional[float], now: datetime, strategy_version: Optional[int] = None) -> dict:
+    ensure_press_fields(book)
+    opens = [decorate_position(p, yes_bid, no_bid) for p in positions_of(book)]
+    opens = [p for p in opens if p]
+    trades = [decorate_trade(t, yes_bid, no_bid) for t in (book.get("trades") or [])]
+    cash = round_money(float(book.get("cash") or 0))
+    start = float(book.get("starting_balance") or RACE_STARTING)
+    equity = mark_equity_multi(cash, opens, yes_bid, no_bid)
+    amount, contracts = book_totals(trades, None)
+    # Include any open tickets not yet mirrored into trades.
+    extra_amt, extra_ct = book_totals([], None)
+    if opens:
+        open_amt, open_ct = book_totals(opens, None)
+        # book_totals on trades already counts open logs; use max to be safe
+        if amount <= 0 and open_amt:
+            amount, contracts = open_amt, open_ct
+        elif contracts == 0 and open_ct:
+            contracts = open_ct
+    stats = trade_stats(trades)
+    out = dict(book)
+    if out.get("id") == "v2" and strategy_version:
+        out["badge"] = f"STRICT RULES · v{int(strategy_version)}"
+        out["name"] = "Strict Rules"
+        out["short_name"] = "Version 2"
+    out["cash"] = cash
+    out["open_positions"] = opens
+    out["position"] = opens[-1] if opens else None
+    out["trades"] = trades
+    out["amount_bought"] = amount
+    out["contracts_total"] = contracts
+    out["equity"] = equity
+    out["pnl"] = round_money(equity - start)
+    out["pnl_pct"] = round(((equity - start) / start) * 100.0, 2) if start else 0.0
+    out["trade_count"] = stats["trade_count"]
+    out["wins"] = stats["wins"]
+    out["losses"] = stats["losses"]
+    out["win_rate"] = stats["win_rate"]
+    out["net_pnl"] = out["pnl"]
+    out["next_stake_label"] = next_stake_label(bool(book.get("press_next")), book.get("last_win_stake"), cash)
+    out["updated_at"] = iso_utc(now)
+    out["updated_at_pt"] = fmt_pt(now)
+    return out
+
+
+def step_v1_book(
+    book: dict,
+    market: Optional[dict],
+    settled: list[dict],
+    ind_1m: Optional[Indicators],
+    ind_5m: Optional[Indicators],
+    btc_price: float,
+    now: datetime,
+) -> tuple[dict, Signal]:
+    """Version 1: hold all tickets to settlement; at most one new entry per 5-minute check."""
+    ensure_press_fields(book)
+    events: list[str] = list(book.get("events") or [])
+    cash = float(book.get("cash") or RACE_STARTING)
+    trades = list(book.get("trades") or [])
+    press_next = bool(book.get("press_next"))
+    last_win_stake = book.get("last_win_stake")
+    positions = positions_of(book)
+
+    cash, positions, trades, events, closed, _, _ = settle_open_positions(
+        cash, positions, trades, events, settled, [market] if market else [], now,
+    )
+    for trade in closed:
+        press_next, last_win_stake = apply_press_from_trade(press_next, last_win_stake, trade)
+
+    mp = market_payload(market, now) if market else None
+    yes_ask = mp["yes_ask"] if mp else None
+    yes_bid = mp["yes_bid"] if mp else None
+    no_ask = mp["no_ask"] if mp else None
+    no_bid = mp["no_bid"] if mp else None
+    strike = mp["strike"] if mp else None
+    remaining = mp["remaining_sec"] if mp else None
+    ticker = mp["ticker"] if mp else None
+    count = window_trade_count(trades, ticker, positions)
+    last = last_entry_for(trades, ticker, positions)
+
+    sig = make_v1_signal(
+        ind_1m=ind_1m,
+        ind_5m=ind_5m,
+        btc_price=btc_price,
+        strike=strike,
+        yes_ask=yes_ask,
+        yes_bid=yes_bid,
+        no_ask=no_ask,
+        no_bid=no_bid,
+        remaining_sec=remaining,
+        open_positions=positions,
+        window_trade_count=count,
+        last_entry=last,
+        ticker=ticker,
+    )
+
+    if market and sig.action in ("BUY_YES", "BUY_NO") and sig.ask is not None and count < V1_MAX_TRADES_PER_WINDOW:
+        base = float(sig.base_stake or STAKE_NORMAL)
+        entry_stake, pressed = resolve_entry_stake(base, press_next, last_win_stake, cash)
+        opened = open_trade(
+            cash, market, sig.side or "yes", float(sig.ask), sig.reason, now,
+            stake=entry_stake, pressed=pressed, strength=sig.strength,
+        )
+        if opened:
+            cash, position, log = opened
+            log["window_entry"] = count + 1
+            position["window_entry"] = count + 1
+            trades.append(log)
+            positions.append(position)
+            press_tag = " 2× PRESS" if pressed else ""
+            events.append(
+                f"Opened {position['side'].upper()} {position['contracts']}x {position['ticker']} @ {cents_label(position['entry_price'])} "
+                f"(bought ${position['total_in']:.2f}, ${position['stake']:.0f} ticket{press_tag}, entry #{count + 1} in window)"
+            )
+            sig = Signal(
+                "HOLD",
+                f"BOUGHT {position['side'].upper()} @ {cents_label(position['entry_price'])}",
+                sig.reason,
+                side=position["side"],
+                ask=sig.ask,
+                bid=yes_bid if position["side"] == "yes" else no_bid,
+                strength=sig.strength,
+                base_stake=sig.base_stake,
+            )
+        else:
+            events.append("Version 1 wanted a ticket but there wasn’t enough paper cash after fees.")
+            if positions:
+                sig = Signal("HOLD", "HOLD — not enough cash", sig.reason + " Not enough paper cash to add another ticket.", side=positions[-1].get("side"))
+            else:
+                sig = Signal("WAIT", "WAIT — No Trade", sig.reason + " Not enough paper cash to size the ticket after fees.")
+
+    book["cash"] = round_money(cash)
+    book["open_positions"] = positions
+    book["position"] = positions[-1] if positions else None
+    book["trades"] = trades
+    book["press_next"] = bool(press_next)
+    book["last_win_stake"] = last_win_stake
+    book["events"] = events[-20:]
+    append_race_check(book, sig, market, now, btc_price, book_id="v1")
+    return finalize_race_book(book, yes_bid, no_bid, now), sig
+
+
+def step_v2_book(
+    book: dict,
+    market: Optional[dict],
+    settled: list[dict],
+    ind_1m: Optional[Indicators],
+    ind_5m: Optional[Indicators],
+    btc_price: float,
+    now: datetime,
+    params: Optional[StrategyParams],
+    features: Optional[dict],
+    strategy_version: Optional[int] = None,
+) -> tuple[dict, Signal]:
+    """Version 2: strict learned rules, max one trade per 15-minute window."""
+    ensure_press_fields(book)
+    events: list[str] = []
+    cash, position, trades, events, sig, yes_bid, no_bid, press_next, last_win_stake = step_paper_book(
+        float(book.get("cash") or RACE_STARTING),
+        book.get("position") or (positions_of(book)[-1] if positions_of(book) else None),
+        list(book.get("trades") or []),
+        events,
+        market,
+        settled,
+        ind_1m,
+        ind_5m,
+        btc_price,
+        now,
+        allow_new_entries=True,
+        stake=float(book.get("stake") or STAKE_NORMAL),
+        press_next=bool(book.get("press_next")),
+        last_win_stake=book.get("last_win_stake"),
+        params=params,
+        features=features,
+        max_trades_per_window=1,
+    )
+    book["cash"] = round_money(cash)
+    book["position"] = position
+    book["open_positions"] = [position] if position else []
+    book["trades"] = trades
+    book["press_next"] = bool(press_next)
+    book["last_win_stake"] = last_win_stake
+    book["events"] = events[-20:]
+    # Keep the check reason to one crisp line for the split-screen feed.
+    sig = Signal(
+        sig.action,
+        sig.label,
+        crisp_signal_reason(sig),
+        side=sig.side,
+        ask=sig.ask,
+        bid=sig.bid,
+        strength=sig.strength,
+        base_stake=sig.base_stake,
+    )
+    append_race_check(book, sig, market, now, btc_price, book_id="v2")
+    return finalize_race_book(book, yes_bid, no_bid, now, strategy_version=strategy_version), sig
+
+
+def leader_payload(v1: dict, v2: dict) -> dict:
+    e1 = float(v1.get("equity") or v1.get("cash") or RACE_STARTING)
+    e2 = float(v2.get("equity") or v2.get("cash") or RACE_STARTING)
+    margin = round_money(e1 - e2)
+    if abs(margin) < 0.005:
+        return {"leader": "tied", "label": "Tied", "margin": 0.0, "text": "Tied"}
+    if margin > 0:
+        return {
+            "leader": "v1",
+            "label": "Version 1 ahead",
+            "margin": margin,
+            "text": f"Version 1 ahead by +${margin:.2f}",
+        }
+    return {
+        "leader": "v2",
+        "label": "Version 2 ahead",
+        "margin": round_money(-margin),
+        "text": f"Version 2 ahead by +${-margin:.2f}",
+    }
+
+
+def run_race(
+    state: dict,
+    market: Optional[dict],
+    settled: list[dict],
+    ind_1m: Optional[Indicators],
+    ind_5m: Optional[Indicators],
+    btc_price: float,
+    now: datetime,
+    params: Optional[StrategyParams] = None,
+    features: Optional[dict] = None,
+    strategy_version: Optional[int] = None,
+) -> tuple[dict, Signal, Signal]:
+    race = ensure_race(state, now, strategy_version)
+    v1, sig1 = step_v1_book(dict(race["v1"]), market, settled, ind_1m, ind_5m, btc_price, now)
+    v2, sig2 = step_v2_book(
+        dict(race["v2"]), market, settled, ind_1m, ind_5m, btc_price, now,
+        params=params, features=features, strategy_version=strategy_version,
+    )
+    lead = leader_payload(v1, v2)
+    out = {
+        "starting_balance": RACE_STARTING,
+        "start": race.get("start") or iso_utc(now),
+        "start_pt": race.get("start_pt") or fmt_pt(now),
+        "v1": v1,
+        "v2": v2,
+        "leader": lead["leader"],
+        "leader_label": lead["label"],
+        "leader_margin": lead["margin"],
+        "leader_text": lead["text"],
+        "choice": {
+            "v1": {
+                "action": sig1.action,
+                "label": sig1.label,
+                "reason": sig1.reason,
+                "side": sig1.side,
+                "ask": sig1.ask,
+                "strength": sig1.strength,
+                "base_stake": sig1.base_stake,
+            },
+            "v2": {
+                "action": sig2.action,
+                "label": sig2.label,
+                "reason": sig2.reason,
+                "side": sig2.side,
+                "ask": sig2.ask,
+                "strength": sig2.strength,
+                "base_stake": sig2.base_stake,
+            },
+        },
+        "updated_at": iso_utc(now),
+        "updated_at_pt": fmt_pt(now),
+    }
+    return out, sig1, sig2
+
+
 def rules_summary_from_params(p: StrategyParams) -> dict:
     yes = (
         f"1m EMA 9 > 21, {'close > EMA 50, ' if p.require_ema50_align else ''}"
@@ -2121,6 +2890,13 @@ def rules_summary_from_params(p: StrategyParams) -> dict:
             "Every hour a GitHub Action studies the last 7–14 days of settled 15-minute windows, walk-forward "
             "tests new parameter sets on unseen hours, and only promotes a change when validation P&L is clearly "
             "better. That run is free — it does not use Grok Bot."
+        ),
+        "race": (
+            "A live Head-to-Head $40 Race compares two books that start together at $40. "
+            "Version 1 (Active Multi-Trade) can take up to 3 tickets in the same 15-minute window — one new entry "
+            "per 5-minute check — adding to its side on confirmation or flipping if momentum turns. "
+            "Version 2 (Strict Rules) follows the learned strategy config and takes at most one trade per window, "
+            "only when every trend, strike-gap, and price filter passes. Both use $2–$4 sizing and a 2× press, capped at $8."
         ),
     }
 
@@ -2221,7 +2997,12 @@ def main() -> int:
     features = {"volatility_usd": vol, "chop_ratio": chop}
     new_state, sig, events = run_live(state, market, settled, ind_1m, ind_5m, btc_price, now, params=params, features=features)
     session = run_session(state, market, settled, ind_1m, ind_5m, btc_price, now, params=params, features=features)
+    race, sig_v1, sig_v2 = run_race(
+        state, market, settled, ind_1m, ind_5m, btc_price, now,
+        params=params, features=features, strategy_version=strategy_cfg.get("version", 2),
+    )
     new_state["session"] = session
+    new_state["race"] = race
     save_json(STATE_PATH, new_state)
 
     mp = market_payload(market, now)
@@ -2292,6 +3073,7 @@ def main() -> int:
             "events": events,
         },
         "session": session,
+        "race": race,
         "backtest": backtest,
         "strategy": {
             "version": strategy_cfg.get("version", 1),
@@ -2303,7 +3085,7 @@ def main() -> int:
             "metrics": strategy_cfg.get("metrics") or {},
         },
         "learning": load_existing_dashboard().get("learning"),
-        "fee_note": "Every paper trade uses Kalshi’s taker fee, ceil(0.07 × contracts × price × (1 − price)), rounded up to the next cent. The ongoing book starts at $100; the separate 1-hour session starts at $40. Both use a $2–$4 base stake by signal strength, then 2× after a win, capped at $8.",
+        "fee_note": "Every paper trade uses Kalshi’s taker fee, ceil(0.07 × contracts × price × (1 − price)), rounded up to the next cent. The Head-to-Head $40 Race starts two books at $40 together (Version 1 Active Multi-Trade vs Version 2 Strict Rules). The completed 1-hour $40 run and the ongoing $100 book stay in the Trades tab. All books use a $2–$4 base stake by signal strength, then 2× after a win, capped at $8.",
         "rules_summary": rules_summary_from_params(params),
     }
     save_json(DASHBOARD_PATH, dashboard)
@@ -2317,6 +3099,14 @@ def main() -> int:
         f"equity ${session['equity']:,.2f} | {session.get('wins', 0)}W-{session.get('losses', 0)}L | {session.get('events') or ['no new session trades']}",
         flush=True,
     )
+    print(
+        f"  RACE {race.get('leader_text')}: "
+        f"V1 {sig_v1.label} · equity ${race['v1']['equity']:,.2f} · {race['v1'].get('wins', 0)}W-{race['v1'].get('losses', 0)}L | "
+        f"V2 {sig_v2.label} · equity ${race['v2']['equity']:,.2f} · {race['v2'].get('wins', 0)}W-{race['v2'].get('losses', 0)}L",
+        flush=True,
+    )
+    print(f"  V1: {sig_v1.reason}", flush=True)
+    print(f"  V2: {sig_v2.reason}", flush=True)
     for ev in events:
         print(f"  EVENT {ev}", flush=True)
     for ev in session.get("events") or []:

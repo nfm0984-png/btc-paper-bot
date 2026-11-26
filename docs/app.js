@@ -583,27 +583,34 @@
       ? ("Bot refresh " + data.generated_at_pt.replace(", 2026, ", ", "))
       : "";
 
-    const start = sess && (sess.starting_balance != null ? sess.starting_balance : 40);
-    const equity = sess ? (sess.final_balance != null && sess.status === "COMPLETE" ? sess.final_balance : (sess.equity != null ? sess.equity : sess.cash)) : null;
-    $("stat-balance-val").textContent = equity != null ? (money(start) + " → " + money(equity)) : "—";
-    const balSub = $("stat-balance-sub");
-    if (balSub) {
-      const n = sess ? bookContracts(sess) : 0;
-      balSub.textContent = n ? (contractsLabel(n) + " traded") : "Start → current balance";
+    const race = data.race || {};
+    const v1 = race.v1 || {};
+    const v2 = race.v2 || {};
+    const fillBal = (id, book) => {
+      const el = $(id);
+      if (!el) return;
+      const start = book.starting_balance != null ? book.starting_balance : 40;
+      const equity = book.equity != null ? book.equity : book.cash;
+      el.textContent = equity != null ? (money(start) + " → " + money(equity)) : "—";
+    };
+    fillBal("stat-v1-val", v1);
+    fillBal("stat-v2-val", v2);
+    if ($("stat-v1-sub")) $("stat-v1-sub").textContent = ((v1.wins || 0) + "–" + (v1.losses || 0)) + " · Multi-trade";
+    if ($("stat-v2-sub")) $("stat-v2-sub").textContent = ((v2.wins || 0) + "–" + (v2.losses || 0)) + " · Strict rules";
+    if ($("stat-leader-val")) $("stat-leader-val").textContent = race.leader_label || (race.leader === "tied" ? "Tied" : "—") || "Tied";
+    const gap = $("stat-gap-val");
+    if (gap) {
+      const m = race.leader_margin;
+      gap.textContent = m == null ? "—" : money(m);
+      gap.className = "val " + (m > 0 ? "up" : "");
     }
-    const boughtEl = $("stat-bought-val");
-    if (boughtEl) boughtEl.textContent = sess ? money(bookAmountBought(sess)) : "—";
-    const pnl = $("stat-pnl-val");
-    const pnlVal = sess ? sess.pnl : null;
-    pnl.textContent = sess ? money(pnlVal, true) : "—";
-    pnl.className = "val " + (pnlVal > 0 ? "up" : pnlVal < 0 ? "down" : "");
-    $("stat-pnl-sub").textContent = sess ? ((pnlVal > 0 ? "Gain" : pnlVal < 0 ? "Lost" : "Flat") + " · " + pct(sess.pnl_pct)) : "";
-    $("stat-record-val").textContent = sess ? ((sess.wins || 0) + "–" + (sess.losses || 0)) : "—";
-    $("stat-record-sub").textContent = sess && sess.window_label ? sess.window_label : "1-hour $40 run";
+    if ($("stat-leader-sub")) $("stat-leader-sub").textContent = race.start_pt ? ("Race started " + race.start_pt) : "Head-to-head $40 race";
+    if ($("stat-gap-sub")) $("stat-gap-sub").textContent = race.leader_text && race.leader !== "tied" ? race.leader_text : "Difference in equity";
   }
 
   function renderSession(sess) {
     const card = $("session-card");
+    if (!card) return;
     if (!sess || !(sess.starts_at || sess.start)) {
       card.hidden = true;
       return;
@@ -646,31 +653,51 @@
     }
   }
 
-  function renderSignal(live) {
-    const card = $("signal-card");
-    const action = live.call || "WAIT";
-    const side = live.side || (live.position && live.position.side) || "";
-    card.className = "card signal-card " + action + (action === "HOLD" && side ? " " + side : "");
-    $("signal-action").textContent = live.call_label || action;
-    $("signal-reason").textContent = live.reason || "Waiting for the next Kalshi 15-minute window.";
-    const m = live.market || {};
-    const bits = [];
-    if (m.ticker) bits.push(`<span class="mono">${esc(m.ticker)}</span>`);
-    if (m.close_time) bits.push(`<span class="countdown" id="signal-countdown">${remainingText(m.close_time)}</span>`);
-    if (m.strike != null) bits.push(`<span>Strike ${esc(px(m.strike))}</span>`);
-    $("signal-meta").innerHTML = bits.join(" · ");
-    if (closeTimer) clearInterval(closeTimer);
-    if (m.close_time) closeTimer = setInterval(tickContract, 1000);
-
-    const cta = $("kalshi-cta");
-    if (m.kalshi_url) {
-      cta.hidden = false;
-      cta.href = m.kalshi_url;
-    } else {
-      cta.hidden = true;
-      cta.removeAttribute("href");
+  function raceWindowTitle(market) {
+    const m = market || {};
+    if (m.close_time && !Number.isNaN(Date.parse(m.close_time))) {
+      return windowLabelFromClose(new Date(Date.parse(m.close_time))).replace(/ window$/i, " PT");
     }
+    return prettyWindow(m) ? prettyWindow(m).replace(/ window$/i, " PT") : "Waiting for the next window";
+  }
 
+  function renderRaceBar(data, live) {
+    const race = (data && data.race) || {};
+    const m = (live && live.market) || {};
+    if ($("race-window")) $("race-window").textContent = raceWindowTitle(m);
+    const tick = () => {
+      const el = $("race-countdown");
+      if (!el) return;
+      el.textContent = m.close_time ? remainingText(m.close_time) : "";
+    };
+    tick();
+    if (closeTimer) clearInterval(closeTimer);
+    if (m.close_time) closeTimer = setInterval(tick, 1000);
+
+    const btc = liveBtc != null ? liveBtc : live.btc_price;
+    const strike = (m.strike != null ? m.strike : live.strike);
+    const vs = $("race-btc-vs");
+    if (vs) {
+      if (btc != null && strike != null) {
+        const d = btc - strike;
+        vs.textContent = "BTC " + (d >= 0 ? "+" : "−") + money(Math.abs(d)) + " vs " + px(strike) + " strike";
+        vs.className = d >= 0 ? "up" : "down";
+      } else {
+        vs.textContent = "BTC vs strike";
+        vs.className = "";
+      }
+    }
+    const lead = $("race-leader");
+    if (lead) {
+      lead.textContent = race.leader_text || "Tied";
+      const who = race.leader || "tied";
+      lead.className = "pill LEADER " + (who === "v1" ? "v1" : who === "v2" ? "v2" : "tied");
+    }
+    const cta = $("kalshi-cta");
+    if (cta) {
+      if (m.kalshi_url) { cta.hidden = false; cta.href = m.kalshi_url; }
+      else { cta.hidden = true; cta.removeAttribute("href"); }
+    }
     const ind = liveInd || live.indicators_1m;
     const cells = [
       ["EMA 9", ind && ind.ema9],
@@ -679,29 +706,104 @@
       ["RSI 14", ind && ind.rsi14],
       ["MACD Hist", ind && ind.macd_hist],
     ];
-    $("signal-inds").innerHTML = cells.map(([k, v]) =>
-      `<div class="ind"><div class="k">${k}</div><div class="v">${v == null ? "—" : num(v, 2)}</div></div>`
-    ).join("");
-    const dist = live.distance;
+    if ($("signal-inds")) {
+      $("signal-inds").innerHTML = cells.map(([k, v]) =>
+        `<div class="ind"><div class="k">${k}</div><div class="v">${v == null ? "—" : num(v, 2)}</div></div>`
+      ).join("");
+    }
+    const dist = (btc != null && strike != null) ? (btc - strike) : live.distance;
     const quotes = `Yes ${cents(m.yes_bid)} / ${cents(m.yes_ask)} · No ${cents(m.no_bid)} / ${cents(m.no_ask)}`;
     const strikeBits = [
-      m.strike != null ? `Strike ${px(m.strike)}` : null,
+      strike != null ? `Strike ${px(strike)}` : null,
       dist != null ? (`BTC is ${dist >= 0 ? "+" : ""}${money(dist)} vs strike`) : null,
       live.last_1m_time_pt ? ("Last confirmed 1-minute bar: " + live.last_1m_time_pt) : null,
     ].filter(Boolean).join(". ");
-    $("signal-math").textContent = [quotes, strikeBits].filter(Boolean).join(". ") + (liveInd ? " 1-minute indicators are updating live from Coinbase in this browser." : "");
+    if ($("signal-math")) {
+      $("signal-math").textContent = [quotes, strikeBits].filter(Boolean).join(". ") + (liveInd ? " 1-minute indicators are updating live from Coinbase in this browser." : "");
+    }
   }
 
-  function renderRecent(sess) {
-    const cards = groupFeedItems(sessionChecks(sess), (sess && sess.trades) || []).slice(0, 6);
-    $("recent-list").innerHTML = compactEventList(cards, "Every 15-minute window still gets a line here, even on a WAIT.");
+  function renderRaceBook(id, book, choice, live) {
+    book = book || {};
+    choice = choice || {};
+    const start = book.starting_balance != null ? book.starting_balance : 40;
+    const equity = book.equity != null ? book.equity : book.cash;
+    if ($(id + "-equity")) $(id + "-equity").textContent = money(start) + " → " + money(equity);
+    if ($(id + "-bought")) $(id + "-bought").textContent = money(bookAmountBought(book));
+    const pnlEl = $(id + "-pnl");
+    if (pnlEl) {
+      pnlEl.textContent = money(book.pnl, true);
+      pnlEl.className = "v " + (book.pnl > 0 ? "up" : book.pnl < 0 ? "down" : "");
+    }
+    if ($(id + "-contracts")) $(id + "-contracts").textContent = String(bookContracts(book));
+    if ($(id + "-record")) $(id + "-record").textContent = (book.wins || 0) + "–" + (book.losses || 0);
+    if ($(id + "-badge") && book.badge) $(id + "-badge").textContent = book.badge;
+    const press = $(id + "-press");
+    if (press) {
+      const label = book.next_stake_label || "Next stake: $2–$4";
+      press.textContent = label;
+      press.className = "pill " + (book.press_next ? "PRESS" : "BASE");
+    }
+    const box = $(id + "-choice");
+    const action = choice.action || "WAIT";
+    const side = choice.side || "";
+    if (box) box.className = "choice-box " + action + (action === "HOLD" && side ? " " + side : "");
+    if ($(id + "-choice-label")) $(id + "-choice-label").textContent = choice.label || action;
+    if ($(id + "-choice-reason")) $(id + "-choice-reason").textContent = choice.reason || "Waiting for the next 5-minute check.";
+    const opens = (book.open_positions && book.open_positions.length)
+      ? book.open_positions
+      : (book.position ? [book.position] : []);
+    const openEl = $(id + "-open");
+    const market = (live && live.market) || {};
+    if (openEl) {
+      if (!opens.length) {
+        openEl.hidden = false;
+        openEl.className = "open-line wait";
+        openEl.textContent = "Waiting for setup";
+      } else {
+        openEl.hidden = false;
+        openEl.className = "open-line open-stack";
+        openEl.innerHTML = opens.map((p, i) => openTradeLine(
+          p,
+          opens.length > 1 ? ("Open trade #" + (p.window_entry || (i + 1))) : "Open trade",
+          market
+        )).join("");
+      }
+    }
+    const cards = groupFeedItems(sessionChecks(book), book.trades || []).slice(0, 8);
+    if ($(id + "-recent")) {
+      $(id + "-recent").innerHTML = compactEventList(cards, "The first check in this $40 race will land here.");
+    }
   }
 
-  function renderTrades(live, sess) {
-    const sessTrades = ((sess && sess.trades) || []).slice().sort((a, b) => Date.parse(b.entry_time || 0) - Date.parse(a.entry_time || 0));
+  function renderRace(data, live) {
+    const race = (data && data.race) || {};
+    renderRaceBar(data, live || {});
+    const choice = race.choice || {};
+    renderRaceBook("v1", race.v1, choice.v1, live);
+    renderRaceBook("v2", race.v2, choice.v2, live);
+  }
+
+  function renderTrades(live, sess, race) {
+    race = race || (DATA && DATA.race) || {};
     const market = live.market || {};
-    $("session-trades").innerHTML = tradeRows(sessTrades, "No $40-session trades yet this hour. WAIT checks still appear in the activity log below.", market);
-    $("session-checks").innerHTML = checkRows(sessionChecks(sess));
+    const v1 = race.v1 || {};
+    const v2 = race.v2 || {};
+    if ($("v1-trades")) $("v1-trades").innerHTML = tradeRows(v1.trades, "Version 1 hasn’t taken a race trade yet.", market);
+    if ($("v1-checks")) $("v1-checks").innerHTML = checkRows(sessionChecks(v1));
+    if ($("v2-trades")) $("v2-trades").innerHTML = tradeRows(v2.trades, "Version 2 is waiting for a strict-rules setup.", market);
+    if ($("v2-checks")) $("v2-checks").innerHTML = checkRows(sessionChecks(v2));
+    if ($("race-trades-range")) {
+      $("race-trades-range").textContent = race.start_pt
+        ? ("Both books started at $40.00 on " + race.start_pt + ". Version 1 can take up to 3 tickets in a window; Version 2 takes at most one, and only when every strict rule passes.")
+        : "Two books started together at $40. Version 1 can take up to 3 tickets in a window; Version 2 takes at most one, and only when every strict rule passes.";
+    }
+    const sessTrades = ((sess && sess.trades) || []).slice().sort((a, b) => Date.parse(b.entry_time || 0) - Date.parse(a.entry_time || 0));
+    if ($("archive-session-range") && sess && sess.start_pt && sess.end_pt) {
+      $("archive-session-range").textContent = "Completed " + (sess.window_label || "") + " · " + sess.start_pt + " → " + sess.end_pt + ". Kept here so nothing is lost.";
+    }
+    if ($("session-trades")) $("session-trades").innerHTML = tradeRows(sessTrades, "No trades from the archived 1-hour $40 run.", market);
+    if ($("session-checks")) $("session-checks").innerHTML = checkRows(sessionChecks(sess));
 
     $("book-equity").textContent = money(live.equity);
     const bookBought = $("book-bought");
@@ -827,10 +929,9 @@
     const sess = data.session || {};
     const bt = data.backtest || {};
     renderHero(data, live, sess);
+    renderRace(data, live);
     renderSession(sess);
-    renderSignal(live);
-    renderRecent(sess);
-    renderTrades(live, sess);
+    renderTrades(live, sess, data.race || {});
     renderLearning(data);
     renderBacktest(bt);
   }

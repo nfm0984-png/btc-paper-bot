@@ -20,6 +20,9 @@
   --amber: #D97706;
   --amber-ink: #92400E;
   --amber-soft: #FEF3C7;
+  --teal: #0F766E;
+  --teal-ink: #115E59;
+  --teal-soft: #CCFBF1;
   --shadow: 0 8px 24px rgba(154, 52, 18, 0.10);
   --shadow-hero: 0 0 80px rgba(247, 147, 26, 0.22), 0 18px 40px rgba(26, 16, 6, 0.28);
   --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Inter, "Helvetica Neue", Arial, sans-serif;
@@ -32,7 +35,7 @@ button, input { font-family: inherit; touch-action: manipulation; }
 a { color: var(--brand-deep); }
 ::-webkit-scrollbar { display: none; }
 
-.wrap { max-width: 1100px; margin: 0 auto; padding: 20px 20px 48px; }
+.wrap { max-width: 1240px; margin: 0 auto; padding: 20px 20px 48px; }
 
 /* —— Hero —— */
 .hero {
@@ -318,3 +321,67 @@ footer a:hover { color: var(--brand-deep); }
 
 .learn-takeaway { margin-top: 8px; font-size: 15px; line-height: 1.5; font-weight: 600; color: #44403C; }
 .learn-stats { margin-top: 8px; font-size: 12.5px; font-weight: 700; color: var(--muted); line-height: 1.45; }
+
+
+/* —— Head-to-head split screen —— */
+.race-bar { padding: 16px 18px 12px; }
+.race-bar-main {
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap;
+}
+.race-bar-copy { min-width: 0; flex: 1 1 240px; }
+.race-bar-copy .card-title { font-size: 22px; }
+.race-bar-right {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end;
+}
+.cta.race-cta { width: auto; min-width: 160px; height: 44px; margin-top: 0; padding: 0 16px; }
+.race-bar .card-range { display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: baseline; }
+.race-dot { color: var(--faint); }
+.pill.LEADER { background: var(--green-soft); color: var(--green-ink); border-color: #86EFAC; }
+.pill.LEADER.v1 { background: var(--amber-soft); color: var(--amber-ink); border-color: #FCD34D; }
+.pill.LEADER.v2 { background: var(--teal-soft); color: var(--teal-ink); border-color: #5EEAD4; }
+.pill.LEADER.tied { background: var(--brand-soft); color: #9A3412; border-color: var(--brand-line); }
+.pill.V1 { background: var(--amber-soft); color: var(--amber-ink); border-color: #FCD34D; }
+.pill.V2 { background: var(--teal-soft); color: var(--teal-ink); border-color: #5EEAD4; }
+
+.split-jump {
+  display: none; gap: 8px; margin: 0 0 12px; position: sticky; top: 8px; z-index: 5;
+}
+.split-jump a {
+  flex: 1; text-align: center; text-decoration: none; font-weight: 800; font-size: 13px;
+  padding: 10px 12px; border-radius: 999px; border: 1.5px solid var(--brand-line);
+  background: #fff; color: var(--ink);
+}
+.split-jump a[href="#col-v1"] { background: var(--amber-soft); color: var(--amber-ink); border-color: #FCD34D; }
+.split-jump a[href="#col-v2"] { background: var(--teal-soft); color: var(--teal-ink); border-color: #5EEAD4; }
+
+.split {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start;
+}
+.split-col { min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+.race-book.v1-card { border-color: #F6C893; box-shadow: 0 8px 24px rgba(234, 88, 12, 0.08); }
+.race-book.v2-card { border-color: #99F6E4; box-shadow: 0 8px 24px rgba(15, 118, 110, 0.08); }
+.choice-box {
+  margin-top: 14px; border-radius: 16px; border: 1.5px solid var(--brand-line);
+  background: var(--page); padding: 14px 16px;
+}
+.v1-card .choice-box { border-color: #F6C893; }
+.v2-card .choice-box { border-color: #99F6E4; }
+.choice-box .card-kicker { margin-bottom: 4px; }
+.choice-action {
+  font-size: 22px; font-weight: 900; letter-spacing: -0.03em; line-height: 1.2; margin: 2px 0 6px;
+}
+.choice-box.BUY_YES .choice-action, .choice-box.HOLD.yes .choice-action { color: var(--green-ink); }
+.choice-box.BUY_NO .choice-action, .choice-box.HOLD.no .choice-action { color: var(--red-ink); }
+.choice-box.WAIT .choice-action { color: var(--amber-ink); }
+.choice-reason { font-size: 14.5px; line-height: 1.5; font-weight: 600; color: #44403C; margin: 0; }
+.open-stack { display: flex; flex-direction: column; gap: 8px; }
+.open-line.wait { color: var(--muted); font-weight: 700; }
+
+@media (max-width: 767px) {
+  .split { grid-template-columns: 1fr; }
+  .split-jump { display: flex; }
+  .split-col { scroll-margin-top: 64px; }
+  .hero h1 { font-size: 28px; }
+  .race-bar-right { width: 100%; justify-content: space-between; }
+  .cta.race-cta { flex: 1; }
+}
