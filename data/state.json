@@ -1,9 +1,41 @@
 {
-  "cash": 100.0,
+  "cash": 95.3,
   "starting_balance": 100.0,
   "stake": 5.0,
-  "position": null,
-  "trades": [],
+  "position": {
+    "ticker": "KXBTC15M-26NOV261415-15",
+    "event_ticker": "KXBTC15M-26NOV261415",
+    "title": "BTC price up in next 15 mins?",
+    "side": "no",
+    "contracts": 8,
+    "entry_price": 0.57,
+    "entry_fee": 0.14,
+    "cost": 4.56,
+    "total_in": 4.7,
+    "entry_time": "2026-11-26T19:00:59Z",
+    "entry_time_pt": "Nov 26, 2026, 11:00 AM PT",
+    "close_time": "2026-11-26T19:15:00Z",
+    "close_time_pt": "Nov 26, 2026, 11:15 AM PT",
+    "strike": 60416.55,
+    "reason": "EMA 9 < 21 ($60,416 < $60,456); price below the 50-period EMA; MACD histogram is negative; RSI 41; 5-minute trend agrees. BTC $-25.70 vs the $60,416.55 strike, No ask 57\u00a2 \u2014 Buy No.",
+    "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov261415-15"
+  },
+  "trades": [
+    {
+      "status": "open",
+      "ticker": "KXBTC15M-26NOV261415-15",
+      "side": "no",
+      "contracts": 8,
+      "entry_price": 0.57,
+      "entry_fee": 0.14,
+      "entry_time": "2026-11-26T19:00:59Z",
+      "entry_time_pt": "Nov 26, 2026, 11:00 AM PT",
+      "reason": "EMA 9 < 21 ($60,416 < $60,456); price below the 50-period EMA; MACD histogram is negative; RSI 41; 5-minute trend agrees. BTC $-25.70 vs the $60,416.55 strike, No ask 57\u00a2 \u2014 Buy No.",
+      "strike": 60416.55,
+      "running_balance": 95.3,
+      "total_in": 4.7
+    }
+  ],
   "equity_history": [
     {
       "t": 1795717955,
@@ -19,17 +51,54 @@
       "t": 1795719575,
       "t_pt": "Nov 26, 2026, 10:59 AM PT",
       "equity": 100.0
+    },
+    {
+      "t": 1795719659,
+      "t_pt": "Nov 26, 2026, 11:00 AM PT",
+      "equity": 99.78
     }
   ],
   "created_at": "2026-11-26T18:33:31Z",
-  "updated_at": "2026-11-26T18:59:35Z",
-  "updated_at_pt": "Nov 26, 2026, 10:59 AM PT",
+  "updated_at": "2026-11-26T19:00:59Z",
+  "updated_at_pt": "Nov 26, 2026, 11:00 AM PT",
   "session": {
     "starting_balance": 40.0,
     "stake": 5.0,
-    "cash": 40.0,
-    "position": null,
-    "trades": [],
+    "cash": 35.3,
+    "position": {
+      "ticker": "KXBTC15M-26NOV261415-15",
+      "event_ticker": "KXBTC15M-26NOV261415",
+      "title": "BTC price up in next 15 mins?",
+      "side": "no",
+      "contracts": 8,
+      "entry_price": 0.57,
+      "entry_fee": 0.14,
+      "cost": 4.56,
+      "total_in": 4.7,
+      "entry_time": "2026-11-26T19:00:59Z",
+      "entry_time_pt": "Nov 26, 2026, 11:00 AM PT",
+      "close_time": "2026-11-26T19:15:00Z",
+      "close_time_pt": "Nov 26, 2026, 11:15 AM PT",
+      "strike": 60416.55,
+      "reason": "EMA 9 < 21 ($60,416 < $60,456); price below the 50-period EMA; MACD histogram is negative; RSI 41; 5-minute trend agrees. BTC $-25.70 vs the $60,416.55 strike, No ask 57\u00a2 \u2014 Buy No.",
+      "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov261415-15"
+    },
+    "trades": [
+      {
+        "status": "open",
+        "ticker": "KXBTC15M-26NOV261415-15",
+        "side": "no",
+        "contracts": 8,
+        "entry_price": 0.57,
+        "entry_fee": 0.14,
+        "entry_time": "2026-11-26T19:00:59Z",
+        "entry_time_pt": "Nov 26, 2026, 11:00 AM PT",
+        "reason": "EMA 9 < 21 ($60,416 < $60,456); price below the 50-period EMA; MACD histogram is negative; RSI 41; 5-minute trend agrees. BTC $-25.70 vs the $60,416.55 strike, No ask 57\u00a2 \u2014 Buy No.",
+        "strike": 60416.55,
+        "running_balance": 35.3,
+        "total_in": 4.7
+      }
+    ],
     "checks": [
       {
         "t": "2026-11-26T18:59:35Z",
@@ -42,6 +111,18 @@
         "yes_ask": 0.001,
         "no_ask": 1.0,
         "cash": 40.0
+      },
+      {
+        "t": "2026-11-26T19:00:59Z",
+        "t_pt": "Nov 26, 2026, 11:00 AM PT",
+        "ticker": "KXBTC15M-26NOV261415-15",
+        "action": "HOLD",
+        "label": "HOLD NO @ 57\u00a2",
+        "reason": "Just bought NO \u2014 EMA 9 < 21 ($60,416 < $60,456); price below the 50-period EMA; MACD histogram is negative; RSI 41; 5-minute trend agrees. BTC $-25.70 vs the $60,416.55 strike, No ask 57\u00a2 \u2014 Buy No.",
+        "btc_price": 60390.85,
+        "yes_ask": 0.44,
+        "no_ask": 0.57,
+        "cash": 35.3
       }
     ],
     "start": "2026-11-26T18:59:35Z",
@@ -50,22 +131,24 @@
     "end_pt": "Nov 26, 2026, 11:59 AM PT",
     "window_label": "10:59 AM \u2013 11:59 AM PT",
     "status": "LIVE",
-    "status_label": "LIVE \u00b7 59m left",
-    "remaining_sec": 3599,
-    "equity": 40.0,
-    "pnl": 0.0,
-    "pnl_pct": 0.0,
+    "status_label": "LIVE \u00b7 58m left",
+    "remaining_sec": 3515,
+    "equity": 39.78,
+    "pnl": -0.22,
+    "pnl_pct": -0.55,
     "trade_count": 0,
     "wins": 0,
     "losses": 0,
     "win_rate": null,
-    "net_pnl": 0.0,
+    "net_pnl": -0.22,
     "final_balance": null,
     "completed_at": null,
     "completed_at_pt": null,
     "created_at": "2026-11-26T18:59:35Z",
-    "updated_at": "2026-11-26T18:59:35Z",
-    "updated_at_pt": "Nov 26, 2026, 10:59 AM PT",
-    "events": []
+    "updated_at": "2026-11-26T19:00:59Z",
+    "updated_at_pt": "Nov 26, 2026, 11:00 AM PT",
+    "events": [
+      "Opened NO 8x KXBTC15M-26NOV261415-15 @ 57\u00a2 (fee $0.14)"
+    ]
   }
 }
