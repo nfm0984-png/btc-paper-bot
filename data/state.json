@@ -9,9 +9,14 @@
       "t": 1795717955,
       "t_pt": "Nov 26, 2026, 10:32 AM PT",
       "equity": 100.0
+    },
+    {
+      "t": 1795718054,
+      "t_pt": "Nov 26, 2026, 10:34 AM PT",
+      "equity": 100.0
     }
   ],
   "created_at": "2026-11-26T18:33:31Z",
-  "updated_at": "2026-11-26T18:32:35Z",
-  "updated_at_pt": "Nov 26, 2026, 10:32 AM PT"
+  "updated_at": "2026-11-26T18:34:14Z",
+  "updated_at_pt": "Nov 26, 2026, 10:34 AM PT"
 }
