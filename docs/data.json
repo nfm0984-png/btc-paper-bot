@@ -4843,7 +4843,9 @@
       "val_windows": 399,
       "promoted_from": 2,
       "candidate": "rsi_bear_30_45"
-    }
+    },
+    "last_promoted_at": "2026-11-26T23:55:30Z",
+    "last_promoted_at_pt": "Nov 26, 2026, 3:55 PM PT"
   },
   "learning": {
     "generated_at": "2026-11-27T01:15:38Z",
