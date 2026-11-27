@@ -474,11 +474,16 @@
       "t": 1795799907,
       "t_pt": "Nov 27, 2026, 9:18 AM PT",
       "equity": 78.09
+    },
+    {
+      "t": 1795800206,
+      "t_pt": "Nov 27, 2026, 9:23 AM PT",
+      "equity": 78.09
     }
   ],
   "created_at": "2026-11-26T18:33:31Z",
-  "updated_at": "2026-11-27T17:18:27Z",
-  "updated_at_pt": "Nov 27, 2026, 9:18 AM PT",
+  "updated_at": "2026-11-27T17:23:26Z",
+  "updated_at_pt": "Nov 27, 2026, 9:23 AM PT",
   "session": {
     "starting_balance": 40.0,
     "stake": 5.0,
@@ -649,8 +654,8 @@
         "reason": "Picked NO @ 64\u00a2 \u2014 BTC is \u2212$108 below strike with 1m trending down & RSI cooled to 42.",
         "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov271230-30",
         "window_entry": 1,
-        "mark": 7.56,
-        "pnl": -0.32,
+        "mark": 9.36,
+        "pnl": 1.48,
         "pnl_kind": "unrealized",
         "book_id": "v1",
         "book_label": "Version 1"
@@ -678,8 +683,8 @@
           "reason": "Picked NO @ 64\u00a2 \u2014 BTC is \u2212$108 below strike with 1m trending down & RSI cooled to 42.",
           "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov271230-30",
           "window_entry": 1,
-          "mark": 7.56,
-          "pnl": -0.32,
+          "mark": 9.36,
+          "pnl": 1.48,
           "pnl_kind": "unrealized",
           "book_id": "v1",
           "book_label": "Version 1"
@@ -2851,11 +2856,35 @@
           "book_id": "v1",
           "book_label": "Version 1",
           "open_count": 1
+        },
+        {
+          "t": "2026-11-27T17:23:26Z",
+          "t_pt": "Nov 27, 2026, 9:23 AM PT",
+          "ticker": "KXBTC15M-26NOV271230-30",
+          "close_time": "2026-11-27T17:30:00Z",
+          "close_time_pt": "Nov 27, 2026, 9:30 AM PT",
+          "window_label": "9:15 AM \u2013 9:30 AM PT",
+          "action": "HOLD",
+          "label": "WAIT \u2014 No tradable ask",
+          "reason": "Neither Yes nor No is between 35\u00a2 and 75\u00a2, so Version 1 stands aside.",
+          "reason_full": "Neither Yes nor No is between 35\u00a2 and 75\u00a2, so Version 1 stands aside.",
+          "btc_price": 59834.39,
+          "strike": 59932.33,
+          "yes_ask": 0.22,
+          "no_ask": 0.79,
+          "side": "no",
+          "ask": null,
+          "contracts": 12,
+          "entry_price": 0.64,
+          "cash": 57.02,
+          "book_id": "v1",
+          "book_label": "Version 1",
+          "open_count": 1
         }
       ],
-      "equity": 64.58,
-      "pnl": -35.42,
-      "pnl_pct": -35.42,
+      "equity": 66.38,
+      "pnl": -33.62,
+      "pnl_pct": -33.62,
       "amount_bought": 189.98,
       "contracts_total": 308,
       "wins": 13,
@@ -2886,9 +2915,9 @@
         "Settled NO on KXBTC15M-26NOV271215-15: Settled YES at BTC 59932.33 vs strike 59914.26. PnL -7.88",
         "Opened NO 12x KXBTC15M-26NOV271230-30 @ 64\u00a2 (bought $7.88, $8 ticket, entry #1 in window)"
       ],
-      "net_pnl": -35.42,
-      "updated_at": "2026-11-27T17:18:27Z",
-      "updated_at_pt": "Nov 27, 2026, 9:18 AM PT"
+      "net_pnl": -33.62,
+      "updated_at": "2026-11-27T17:23:26Z",
+      "updated_at_pt": "Nov 27, 2026, 9:23 AM PT"
     },
     "v2": {
       "id": "v2",
@@ -4510,6 +4539,30 @@
           "book_id": "v2",
           "book_label": "Version 2",
           "open_count": 0
+        },
+        {
+          "t": "2026-11-27T17:23:26Z",
+          "t_pt": "Nov 27, 2026, 9:23 AM PT",
+          "ticker": "KXBTC15M-26NOV271230-30",
+          "close_time": "2026-11-27T17:30:00Z",
+          "close_time_pt": "Nov 27, 2026, 9:30 AM PT",
+          "window_label": "9:15 AM \u2013 9:30 AM PT",
+          "action": "WAIT",
+          "label": "WAIT \u2014 Too choppy",
+          "reason": "The last 15 minutes were choppy (chop 0.91 vs a 0.80 cap) \u2014 the bot stands aside.",
+          "reason_full": "The last 15 minutes were choppy (chop 0.91 vs a 0.80 cap) \u2014 the bot stands aside.",
+          "btc_price": 59834.39,
+          "strike": 59932.33,
+          "yes_ask": 0.22,
+          "no_ask": 0.79,
+          "side": null,
+          "ask": null,
+          "contracts": null,
+          "entry_price": null,
+          "cash": 82.79,
+          "book_id": "v2",
+          "book_label": "Version 2",
+          "open_count": 0
         }
       ],
       "equity": 82.79,
@@ -4523,38 +4576,36 @@
       "win_rate": 33.3,
       "next_stake_label": "Next stake: $4\u2013$8 flat (no press)",
       "created_at": "2026-11-26T20:22:54Z",
-      "events": [
-        "Settled NO on KXBTC15M-26NOV271215-15: Settled YES at BTC 59932.33 vs strike 59914.26. PnL -7.76"
-      ],
+      "events": [],
       "net_pnl": -17.21,
-      "updated_at": "2026-11-27T17:18:27Z",
-      "updated_at_pt": "Nov 27, 2026, 9:18 AM PT"
+      "updated_at": "2026-11-27T17:23:26Z",
+      "updated_at_pt": "Nov 27, 2026, 9:23 AM PT"
     },
     "leader": "v2",
     "leader_label": "Version 2 ahead",
-    "leader_margin": 18.21,
-    "leader_text": "Version 2 ahead by +$18.21",
+    "leader_margin": 16.41,
+    "leader_text": "Version 2 ahead by +$16.41",
     "choice": {
       "v1": {
         "action": "HOLD",
-        "label": "BOUGHT NO @ 64\u00a2",
-        "reason": "Picked NO @ 64\u00a2 \u2014 BTC is \u2212$108 below strike with 1m trending down & RSI cooled to 42.",
+        "label": "WAIT \u2014 No tradable ask",
+        "reason": "Neither Yes nor No is between 35\u00a2 and 75\u00a2, so Version 1 stands aside.",
         "side": "no",
-        "ask": 0.64,
-        "strength": "top",
-        "base_stake": 8.0
+        "ask": null,
+        "strength": null,
+        "base_stake": null
       },
       "v2": {
         "action": "WAIT",
-        "label": "WAIT \u2014 No Trade",
-        "reason": "Choppy / no clean edge: price is below the strike, but the 1-minute trend/momentum is not cleanly bearish (MACD histogram is still positive); Yes ask 37\u00a2.",
+        "label": "WAIT \u2014 Too choppy",
+        "reason": "The last 15 minutes were choppy (chop 0.91 vs a 0.80 cap) \u2014 the bot stands aside.",
         "side": null,
         "ask": null,
         "strength": null,
         "base_stake": null
       }
     },
-    "updated_at": "2026-11-27T17:18:27Z",
-    "updated_at_pt": "Nov 27, 2026, 9:18 AM PT"
+    "updated_at": "2026-11-27T17:23:26Z",
+    "updated_at_pt": "Nov 27, 2026, 9:23 AM PT"
   }
 }
