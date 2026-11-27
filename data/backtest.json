@@ -1,15 +1,15 @@
 {
-  "start": "2026-11-22T23:45:00Z",
+  "start": "2026-11-23T00:00:00Z",
   "end": "2026-11-27T23:30:00Z",
-  "start_pt": "Nov 22, 2026, 3:45 PM PT",
+  "start_pt": "Nov 22, 2026, 4:00 PM PT",
   "end_pt": "Nov 27, 2026, 3:30 PM PT",
   "days": 5.0,
-  "windows_scanned": 471,
+  "windows_scanned": 470,
   "windows_traded": 43,
-  "windows_skipped": 428,
+  "windows_skipped": 427,
   "skip_reasons": {
-    "WAIT \u2014 Too close to strike": 180,
     "WAIT \u2014 Too choppy": 115,
+    "WAIT \u2014 Too close to strike": 179,
     "WAIT \u2014 No Trade": 128,
     "WAIT \u2014 No Edge": 5
   },
@@ -28,11 +28,6 @@
   "gross_loss": 73.4,
   "net_pnl": 47.72,
   "equity_history": [
-    {
-      "t": 1795391160,
-      "t_pt": "Nov 22, 2026, 3:46 PM PT",
-      "equity": 100.0
-    },
     {
       "t": 1795392060,
       "t_pt": "Nov 22, 2026, 4:01 PM PT",
@@ -3678,8 +3673,8 @@
   ],
   "assumption_note": "Each window is evaluated once, 1 minute after it opens, using the real Kalshi Yes/No quotes at that minute and Coinbase 1-minute / 5-minute / 15-minute / 1-hour BTC candles, plus a spot-derived fair probability from realized 1-minute volatility. Trades use a $4\u2013$8 flat stake by signal strength (no 2\u00d7 press) and the official quadratic taker fee. When a full 15-minute Kalshi bid path is available, early take-profit and cut-loss rules are applied on that path; otherwise the ticket is held to official Yes/No settlement. The live bot can also enter later in a window (on a 5-minute scan) and uses live order-book and taker-flow data as a market reader; those live-only prints are not in this backtest.",
   "fee_note": "Paper PnL includes Kalshi\u2019s taker fee: ceil(0.07 \u00d7 contracts \u00d7 price \u00d7 (1 \u2212 price)), rounded up to the next cent.",
-  "generated_at": "2026-11-27T23:40:41Z",
-  "generated_at_pt": "Nov 27, 2026, 3:40 PM PT",
+  "generated_at": "2026-11-27T23:45:42Z",
+  "generated_at_pt": "Nov 27, 2026, 3:45 PM PT",
   "candle_source_1m": "coinbase",
   "candle_source_5m": "coinbase",
   "candle_source_15m": "coinbase",
