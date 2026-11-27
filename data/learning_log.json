@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-11-27T03:59:52Z",
-  "updated_at_pt": "Nov 26, 2026, 7:59 PM PT",
+  "updated_at": "2026-11-27T05:05:49Z",
+  "updated_at_pt": "Nov 26, 2026, 9:05 PM PT",
   "runs": [
     {
       "t": "2026-11-26T20:02:10Z",
@@ -806,6 +806,101 @@
       "decision": "PROMOTED v3 \u2192 v4",
       "takeaway": "Changing bull RSI floor from 52 to 55 and bull RSI cap from 75 to 70 improved unseen P&L by +$22.74 after fees (75.6% WR on 45 trades). Promoted v3 \u2192 v4.",
       "reason": "unseen P&L +$112.52 vs live +$89.78; profit factor 1.65 vs live 1.45"
+    },
+    {
+      "t": "2026-11-27T05:05:49Z",
+      "t_pt": "Nov 26, 2026, 9:05 PM PT",
+      "windows": 1328,
+      "train_windows": 929,
+      "val_windows": 399,
+      "candidates_tested": 40,
+      "live_version": 4,
+      "live": {
+        "train": {
+          "trade_count": 103,
+          "wins": 67,
+          "losses": 36,
+          "win_rate": 65.0,
+          "net_pnl": -16.45,
+          "profit_factor": 0.968,
+          "max_drawdown_pct": 70.79,
+          "ending_equity": 83.55
+        },
+        "val": {
+          "trade_count": 46,
+          "wins": 34,
+          "losses": 12,
+          "win_rate": 73.9,
+          "net_pnl": 105.0,
+          "profit_factor": 1.581,
+          "max_drawdown_pct": 24.07,
+          "ending_equity": 205.0
+        },
+        "overall": {
+          "trade_count": 149,
+          "wins": 101,
+          "losses": 48,
+          "win_rate": 67.8,
+          "net_pnl": 95.25,
+          "profit_factor": 1.138,
+          "max_drawdown_pct": 70.79,
+          "ending_equity": 195.25
+        }
+      },
+      "best_candidate": {
+        "name": "current",
+        "params": {
+          "min_entry_cents": 35,
+          "max_entry_cents": 75,
+          "min_strike_gap_usd": 20.0,
+          "min_mins_left": 2,
+          "max_mins_left": 15,
+          "rsi_bull_min": 55.0,
+          "rsi_bull_max": 70.0,
+          "rsi_bear_min": 30.0,
+          "rsi_bear_max": 45.0,
+          "require_ema50_align": true,
+          "require_5m_align": true,
+          "min_volatility_usd": 0.0,
+          "max_chop_ratio": 1.0,
+          "ema_flat_dollars": 8.0
+        },
+        "train": {
+          "trade_count": 103,
+          "wins": 67,
+          "losses": 36,
+          "win_rate": 65.0,
+          "net_pnl": -16.45,
+          "profit_factor": 0.968,
+          "max_drawdown_pct": 70.79,
+          "ending_equity": 83.55
+        },
+        "val": {
+          "trade_count": 46,
+          "wins": 34,
+          "losses": 12,
+          "win_rate": 73.9,
+          "net_pnl": 105.0,
+          "profit_factor": 1.581,
+          "max_drawdown_pct": 24.07,
+          "ending_equity": 205.0
+        },
+        "overall": {
+          "trade_count": 149,
+          "wins": 101,
+          "losses": 48,
+          "win_rate": 67.8,
+          "net_pnl": 95.25,
+          "profit_factor": 1.138,
+          "max_drawdown_pct": 70.79,
+          "ending_equity": 195.25
+        }
+      },
+      "promoted_to": null,
+      "promoted_params": null,
+      "decision": "KEPT v4",
+      "takeaway": "Current v4 still leads on unseen windows \u2014 kept.",
+      "reason": "promotion cooldown still active"
     }
   ]
 }
