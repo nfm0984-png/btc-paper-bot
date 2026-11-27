@@ -5093,59 +5093,59 @@
     "plain_english": "Buys Yes/No when the 1-minute trend is clean, BTC is at least $40 from the strike, the ask is 35\u201375\u00a2, and 2\u201315 minutes remain in the window. Requires the 50-period EMA to agree. Requires the 5-minute trend to agree. No extra chop filter.",
     "metrics": {
       "overall": {
-        "trade_count": 99,
-        "wins": 73,
+        "trade_count": 100,
+        "wins": 74,
         "losses": 26,
-        "win_rate": 73.7,
-        "net_pnl": 79.74,
-        "profit_factor": 1.422,
+        "win_rate": 74.0,
+        "net_pnl": 83.3,
+        "profit_factor": 1.441,
         "max_drawdown_pct": 23.46,
-        "ending_equity": 179.74
+        "ending_equity": 183.3
       },
       "train": {
-        "trade_count": 67,
-        "wins": 48,
+        "trade_count": 68,
+        "wins": 49,
         "losses": 19,
-        "win_rate": 71.6,
-        "net_pnl": 37.06,
-        "profit_factor": 1.268,
+        "win_rate": 72.1,
+        "net_pnl": 41.3,
+        "profit_factor": 1.298,
         "max_drawdown_pct": 23.46,
-        "ending_equity": 137.06
+        "ending_equity": 141.3
       },
       "val": {
         "trade_count": 32,
         "wins": 25,
         "losses": 7,
         "win_rate": 78.1,
-        "net_pnl": 42.68,
-        "profit_factor": 1.845,
-        "max_drawdown_pct": 11.91,
-        "ending_equity": 142.68
+        "net_pnl": 42.0,
+        "profit_factor": 1.832,
+        "max_drawdown_pct": 12.3,
+        "ending_equity": 142.0
       },
       "windows": 1328,
       "train_windows": 929,
       "val_windows": 399,
       "promoted_from": 4,
       "candidate": "gap_40",
-      "metrics_updated_at": "2026-11-27T08:07:40Z",
-      "metrics_updated_at_pt": "Nov 27, 2026, 12:07 AM PT"
+      "metrics_updated_at": "2026-11-27T09:02:30Z",
+      "metrics_updated_at_pt": "Nov 27, 2026, 1:02 AM PT"
     },
     "last_promoted_at": "2026-11-27T07:21:47Z",
     "last_promoted_at_pt": "Nov 26, 2026, 11:21 PM PT"
   },
   "learning": {
-    "generated_at": "2026-11-27T08:07:40Z",
-    "generated_at_pt": "Nov 27, 2026, 12:07 AM PT",
+    "generated_at": "2026-11-27T09:02:30Z",
+    "generated_at_pt": "Nov 27, 2026, 1:02 AM PT",
     "windows": 1328,
     "history_days": 14,
     "train_windows": 929,
     "val_windows": 399,
     "live_version": 5,
     "decision": "KEPT v5",
-    "takeaway": "A candidate that changed max chop from 1.00 to 0.80 looked better on unseen windows (+$46.32 vs live +$42.68), but a promotion landed too recently \u2014 kept v5.",
+    "takeaway": "A candidate that changed 5-minute filter from on to off looked better on unseen windows (+$48.13 vs live +$42.00), but a promotion landed too recently \u2014 kept v5.",
     "last_run": {
-      "t": "2026-11-27T08:07:40Z",
-      "t_pt": "Nov 27, 2026, 12:07 AM PT",
+      "t": "2026-11-27T09:02:30Z",
+      "t_pt": "Nov 27, 2026, 1:02 AM PT",
       "windows": 1328,
       "train_windows": 929,
       "val_windows": 399,
@@ -5153,38 +5153,38 @@
       "live_version": 5,
       "live": {
         "train": {
-          "trade_count": 67,
-          "wins": 48,
+          "trade_count": 68,
+          "wins": 49,
           "losses": 19,
-          "win_rate": 71.6,
-          "net_pnl": 37.06,
-          "profit_factor": 1.268,
+          "win_rate": 72.1,
+          "net_pnl": 41.3,
+          "profit_factor": 1.298,
           "max_drawdown_pct": 23.46,
-          "ending_equity": 137.06
+          "ending_equity": 141.3
         },
         "val": {
           "trade_count": 32,
           "wins": 25,
           "losses": 7,
           "win_rate": 78.1,
-          "net_pnl": 42.68,
-          "profit_factor": 1.845,
-          "max_drawdown_pct": 11.91,
-          "ending_equity": 142.68
+          "net_pnl": 42.0,
+          "profit_factor": 1.832,
+          "max_drawdown_pct": 12.3,
+          "ending_equity": 142.0
         },
         "overall": {
-          "trade_count": 99,
-          "wins": 73,
+          "trade_count": 100,
+          "wins": 74,
           "losses": 26,
-          "win_rate": 73.7,
-          "net_pnl": 79.74,
-          "profit_factor": 1.422,
+          "win_rate": 74.0,
+          "net_pnl": 83.3,
+          "profit_factor": 1.441,
           "max_drawdown_pct": 23.46,
-          "ending_equity": 179.74
+          "ending_equity": 183.3
         }
       },
       "best_candidate": {
-        "name": "max_chop_0.80",
+        "name": "no_5m",
         "params": {
           "min_entry_cents": 35,
           "max_entry_cents": 75,
@@ -5196,49 +5196,144 @@
           "rsi_bear_min": 30.0,
           "rsi_bear_max": 45.0,
           "require_ema50_align": true,
-          "require_5m_align": true,
+          "require_5m_align": false,
           "min_volatility_usd": 0.0,
-          "max_chop_ratio": 0.8,
+          "max_chop_ratio": 1.0,
           "ema_flat_dollars": 8.0
         },
         "train": {
-          "trade_count": 65,
-          "wins": 47,
-          "losses": 18,
-          "win_rate": 72.3,
-          "net_pnl": 40.41,
-          "profit_factor": 1.305,
-          "max_drawdown_pct": 19.9,
-          "ending_equity": 140.41
+          "trade_count": 105,
+          "wins": 60,
+          "losses": 45,
+          "win_rate": 57.1,
+          "net_pnl": -99.97,
+          "profit_factor": 0.685,
+          "max_drawdown_pct": 99.97,
+          "ending_equity": 0.03
         },
         "val": {
-          "trade_count": 30,
-          "wins": 24,
-          "losses": 6,
-          "win_rate": 80.0,
-          "net_pnl": 46.32,
-          "profit_factor": 2.084,
-          "max_drawdown_pct": 8.09,
-          "ending_equity": 146.32
+          "trade_count": 53,
+          "wins": 40,
+          "losses": 13,
+          "win_rate": 75.5,
+          "net_pnl": 48.13,
+          "profit_factor": 1.515,
+          "max_drawdown_pct": 12.41,
+          "ending_equity": 148.13
         },
         "overall": {
-          "trade_count": 95,
-          "wins": 71,
-          "losses": 24,
-          "win_rate": 74.7,
-          "net_pnl": 86.73,
-          "profit_factor": 1.495,
-          "max_drawdown_pct": 19.9,
-          "ending_equity": 186.73
+          "trade_count": 105,
+          "wins": 60,
+          "losses": 45,
+          "win_rate": 57.1,
+          "net_pnl": -99.97,
+          "profit_factor": 0.685,
+          "max_drawdown_pct": 99.97,
+          "ending_equity": 0.03
         }
       },
       "promoted_to": null,
       "promoted_params": null,
       "decision": "KEPT v5",
-      "takeaway": "A candidate that changed max chop from 1.00 to 0.80 looked better on unseen windows (+$46.32 vs live +$42.68), but a promotion landed too recently \u2014 kept v5.",
+      "takeaway": "A candidate that changed 5-minute filter from on to off looked better on unseen windows (+$48.13 vs live +$42.00), but a promotion landed too recently \u2014 kept v5.",
       "reason": "promotion cooldown still active"
     },
     "runs": [
+      {
+        "t": "2026-11-27T09:02:30Z",
+        "t_pt": "Nov 27, 2026, 1:02 AM PT",
+        "windows": 1328,
+        "train_windows": 929,
+        "val_windows": 399,
+        "candidates_tested": 40,
+        "live_version": 5,
+        "live": {
+          "train": {
+            "trade_count": 68,
+            "wins": 49,
+            "losses": 19,
+            "win_rate": 72.1,
+            "net_pnl": 41.3,
+            "profit_factor": 1.298,
+            "max_drawdown_pct": 23.46,
+            "ending_equity": 141.3
+          },
+          "val": {
+            "trade_count": 32,
+            "wins": 25,
+            "losses": 7,
+            "win_rate": 78.1,
+            "net_pnl": 42.0,
+            "profit_factor": 1.832,
+            "max_drawdown_pct": 12.3,
+            "ending_equity": 142.0
+          },
+          "overall": {
+            "trade_count": 100,
+            "wins": 74,
+            "losses": 26,
+            "win_rate": 74.0,
+            "net_pnl": 83.3,
+            "profit_factor": 1.441,
+            "max_drawdown_pct": 23.46,
+            "ending_equity": 183.3
+          }
+        },
+        "best_candidate": {
+          "name": "no_5m",
+          "params": {
+            "min_entry_cents": 35,
+            "max_entry_cents": 75,
+            "min_strike_gap_usd": 40.0,
+            "min_mins_left": 2,
+            "max_mins_left": 15,
+            "rsi_bull_min": 55.0,
+            "rsi_bull_max": 70.0,
+            "rsi_bear_min": 30.0,
+            "rsi_bear_max": 45.0,
+            "require_ema50_align": true,
+            "require_5m_align": false,
+            "min_volatility_usd": 0.0,
+            "max_chop_ratio": 1.0,
+            "ema_flat_dollars": 8.0
+          },
+          "train": {
+            "trade_count": 105,
+            "wins": 60,
+            "losses": 45,
+            "win_rate": 57.1,
+            "net_pnl": -99.97,
+            "profit_factor": 0.685,
+            "max_drawdown_pct": 99.97,
+            "ending_equity": 0.03
+          },
+          "val": {
+            "trade_count": 53,
+            "wins": 40,
+            "losses": 13,
+            "win_rate": 75.5,
+            "net_pnl": 48.13,
+            "profit_factor": 1.515,
+            "max_drawdown_pct": 12.41,
+            "ending_equity": 148.13
+          },
+          "overall": {
+            "trade_count": 105,
+            "wins": 60,
+            "losses": 45,
+            "win_rate": 57.1,
+            "net_pnl": -99.97,
+            "profit_factor": 0.685,
+            "max_drawdown_pct": 99.97,
+            "ending_equity": 0.03
+          }
+        },
+        "promoted_to": null,
+        "promoted_params": null,
+        "decision": "KEPT v5",
+        "takeaway": "A candidate that changed 5-minute filter from on to off looked better on unseen windows (+$48.13 vs live +$42.00), but a promotion landed too recently \u2014 kept v5.",
+        "reason": "promotion cooldown still active"
+      },
       {
         "t": "2026-11-27T08:07:40Z",
         "t_pt": "Nov 27, 2026, 12:07 AM PT",
