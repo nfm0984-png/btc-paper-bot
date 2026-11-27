@@ -25,36 +25,38 @@
       "wins": 73,
       "losses": 26,
       "win_rate": 73.7,
-      "net_pnl": 153.2,
-      "profit_factor": 1.392,
-      "max_drawdown_pct": 45.12,
-      "ending_equity": 253.2
+      "net_pnl": 79.74,
+      "profit_factor": 1.422,
+      "max_drawdown_pct": 23.46,
+      "ending_equity": 179.74
     },
     "train": {
-      "trade_count": 66,
-      "wins": 47,
+      "trade_count": 67,
+      "wins": 48,
       "losses": 19,
-      "win_rate": 71.2,
-      "net_pnl": 56.33,
-      "profit_factor": 1.203,
-      "max_drawdown_pct": 45.12,
-      "ending_equity": 156.33
+      "win_rate": 71.6,
+      "net_pnl": 37.06,
+      "profit_factor": 1.268,
+      "max_drawdown_pct": 23.46,
+      "ending_equity": 137.06
     },
     "val": {
-      "trade_count": 33,
-      "wins": 26,
+      "trade_count": 32,
+      "wins": 25,
       "losses": 7,
-      "win_rate": 78.8,
-      "net_pnl": 90.17,
-      "profit_factor": 1.791,
-      "max_drawdown_pct": 16.06,
-      "ending_equity": 190.17
+      "win_rate": 78.1,
+      "net_pnl": 42.68,
+      "profit_factor": 1.845,
+      "max_drawdown_pct": 11.91,
+      "ending_equity": 142.68
     },
     "windows": 1328,
     "train_windows": 929,
     "val_windows": 399,
     "promoted_from": 4,
-    "candidate": "gap_40"
+    "candidate": "gap_40",
+    "metrics_updated_at": "2026-11-27T08:07:40Z",
+    "metrics_updated_at_pt": "Nov 27, 2026, 12:07 AM PT"
   },
   "plain_english": "Buys Yes/No when the 1-minute trend is clean, BTC is at least $40 from the strike, the ask is 35\u201375\u00a2, and 2\u201315 minutes remain in the window. Requires the 50-period EMA to agree. Requires the 5-minute trend to agree. No extra chop filter.",
   "last_promoted_at": "2026-11-27T07:21:47Z",

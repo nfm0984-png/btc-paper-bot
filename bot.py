@@ -34,14 +34,14 @@ KALSHI_API = "https://api.elections.kalshi.com/trade-api/v2"
 KALSHI_MARKET_URL = "https://kalshi.com/markets/kxbtc15m/{ticker}"
 
 STARTING_BALANCE = 100.00
-# Variable base stake: $4 normal, $6 strong, $8 top-conviction.
-# Every ticket’s total cost (contracts × price + taker fee) stays in [$4, $20].
-# A 2× press after a win is hard-capped at $20 ($4→$8, $6→$12, $8→$16, then $20 max).
+# Flat conviction sizing: $4 normal, $6 strong, $8 top-conviction. No 2× press.
+# Every ticket’s total cost (contracts × price + taker fee) stays in [$4, $8].
 STAKE_NORMAL = 4.00
 STAKE_STRONG = 6.00
 STAKE_TOP = 8.00
 STAKE_MIN = 4.00
-STAKE_PRESS_CAP = 20.00
+STAKE_MAX = 8.00
+PRESS_ENABLED = False
 STAKE = STAKE_NORMAL  # default / display alias
 SESSION_STARTING = 40.00
 SESSION_STAKE = STAKE_NORMAL
@@ -49,8 +49,9 @@ SESSION_MINUTES = 60
 # Head-to-head $100 race: Version 1 (multi-trade) vs Version 2 (strict / learned rules).
 RACE_STARTING = 100.00
 RACE_BOOK_KEYS = ("v1", "v2", "every15m", "selective")
-V1_ASK_MIN = 0.05
-V1_ASK_MAX = 0.95
+V1_ASK_MIN = 0.35
+V1_ASK_MAX = 0.75
+V1_MIN_STRIKE_GAP = 20.0
 V1_MIN_REMAINING_SEC = 120
 V1_MAX_TRADES_PER_WINDOW = 3
 # Trades opened under the old flat-$5 rule have no `stake` field.
@@ -1083,10 +1084,11 @@ def inferred_stake(obj: Optional[dict]) -> float:
 
 
 def _clamp_press_value(value) -> Optional[float]:
+    """Legacy helper kept for older tests; press is disabled so this just clamps to [$4, $8]."""
     if value is None:
         return None
     try:
-        return round_money(min(STAKE_PRESS_CAP, max(STAKE_MIN, float(value))))
+        return round_money(min(STAKE_MAX, max(STAKE_MIN, float(value))))
     except (TypeError, ValueError):
         return None
 
@@ -1094,16 +1096,17 @@ def _clamp_press_value(value) -> Optional[float]:
 def ensure_press_fields(book: dict) -> dict:
     """Upgrade an existing book/session in place without touching cash or trades.
 
-    Clamps any stored press/last-win stake into the [$4, $20] band.
+    Clears any armed 2× press so every live book uses flat $4–$8 sizing.
+    Historical pressed tickets in the trade log are left as-is.
     """
     if not isinstance(book, dict):
         return book
-    book.setdefault("press_next", False)
-    book.setdefault("last_win_stake", None)
+    book["press_next"] = False
+    book["last_win_stake"] = None
+    if "press_stake" in book:
+        book["press_stake"] = None
     book.setdefault("stake", STAKE)
-    for key in ("last_win_stake", "press_stake"):
-        if book.get(key) is not None:
-            book[key] = _clamp_press_value(book[key])
+    book["next_stake_label"] = next_stake_label(False, None, book.get("cash"))
     return book
 
 
@@ -1113,42 +1116,29 @@ def resolve_entry_stake(
     last_win_stake: Optional[float],
     cash: float,
 ) -> tuple[float, bool]:
-    """Return (stake, is_press). Press is 2× the last winning stake, hard-capped at $20 and at cash.
+    """Return (stake, is_press) using flat $4–$8 conviction sizing.
 
-    If cash is under the $4.00 minimum, returns (0, False) so the caller skips the trade.
+    The 2× press is disabled (`PRESS_ENABLED` is False); press_next / last_win_stake
+    are ignored. If cash is under the $4.00 minimum, returns (0, False) so the
+    caller skips the trade.
     """
     cash = max(0.0, float(cash or 0))
     if cash + 1e-9 < STAKE_MIN:
         return 0.0, False
-    if press_next and last_win_stake:
-        last = min(STAKE_PRESS_CAP, max(STAKE_MIN, float(last_win_stake)))
-        target = min(STAKE_PRESS_CAP, round_money(2.0 * last))
-        pressed = True
-    else:
-        target = float(base_stake if base_stake is not None else STAKE_NORMAL)
-        pressed = False
-    target = min(round_money(target), STAKE_PRESS_CAP, round_money(cash))
+    target = float(base_stake if base_stake is not None else STAKE_NORMAL)
+    target = min(max(round_money(target), STAKE_MIN), STAKE_MAX, round_money(cash))
     if target + 1e-9 < STAKE_MIN:
         return 0.0, False
-    return target, pressed and target > 0
+    return target, False
 
 
 def apply_press_from_trade(press_next: bool, last_win_stake: Optional[float], trade: dict) -> tuple[bool, Optional[float]]:
-    """Update press state after a trade settles or exits. A win arms 2×; a loss resets."""
-    pnl = trade.get("pnl")
-    if pnl is None:
-        return press_next, last_win_stake
-    stake = inferred_stake(trade)
-    if float(pnl) > 0:
-        return True, _clamp_press_value(stake)
+    """Press is disabled — never arm a 2× stake after a win or loss."""
     return False, None
 
 
-def next_stake_label(press_next: bool, last_win_stake: Optional[float], cash: Optional[float] = None) -> str:
-    if press_next and last_win_stake:
-        stake, _ = resolve_entry_stake(STAKE_NORMAL, True, last_win_stake, cash if cash is not None else STAKE_PRESS_CAP)
-        return f"Next trade: 2× press (${stake:.0f})"
-    return "Next stake: $4–$20"
+def next_stake_label(press_next: bool = False, last_win_stake: Optional[float] = None, cash: Optional[float] = None) -> str:
+    return "Next stake: $4–$8 flat (no press)"
 
 
 def dedupe_trades(trades: Optional[list]) -> list[dict]:
@@ -1343,10 +1333,10 @@ def ticket_total(contracts: int, ask: float) -> tuple[float, float, float]:
 
 
 def size_ticket(ask: float, target_stake: float, cash: float) -> Optional[tuple[int, float, float, float]]:
-    """Pick a whole number of contracts whose total cost is in [$4, $20] and ≤ cash.
+    """Pick a whole number of contracts whose total cost is in [$4, $8] and ≤ cash.
 
     Starts with the largest size whose total ≤ the clamped target, then bumps
-    contracts up (while staying ≤ $20 and ≤ cash) if that total would be under $4.
+    contracts up (while staying ≤ $8 and ≤ cash) if that total would be under $4.
     Returns (contracts, cost, fee, total), or None to skip the trade.
     """
     if ask <= 0 or ask >= 1:
@@ -1354,11 +1344,11 @@ def size_ticket(ask: float, target_stake: float, cash: float) -> Optional[tuple[
     cash = max(0.0, float(cash or 0))
     if cash + 1e-9 < STAKE_MIN:
         return None
-    target = min(max(float(target_stake), STAKE_MIN), STAKE_PRESS_CAP, round_money(cash))
+    target = min(max(float(target_stake), STAKE_MIN), STAKE_MAX, round_money(cash))
     if target + 1e-9 < STAKE_MIN:
         return None
-    # Generous upper bound: fees are small, so this covers the $20 cap.
-    max_n = int(min(STAKE_PRESS_CAP, cash) // ask) + 3
+    # Generous upper bound: fees are small, so this covers the $8 cap.
+    max_n = int(min(STAKE_MAX, cash) // ask) + 3
     best: Optional[tuple[int, float, float, float]] = None
     for n in range(1, max(1, max_n) + 1):
         cost, fee, total = ticket_total(n, ask)
@@ -1372,12 +1362,12 @@ def size_ticket(ask: float, target_stake: float, cash: float) -> Optional[tuple[
         n, cost, fee, total = best
     while n >= 0 and total + 1e-9 < STAKE_MIN:
         nxt = ticket_total(n + 1, ask)
-        if nxt[2] <= STAKE_PRESS_CAP + 1e-9 and nxt[2] <= cash + 1e-9:
+        if nxt[2] <= STAKE_MAX + 1e-9 and nxt[2] <= cash + 1e-9:
             n += 1
             cost, fee, total = nxt
         else:
             break
-    if n < 1 or total + 1e-9 < STAKE_MIN or total > STAKE_PRESS_CAP + 1e-9 or total > cash + 1e-9:
+    if n < 1 or total + 1e-9 < STAKE_MIN or total > STAKE_MAX + 1e-9 or total > cash + 1e-9:
         return None
     return n, cost, fee, total
 
@@ -1655,7 +1645,7 @@ def run_backtest(
         "assumption_note": (
             "Each window is evaluated once, 1 minute after it opens, using the real Kalshi Yes/No "
             "quotes at that minute and Coinbase 1-minute / 5-minute BTC candles. Trades use a $4–$8 "
-            "base stake by signal strength, then 2× after a win (capped at $20), "
+            "flat $4–$8 stake by signal strength (no 2× press), "
             "the official quadratic taker fee, and are held to Kalshi’s official Yes/No settlement. "
             "The live bot can also enter later in a window (on a 5-minute scan) or exit early if momentum flips; "
             "those live extras are not in this backtest."
@@ -1669,7 +1659,7 @@ def simulate_prepared_windows(
     params: StrategyParams,
     starting: float = STARTING_BALANCE,
 ) -> dict:
-    """Replay settled feature-windows with live sizing, fees, and 2× press."""
+    """Replay settled feature-windows with live $4–$8 sizing and fees (no press)."""
     cash = float(starting)
     press_next = False
     last_win_stake: Optional[float] = None
@@ -2407,11 +2397,49 @@ def make_v1_signal(
         return Signal(
             "HOLD" if positions else "WAIT",
             "WAIT — No tradable ask",
-            "Neither Yes nor No is between 5¢ and 95¢, so Version 1 stands aside.",
+            "Neither Yes nor No is between 35¢ and 75¢, so Version 1 stands aside.",
             side=(positions[-1].get("side") if positions else None),
         )
     if strike is None:
         return Signal("WAIT", "WAIT — No Trade", "The contract strike is not posted yet.")
+
+    dist = float(btc_price) - float(strike)
+    if abs(dist) < V1_MIN_STRIKE_GAP:
+        dist_txt = dist_phrase(btc_price, strike)
+        return Signal(
+            "HOLD" if positions else "WAIT",
+            ("HOLD open trades — " if positions else "") + "WAIT — Too close to strike",
+            f"{dist_txt}. That’s inside a ${V1_MIN_STRIKE_GAP:.0f} band, so settlement could still flip either way.",
+            side=(positions[-1].get("side") if positions else None),
+        )
+
+    # Never fade price location: Yes only above the strike, No only below.
+    if dist <= 0:
+        yes_ok = False
+    if dist >= 0:
+        no_ok = False
+    if not yes_ok and not no_ok:
+        dist_txt = dist_phrase(btc_price, strike)
+        expensive = None
+        if dist > 0 and yes_ask is not None and float(yes_ask) > V1_ASK_MAX:
+            expensive = f"Yes is already {cents_label(yes_ask)} — too expensive (bot only buys 35¢–75¢)"
+        elif dist < 0 and no_ask is not None and float(no_ask) > V1_ASK_MAX:
+            expensive = f"No is already {cents_label(no_ask)} — too expensive (bot only buys 35¢–75¢)"
+        if expensive:
+            reason = f"{dist_txt}, but {expensive}."
+            label = "WAIT — No Edge"
+        else:
+            reason = (
+                f"{dist_txt}. Version 1 will not fade price location "
+                "(only buys Yes above the strike, No below) and has no tradable aligned ask in the 35¢–75¢ band."
+            )
+            label = "WAIT — No fade"
+        return Signal(
+            "HOLD" if positions else "WAIT",
+            ("HOLD open trades — " if positions else "") + label,
+            reason,
+            side=(positions[-1].get("side") if positions else None),
+        )
 
     yes_score, yes_al = score_side("yes", ind_1m, ind_5m, btc_price, strike, yes_ask)
     no_score, no_al = score_side("no", ind_1m, ind_5m, btc_price, strike, no_ask)
@@ -2579,7 +2607,7 @@ def new_race_book(book_id: str, now: datetime, strategy_version: Optional[int] =
         "losses": 0,
         "trade_count": 0,
         "win_rate": None,
-        "next_stake_label": "Next stake: $4–$20",
+        "next_stake_label": "Next stake: $4–$8 flat (no press)",
         "created_at": iso_utc(now),
         "events": [],
     }
@@ -3026,22 +3054,25 @@ def rules_summary_from_params(p: StrategyParams) -> dict:
             "or momentum and BTC-vs-strike both flip against the position. Otherwise hold to official settlement."
         ),
         "sizing": (
-            "Normal qualifying signal $4, strong $6, top-conviction $8. After a win, the next trade is 2× that "
-            "winning stake, hard-capped at $20 and never more than cash on hand. A $4 win presses to $8, a $6 win to $12, "
-            "an $8 win to $16, and further wins cap at $20. A loss resets to $4–$8. Every ticket’s total cost stays in the $4–$20 range. "
-            "The $100 race books, the archived 1-hour $40 run, and the ongoing $100 book each track this separately."
+            "Normal qualifying signal $4, strong $6, top-conviction $8 — flat $4–$8 per trade (no press). "
+            "Every ticket’s total cost, including the Kalshi taker fee, stays between $4 and $8. "
+            "If cash is under $4 the book skips the trade. "
+            "The $100 race books, the archived 1-hour $40 run, and the ongoing $100 book each use the same flat sizing."
         ),
         "learning": (
             "Every hour a GitHub Action studies the last 7–14 days of settled 15-minute windows, walk-forward "
-            "tests new parameter sets on unseen hours, and only promotes a change when validation P&L is clearly "
-            "better. That run is free — it does not use Grok Bot."
+            "tests new parameter sets on unseen hours, and only promotes a change when unseen validation dollar "
+            "P&L is strictly higher than the live config by at least $1.50, overall P&L is positive, and drawdown "
+            "is acceptable — never just because profit factor rose. That run is free — it does not use Grok Bot."
         ),
         "race": (
             "A live Head-to-Head $100 Race compares two books that start together at $100. "
             "Version 1 (Active Multi-Trade) can take up to 3 tickets in the same 15-minute window — one new entry "
-            "per 5-minute check — adding to its side on confirmation or flipping if momentum turns. "
+            "per 5-minute check — adding to its side on confirmation or flipping if momentum turns, but only when "
+            "the ask is 35¢–75¢, BTC is at least $20 from the strike, and the side agrees with price location "
+            "(Yes only above the strike, No only below). "
             "Version 2 (Strict Rules) follows the learned strategy config and takes at most one trade per window, "
-            "only when every trend, strike-gap, and price filter passes. Both use $4–$20 sizing and a 2× press, hard-capped at $20."
+            "only when every trend, strike-gap, and price filter passes. Both use flat $4–$8 sizing (no press)."
         ),
     }
 
@@ -3230,7 +3261,7 @@ def main() -> int:
             "metrics": strategy_cfg.get("metrics") or {},
         },
         "learning": load_existing_dashboard().get("learning"),
-        "fee_note": "Every paper trade uses Kalshi’s taker fee, ceil(0.07 × contracts × price × (1 − price)), rounded up to the next cent. The Head-to-Head $100 Race starts two books at $100 together (Version 1 Active Multi-Trade vs Version 2 Strict Rules). Existing $40 race books are lifted to $100 by adding the cash delta, so prior trades and P&L stay accurate. The completed 1-hour $40 run and the ongoing $100 book stay in the Trades tab. All books use a $4–$8 base stake by signal strength, then 2× after a win, hard-capped at $20. Every ticket costs $4–$20 (including fees).",
+        "fee_note": "Every paper trade uses Kalshi’s taker fee, ceil(0.07 × contracts × price × (1 − price)), rounded up to the next cent. The Head-to-Head $100 Race starts two books at $100 together (Version 1 Active Multi-Trade vs Version 2 Strict Rules). Existing $40 race books are lifted to $100 by adding the cash delta, so prior trades and P&L stay accurate. The completed 1-hour $40 run and the ongoing $100 book stay in the Trades tab. All books use flat $4–$8 sizing by signal strength (no 2× press). Every ticket costs $4–$8 including fees.",
         "rules_summary": rules_summary_from_params(params),
     }
     save_json(DASHBOARD_PATH, dashboard)

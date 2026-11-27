@@ -830,9 +830,9 @@
     if (sessB) sessB.textContent = money(bookAmountBought(sess));
     const press = $("session-press");
     if (press) {
-      const label = sess.next_stake_label || (sess.press_next ? ("Next trade: 2× press ($" + Math.round(Math.min(20, 2 * (sess.last_win_stake || 0))) + ")") : "Next stake: $4–$20");
+      const label = sess.next_stake_label || "Next stake: $4–$8 flat (no press)";
       press.textContent = label;
-      press.className = "pill " + (sess.press_next ? "PRESS" : "BASE");
+      press.className = "pill BASE";
     }
 
     const posEl = $("session-open");
@@ -933,9 +933,9 @@
     if ($(id + "-badge") && book.badge) $(id + "-badge").textContent = book.badge;
     const press = $(id + "-press");
     if (press) {
-      const label = book.next_stake_label || "Next stake: $4–$20";
+      const label = book.next_stake_label || "Next stake: $4–$8 flat (no press)";
       press.textContent = label;
-      press.className = "pill " + (book.press_next ? "PRESS" : "BASE");
+      press.className = "pill BASE";
     }
     const box = $(id + "-choice");
     const action = choice.action || "WAIT";
@@ -1010,7 +1010,7 @@
     $("book-pnl-sub").textContent = (live.pnl > 0 ? "Gain " : live.pnl < 0 ? "Lost " : "") + pct(live.pnl_pct) + " from " + money(live.starting_balance) + (live.cash != null ? " · cash " + money(live.cash) : "");
     const bookWin = $("book-win");
     if (bookWin) {
-      const press = live.next_stake_label || (live.press_next ? "Next trade: 2× press" : "Next stake: $4–$20");
+      const press = live.next_stake_label || "Next stake: $4–$8 flat (no press)";
       bookWin.textContent = (live.win_rate == null ? "No closed trades yet" : (live.win_rate.toFixed(1) + "% after fees")) + " · " + press;
     }
 
@@ -1031,7 +1031,7 @@
       : "Backtest unavailable.";
     $("bt-pnl").textContent = money(bt.net_pnl, true);
     $("bt-pnl").className = "val " + (bt.net_pnl > 0 ? "up" : bt.net_pnl < 0 ? "down" : "");
-    $("bt-eq").textContent = money(bt.starting_balance) + " → " + money(bt.ending_equity) + " · $4–$20 tickets, 2× after a win (max $20)";
+    $("bt-eq").textContent = money(bt.starting_balance) + " → " + money(bt.ending_equity) + " · $4–$8 flat per trade (no press)";
     $("bt-ret").textContent = pct(bt.return_pct);
     $("bt-ret").className = "val " + (bt.return_pct > 0 ? "up" : bt.return_pct < 0 ? "down" : "");
     $("bt-windows").textContent = (bt.windows_traded || 0) + " trades · " + (bt.windows_skipped || 0) + " stands aside";

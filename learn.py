@@ -22,7 +22,7 @@ import bot
 
 LOG_MAX_ENTRIES = 200
 VAL_MARGIN_USD = 1.50
-VAL_PF_IMPROVE = 1.10
+VAL_PF_IMPROVE = 1.10  # unused: promotions require higher unseen dollar P&L, not PF alone
 DD_SLACK_PCT = 4.0
 DD_SLACK_MULT = 1.25
 MAX_DD_HARD = 25.0
@@ -363,6 +363,13 @@ def drawdown_ok(cand_dd: float, cur_dd: float) -> bool:
 
 
 def beats_current(cand: dict, cur: dict) -> tuple[bool, str]:
+    """Promote only when unseen validation *dollar* P&L is strictly better.
+
+    A higher profit factor on fewer (or smaller) dollars is not enough. The
+    candidate must: have enough trades, show positive unseen P&L, beat the
+    live config's unseen dollar P&L by at least VAL_MARGIN_USD, have
+    positive overall P&L, and keep drawdown acceptable.
+    """
     o, v = cand["overall"], cand["val"]
     co, cv = cur["overall"], cur["val"]
     if (o.get("trade_count") or 0) < bot.MIN_PROMOTION_TRADES:
@@ -373,16 +380,16 @@ def beats_current(cand: dict, cur: dict) -> tuple[bool, str]:
     cur_val_pnl = float(cv.get("net_pnl") or 0)
     if val_pnl <= 0:
         return False, f"unseen P&L is {signed_money(val_pnl)}, not positive"
+    if val_pnl <= cur_val_pnl:
+        return False, (
+            f"unseen P&L {signed_money(val_pnl)} is not higher than live {signed_money(cur_val_pnl)} "
+            "(will not promote a lower-dollar candidate because profit factor improved)"
+        )
     margin = val_pnl - cur_val_pnl
-    cand_pf = float(v.get("profit_factor") or 0)
-    cur_pf = float(cv.get("profit_factor") or 0)
-    better_pnl = margin >= VAL_MARGIN_USD
-    better_pf = cur_pf > 0 and cand_pf >= cur_pf * VAL_PF_IMPROVE
-    # If current val is negative / flat, a positive val with any meaningful edge counts via +$1.50.
-    if not better_pnl and not better_pf:
+    if margin < VAL_MARGIN_USD:
         return False, (
             f"unseen P&L {signed_money(val_pnl)} does not beat live {signed_money(cur_val_pnl)} "
-            f"by ≥{signed_money(VAL_MARGIN_USD)} or a 10% better profit factor"
+            f"by ≥{signed_money(VAL_MARGIN_USD)}"
         )
     overall_pnl = float(o.get("net_pnl") or 0)
     if overall_pnl <= 0:
@@ -391,12 +398,7 @@ def beats_current(cand: dict, cur: dict) -> tuple[bool, str]:
     cur_dd = float(co.get("max_drawdown_pct") or 0)
     if not drawdown_ok(cand_dd, cur_dd):
         return False, f"overall drawdown {cand_dd:.1f}% blows up vs live {cur_dd:.1f}%"
-    why = []
-    if better_pnl:
-        why.append(f"unseen P&L {signed_money(val_pnl)} vs live {signed_money(cur_val_pnl)}")
-    if better_pf:
-        why.append(f"profit factor {cand_pf:.2f} vs live {cur_pf:.2f}")
-    return True, "; ".join(why)
+    return True, f"unseen P&L {signed_money(val_pnl)} vs live {signed_money(cur_val_pnl)}"
 
 
 def takeaway(
@@ -454,7 +456,7 @@ def run_learn() -> int:
     )
 
     grid = candidate_grid(current)
-    print(f"  Testing {len(grid)} parameter sets (fees + $4–$20 / 2× press)…", flush=True)
+    print(f"  Testing {len(grid)} parameter sets (fees + flat $4–$8, no press)…", flush=True)
 
     scored: list[tuple[str, bot.StrategyParams, dict]] = []
     for name, params in grid:
@@ -531,25 +533,28 @@ def run_learn() -> int:
         if cooldown_block and eligible:
             pick_name, pick_params, pick_ev, reason = eligible[0]
             reason = "promotion cooldown still active"
-        # Keep live params; refresh default file if it was missing metrics.
+        # Keep live params, but always refresh metrics so a sizing change
+        # (e.g. flat $4–$8, no press) shows up even when we don't promote.
+        prev_metrics = cfg.get("metrics") if isinstance(cfg.get("metrics"), dict) else {}
         cfg.setdefault("version", version)
         cfg["params"] = current.as_dict()
-        cfg["plain_english"] = cfg.get("plain_english") or bot.plain_english_params(current)
+        cfg["plain_english"] = bot.plain_english_params(current)
         cfg.setdefault("updated_at", bot.iso_utc(now))
         cfg.setdefault("updated_at_pt", bot.fmt_pt(now))
-        if not bot.STRATEGY_CONFIG_PATH.exists() or not cfg.get("source"):
-            cfg["source"] = cfg.get("source") or "defaults"
-            bot.save_json(bot.STRATEGY_CONFIG_PATH, cfg)
-        elif cfg.get("version") == 1 and cfg.get("source") == "defaults" and not cfg.get("metrics"):
-            cfg["metrics"] = {
-                "overall": current_ev["overall"],
-                "train": current_ev["train"],
-                "val": current_ev["val"],
-                "windows": len(windows),
-                "train_windows": current_ev["train_windows"],
-                "val_windows": current_ev["val_windows"],
-            }
-            bot.save_json(bot.STRATEGY_CONFIG_PATH, cfg)
+        cfg.setdefault("source", "hourly-learner")
+        cfg["metrics"] = {
+            "overall": current_ev["overall"],
+            "train": current_ev["train"],
+            "val": current_ev["val"],
+            "windows": len(windows),
+            "train_windows": current_ev["train_windows"],
+            "val_windows": current_ev["val_windows"],
+            "promoted_from": prev_metrics.get("promoted_from"),
+            "candidate": prev_metrics.get("candidate") or "current",
+            "metrics_updated_at": bot.iso_utc(now),
+            "metrics_updated_at_pt": bot.fmt_pt(now),
+        }
+        bot.save_json(bot.STRATEGY_CONFIG_PATH, cfg)
         print(f"  {decision}: {reason}", flush=True)
 
     note = takeaway(

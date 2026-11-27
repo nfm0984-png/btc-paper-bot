@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Unit/sanity checks for $4-$20 sizing and the 2x press rule (cap $20)."""
+"""Unit/sanity checks for flat $4–$8 sizing (no 2× press)."""
 from __future__ import annotations
 import json
 import sys
@@ -13,7 +13,8 @@ from bot import (
     LEGACY_FLAT_STAKE,
     STAKE_MIN,
     STAKE_NORMAL,
-    STAKE_PRESS_CAP,
+    STAKE_MAX,
+    PRESS_ENABLED,
     STAKE_STRONG,
     STAKE_TOP,
     apply_press_from_trade,
@@ -68,67 +69,63 @@ def test_grade_normal_strong_top():
     assert (g, stake) == ("top", STAKE_TOP), (g, stake, notes)
 
 
-def test_press_ladder_and_reset():
-    # $4 win -> $8; $6 -> $12; $8 -> $16; $10 -> $20; $16 or $20 stay capped at $20.
-    for won, nxt in ((4, 8), (6, 12), (8, 16), (10, 20), (16, 20), (20, 20)):
+def test_press_is_disabled_and_sizing_is_flat():
+    assert PRESS_ENABLED is False
+
+    # A win must never arm a 2× press.
+    for won in (4, 6, 8, 16, 20):
         press, last = apply_press_from_trade(False, None, {"pnl": 1.50, "stake": won})
-        assert press is True
-        assert last == min(float(won), STAKE_PRESS_CAP)
-        stake, is_press = resolve_entry_stake(STAKE_NORMAL, press, last, cash=100)
-        assert is_press is True
-        assert stake == nxt, (won, stake, nxt)
+        assert press is False and last is None
+        stake, is_press = resolve_entry_stake(STAKE_NORMAL, True, won, cash=100)
+        assert is_press is False
+        assert stake == STAKE_NORMAL, (won, stake)
 
-    # After a pressed $16 win, the next press caps at $20
-    press, last = apply_press_from_trade(True, 16.0, {"pnl": 8.0, "stake": 16.0})
-    stake, is_press = resolve_entry_stake(STAKE_NORMAL, press, last, cash=100)
-    assert is_press and stake == 20.0
+    # Armed press state on disk is cleared on load.
+    book = ensure_press_fields({"press_next": True, "last_win_stake": 16.0, "press_stake": 20.0, "cash": 100})
+    assert book["press_next"] is False
+    assert book["last_win_stake"] is None
+    assert book["press_stake"] is None
+    assert "no press" in book["next_stake_label"]
 
-    # Stored press values are clamped into [$4, $20] on load
-    book = ensure_press_fields({"press_next": True, "last_win_stake": 2.0, "press_stake": 3.0, "cash": 100})
-    assert book["last_win_stake"] == 4.0
-    assert book["press_stake"] == 4.0
-    high = ensure_press_fields({"press_next": True, "last_win_stake": 40.0, "press_stake": 40.0, "cash": 100})
-    assert high["last_win_stake"] == 20.0
-    assert high["press_stake"] == 20.0
-    stake, is_press = resolve_entry_stake(STAKE_NORMAL, True, 40.0, cash=100)
-    assert is_press and stake == 20.0
-
-    # A loss resets to $4–$8
-    press, last = apply_press_from_trade(True, 16.0, {"pnl": -8.0, "stake": 16.0})
-    assert press is False and last is None
-    stake, is_press = resolve_entry_stake(STAKE_STRONG, press, last, cash=100)
+    # Even if a caller still passes press_next=True, stake stays flat $4–$8.
+    stake, is_press = resolve_entry_stake(STAKE_NORMAL, True, 16.0, cash=100)
+    assert is_press is False and stake == STAKE_NORMAL
+    stake, is_press = resolve_entry_stake(STAKE_STRONG, True, 20.0, cash=100)
     assert is_press is False and stake == STAKE_STRONG
+    stake, is_press = resolve_entry_stake(STAKE_TOP, True, 8.0, cash=100)
+    assert is_press is False and stake == STAKE_TOP
 
-    # Cash between $4 and $20 still allows a ticket, limited to cash
-    stake, is_press = resolve_entry_stake(STAKE_NORMAL, True, 8.0, cash=10.25)
-    assert is_press and stake == 10.25
+    # A $10 "legacy press" target is clamped to the $8 max.
+    stake, is_press = resolve_entry_stake(10.0, False, None, cash=100)
+    assert is_press is False and stake == STAKE_MAX
+
+    # Cash between $4 and $8 still allows a ticket, limited to cash
+    stake, is_press = resolve_entry_stake(STAKE_TOP, False, None, cash=5.25)
+    assert is_press is False and stake == 5.25
 
     # Cash under $4 skips rather than placing a sub-$4 ticket
     stake, is_press = resolve_entry_stake(STAKE_NORMAL, False, None, cash=3.50)
     assert stake == 0 and is_press is False
 
-    assert next_stake_label(True, 4.0, 100).startswith("Next trade: 2× press ($8)")
-    assert next_stake_label(True, 6.0, 100).startswith("Next trade: 2× press ($12)")
-    assert next_stake_label(True, 8.0, 100).startswith("Next trade: 2× press ($16)")
-    assert next_stake_label(True, 16.0, 100).startswith("Next trade: 2× press ($20)")
-    assert next_stake_label(False, None) == "Next stake: $4–$20"
+    assert next_stake_label(True, 16.0, 100) == "Next stake: $4–$8 flat (no press)"
+    assert next_stake_label(False, None) == "Next stake: $4–$8 flat (no press)"
 
 
-def test_tickets_stay_in_4_to_20_across_prices():
+def test_tickets_stay_in_4_to_8_across_prices():
     market = {"ticker": "KXBTC15M-X", "event_ticker": "E", "title": "t", "close_time": None, "floor_strike": 100}
     prices = [round(p / 100.0, 2) for p in range(10, 91, 5)] + [0.75, 0.90]
     for ask in prices:
-        for target in (4.0, 6.0, 8.0, 20.0):
+        for target in (4.0, 6.0, 8.0):
             sized = size_ticket(ask, target, cash=100)
             assert sized is not None, (ask, target)
             n, cost, fee, total = sized
             assert n >= 1
-            assert STAKE_MIN - 1e-9 <= total <= STAKE_PRESS_CAP + 1e-9, (ask, target, n, total, fee)
+            assert STAKE_MIN - 1e-9 <= total <= STAKE_MAX + 1e-9, (ask, target, n, total, fee)
             assert abs(fee - kalshi_taker_fee(n, ask)) < 1e-9
             opened = open_trade(100, market, "yes", ask, "test", utc_now(), stake=target)
             assert opened is not None, (ask, target)
             cash, pos, log = opened
-            assert STAKE_MIN - 1e-9 <= pos["amount_bought"] <= STAKE_PRESS_CAP + 1e-9, (ask, target, pos["amount_bought"])
+            assert STAKE_MIN - 1e-9 <= pos["amount_bought"] <= STAKE_MAX + 1e-9, (ask, target, pos["amount_bought"])
             assert pos["amount_bought"] == total
             assert pos["contracts"] == n
             assert abs(100 - cash - total) < 1e-9
@@ -136,16 +133,16 @@ def test_tickets_stay_in_4_to_20_across_prices():
     four_cost = 4 * 0.90 + kalshi_taker_fee(4, 0.90)
     assert four_cost < 4.0
     n, _, _, total = size_ticket(0.90, 4.0, cash=100)
-    assert n >= 5 and total >= 4.0
+    assert n >= 5 and total >= 4.0 and total <= STAKE_MAX + 1e-9
     # Cash under $4: skip
     assert size_ticket(0.50, 4.0, cash=3.99) is None
     assert open_trade(3.50, market, "no", 0.50, "test", utc_now(), stake=4) is None
-    # Plenty of cash, $20 target never exceeds $20
+    # A leftover $20 target is clamped to $8
     n, _, _, total = size_ticket(0.40, 20.0, cash=100)
-    assert total <= 20.0 + 1e-9
+    assert total <= STAKE_MAX + 1e-9
     # $4 floor still holds at a cheap 10¢ ask
     n, _, _, total = size_ticket(0.10, 4.0, cash=100)
-    assert total >= 4.0 and total <= 20.0
+    assert total >= 4.0 and total <= STAKE_MAX + 1e-9
 
 
 def test_lift_race_bankroll_preserves_pnl_and_trades():
@@ -202,11 +199,11 @@ def test_legacy_state_upgrades_without_reset():
     amount, contracts = book_totals(raw["session"]["trades"], raw["session"]["position"])
     assert contracts == 8
     assert amount == 4.7
-    # A legacy $5 ticket that wins arms a 2× press ($10), inside the $4–$20 band.
+    # A legacy $5 winning ticket must not arm a press; next stake stays flat $4–$8.
     press, last = apply_press_from_trade(False, None, {"pnl": 3.3, "total_in": 4.7, "stake": 5})
-    assert last == 5.0
-    stake, _ = resolve_entry_stake(4, press, last, cash=95.3)
-    assert stake == 10.0
+    assert press is False and last is None
+    stake, is_press = resolve_entry_stake(4, press, last, cash=95.3)
+    assert is_press is False and stake == 4.0
 
 
 def test_dedupe_open_then_closed_and_open_trade_records_stake():
@@ -235,8 +232,8 @@ def test_dedupe_open_then_closed_and_open_trade_records_stake():
 if __name__ == "__main__":
     tests = [
         test_grade_normal_strong_top,
-        test_press_ladder_and_reset,
-        test_tickets_stay_in_4_to_20_across_prices,
+        test_press_is_disabled_and_sizing_is_flat,
+        test_tickets_stay_in_4_to_8_across_prices,
         test_lift_race_bankroll_preserves_pnl_and_trades,
         test_legacy_state_upgrades_without_reset,
         test_dedupe_open_then_closed_and_open_trade_records_stake,
@@ -244,4 +241,4 @@ if __name__ == "__main__":
     for fn in tests:
         fn()
         print("OK", fn.__name__)
-    print("All sizing/press checks passed.")
+    print("All sizing checks passed.")

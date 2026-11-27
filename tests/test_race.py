@@ -13,7 +13,10 @@ from bot import (
     Indicators,
     RACE_STARTING,
     STAKE_NORMAL,
-    STAKE_PRESS_CAP,
+    STAKE_MAX,
+    V1_ASK_MAX,
+    V1_ASK_MIN,
+    V1_MIN_STRIKE_GAP,
     apply_press_from_trade,
     ensure_race,
     make_v1_signal,
@@ -122,7 +125,7 @@ def test_v1_can_add_and_flip_up_to_three_then_caps():
     assert "adding YES" in sig2.reason
     # Momentum flips — enter NO as a third ticket.
     now3 = now + timedelta(minutes=10)
-    m3 = market(now3, ticker=ticker, strike=60400, yes=0.70, no=0.32, remaining=4 * 60)
+    m3 = market(now3, ticker=ticker, strike=60400, yes=0.70, no=0.42, remaining=4 * 60)
     book, sig3 = step_v1_book(book, m3, [], bear(), bear(), 60280, now3)
     assert len(book["open_positions"]) == 3, (sig3.reason, book["events"])
     assert book["open_positions"][-1]["side"] == "no"
@@ -137,7 +140,7 @@ def test_v1_can_add_and_flip_up_to_three_then_caps():
     assert window_trade_count(book["trades"], ticker, book["open_positions"]) == 3
 
 
-def test_v1_settles_all_open_positions_and_respects_press_and_cash_cap():
+def test_v1_settles_all_open_positions_and_respects_flat_sizing_and_cash_cap():
     now = utc_now()
     ticker = "KXBTC15M-TEST-SETTLE"
     book = new_race_book("v1", now)
@@ -162,13 +165,13 @@ def test_v1_settles_all_open_positions_and_respects_press_and_cash_cap():
     assert all(t["pnl"] > 0 for t in closed)
     assert book["wins"] == 2
     assert book["cash"] > cash_before_settle
-    assert book["press_next"] is True
-    # Press is 2× last winning stake, hard-capped at $20, and never more than cash.
+    assert book["press_next"] is False
+    # Flat $4–$8 sizing: a win does not arm a 2× press.
     last = closed[-1]["stake"]
     stake, pressed = resolve_entry_stake(STAKE_NORMAL, True, last, book["cash"])
-    assert pressed is True
-    assert stake == min(STAKE_PRESS_CAP, round(2 * last, 2), book["cash"])
-    assert 4.0 - 1e-9 <= stake <= 20.0 + 1e-9
+    assert pressed is False
+    assert stake == STAKE_NORMAL
+    assert 4.0 - 1e-9 <= stake <= STAKE_MAX + 1e-9
     # Cash cap: a nearly empty book cannot open a ticket.
     broke = new_race_book("v1", now)
     broke["cash"] = 0.40
@@ -270,14 +273,86 @@ def test_ensure_race_does_not_reset_existing_books():
     assert state40["cash"] == 95.30
     assert state40["session"]["final_balance"] == 35.30
 
+def test_v1_rejects_expensive_favorite_close_strike_and_fade():
+    now = utc_now()
+    # 84¢ Yes while BTC is well above the strike — the favorite leak.
+    expensive = make_v1_signal(
+        ind_1m=bull(),
+        ind_5m=bull(),
+        btc_price=60540,
+        strike=60400,
+        yes_ask=0.84,
+        yes_bid=0.82,
+        no_ask=0.17,
+        no_bid=0.15,
+        remaining_sec=12 * 60,
+        open_positions=[],
+        window_trade_count=0,
+    )
+    assert expensive.action == "WAIT", expensive
+    assert "expensive" in (expensive.reason or "").lower() or "35" in (expensive.reason or "")
+    assert V1_ASK_MAX == 0.75 and V1_ASK_MIN == 0.35
+
+    # Coin-flip: only $12 from the strike.
+    tight = make_v1_signal(
+        ind_1m=bull(),
+        ind_5m=bull(),
+        btc_price=60412,
+        strike=60400,
+        yes_ask=0.64,
+        yes_bid=0.62,
+        no_ask=0.37,
+        no_bid=0.35,
+        remaining_sec=8 * 60,
+        open_positions=[],
+        window_trade_count=0,
+    )
+    assert tight.action == "WAIT", tight
+    assert "strike" in (tight.label or "").lower() or "band" in (tight.reason or "").lower()
+    assert V1_MIN_STRIKE_GAP == 20.0
+
+    # Fade leak: never buy No at 35¢ while BTC is already +$45 above the strike.
+    fade = make_v1_signal(
+        ind_1m=bear(),
+        ind_5m=bear(),
+        btc_price=60527,
+        strike=60482,
+        yes_ask=0.66,
+        yes_bid=0.64,
+        no_ask=0.35,
+        no_bid=0.33,
+        remaining_sec=12 * 60,
+        open_positions=[],
+        window_trade_count=0,
+    )
+    assert fade.action != "BUY_NO", fade
+    # Same window with an untradable Yes — must WAIT rather than fade with No.
+    fade_wait = make_v1_signal(
+        ind_1m=bear(),
+        ind_5m=bear(),
+        btc_price=60527,
+        strike=60482,
+        yes_ask=0.84,
+        yes_bid=0.82,
+        no_ask=0.35,
+        no_bid=0.33,
+        remaining_sec=12 * 60,
+        open_positions=[],
+        window_trade_count=0,
+    )
+    assert fade_wait.action == "WAIT", fade_wait
+    assert "fade" in (fade_wait.reason or "").lower() or "expensive" in (fade_wait.reason or "").lower() or "35" in (fade_wait.reason or "")
+
+
 
 if __name__ == "__main__":
     tests = [
         test_v1_scores_yes_vs_no_and_writes_choice_reason,
         test_v1_can_add_and_flip_up_to_three_then_caps,
-        test_v1_settles_all_open_positions_and_respects_press_and_cash_cap,
+        test_v1_settles_all_open_positions_and_respects_flat_sizing_and_cash_cap,
         test_v2_is_strict_one_trade_and_waits_without_edge,
         test_ensure_race_does_not_reset_existing_books,
+        test_v1_rejects_expensive_favorite_close_strike_and_fade,
     ]
     for fn in tests:
         fn()

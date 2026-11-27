@@ -106,6 +106,33 @@ def test_promotion_requires_sample_and_val_edge():
     ok, why = learn.beats_current(wrecked, cur)
     assert ok is False and "drawdown" in why
 
+    # Higher profit factor but LOWER unseen dollar P&L must never promote
+    # (the v5 gap_$40 case: PF 1.79 vs 1.58, val P&L $90.17 vs $105.00).
+    pf_only = {
+        "overall": {"trade_count": 40, "wins": 30, "losses": 10, "win_rate": 75.0, "net_pnl": 20.0, "profit_factor": 1.8, "max_drawdown_pct": 7.0},
+        "val": {"trade_count": 12, "wins": 10, "losses": 2, "win_rate": 83.0, "net_pnl": 2.00, "profit_factor": 2.2, "max_drawdown_pct": 4.0},
+        "train": {},
+    }
+    # current val is $4.00 in `cur`? cur val is 0.40; 2.00 beats 0.40. Use a richer current.
+    rich_cur = {
+        "overall": {"trade_count": 40, "wins": 24, "losses": 16, "win_rate": 60.0, "net_pnl": 18.0, "profit_factor": 1.3, "max_drawdown_pct": 8.0},
+        "val": {"trade_count": 12, "wins": 8, "losses": 4, "win_rate": 66.0, "net_pnl": 5.00, "profit_factor": 1.4, "max_drawdown_pct": 6.0},
+        "train": {},
+    }
+    ok, why = learn.beats_current(pf_only, rich_cur)
+    assert ok is False, why
+    assert "not higher" in why or "profit factor" in why
+
+    # Equal unseen dollars also rejected (must be strictly higher by ≥ $1.50)
+    tied = {
+        "overall": {"trade_count": 40, "wins": 28, "losses": 12, "win_rate": 70.0, "net_pnl": 18.0, "profit_factor": 1.6, "max_drawdown_pct": 7.0},
+        "val": {"trade_count": 12, "wins": 8, "losses": 4, "win_rate": 66.0, "net_pnl": 5.00, "profit_factor": 1.8, "max_drawdown_pct": 5.0},
+        "train": {},
+    }
+    ok, why = learn.beats_current(tied, rich_cur)
+    assert ok is False
+    assert "not higher" in why or "≥" in why or "$1.50" in why or "1.50" in why
+
 
 def test_simulate_empty_is_flat():
     ev = bot.simulate_prepared_windows([], bot.StrategyParams())
