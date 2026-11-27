@@ -1,7 +1,7 @@
 {
-  "version": 3,
-  "updated_at": "2026-11-26T23:55:30Z",
-  "updated_at_pt": "Nov 26, 2026, 3:55 PM PT",
+  "version": 4,
+  "updated_at": "2026-11-27T03:59:52Z",
+  "updated_at_pt": "Nov 26, 2026, 7:59 PM PT",
   "source": "hourly-learner",
   "params": {
     "min_entry_cents": 35,
@@ -9,8 +9,8 @@
     "min_strike_gap_usd": 20.0,
     "min_mins_left": 2,
     "max_mins_left": 15,
-    "rsi_bull_min": 52.0,
-    "rsi_bull_max": 75.0,
+    "rsi_bull_min": 55.0,
+    "rsi_bull_max": 70.0,
     "rsi_bear_min": 30.0,
     "rsi_bear_max": 45.0,
     "require_ema50_align": true,
@@ -21,42 +21,42 @@
   },
   "metrics": {
     "overall": {
-      "trade_count": 157,
-      "wins": 108,
-      "losses": 49,
-      "win_rate": 68.8,
-      "net_pnl": 172.66,
-      "profit_factor": 1.249,
-      "max_drawdown_pct": 69.89,
-      "ending_equity": 272.66
+      "trade_count": 148,
+      "wins": 101,
+      "losses": 47,
+      "win_rate": 68.2,
+      "net_pnl": 102.77,
+      "profit_factor": 1.15,
+      "max_drawdown_pct": 70.79,
+      "ending_equity": 202.77
     },
     "train": {
-      "trade_count": 112,
-      "wins": 75,
-      "losses": 37,
-      "win_rate": 67.0,
-      "net_pnl": 53.76,
-      "profit_factor": 1.101,
-      "max_drawdown_pct": 69.89,
-      "ending_equity": 153.76
+      "trade_count": 103,
+      "wins": 67,
+      "losses": 36,
+      "win_rate": 65.0,
+      "net_pnl": -16.45,
+      "profit_factor": 0.968,
+      "max_drawdown_pct": 70.79,
+      "ending_equity": 83.55
     },
     "val": {
       "trade_count": 45,
-      "wins": 33,
-      "losses": 12,
-      "win_rate": 73.3,
-      "net_pnl": 113.68,
-      "profit_factor": 1.696,
-      "max_drawdown_pct": 22.27,
-      "ending_equity": 213.68
+      "wins": 34,
+      "losses": 11,
+      "win_rate": 75.6,
+      "net_pnl": 112.52,
+      "profit_factor": 1.65,
+      "max_drawdown_pct": 21.29,
+      "ending_equity": 212.52
     },
     "windows": 1328,
     "train_windows": 929,
     "val_windows": 399,
-    "promoted_from": 2,
-    "candidate": "rsi_bear_30_45"
+    "promoted_from": 3,
+    "candidate": "rsi_bull_55_70"
   },
   "plain_english": "Buys Yes/No when the 1-minute trend is clean, BTC is at least $20 from the strike, the ask is 35\u201375\u00a2, and 2\u201315 minutes remain in the window. Requires the 50-period EMA to agree. Requires the 5-minute trend to agree. No extra chop filter.",
-  "last_promoted_at": "2026-11-26T23:55:30Z",
-  "last_promoted_at_pt": "Nov 26, 2026, 3:55 PM PT"
+  "last_promoted_at": "2026-11-27T03:59:52Z",
+  "last_promoted_at_pt": "Nov 26, 2026, 7:59 PM PT"
 }
