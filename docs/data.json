@@ -5129,7 +5129,9 @@
       "candidate": "gap_40",
       "metrics_updated_at": "2026-11-27T08:07:40Z",
       "metrics_updated_at_pt": "Nov 27, 2026, 12:07 AM PT"
-    }
+    },
+    "last_promoted_at": "2026-11-27T07:21:47Z",
+    "last_promoted_at_pt": "Nov 26, 2026, 11:21 PM PT"
   },
   "learning": {
     "generated_at": "2026-11-27T08:07:40Z",
