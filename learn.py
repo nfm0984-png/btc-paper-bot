@@ -83,6 +83,7 @@ def strategy_snapshot(cfg: dict) -> dict:
         "chart_scorecard": cfg.get("chart_scorecard") or {},
         "last_promoted_at": cfg.get("last_promoted_at"),
         "last_promoted_at_pt": cfg.get("last_promoted_at_pt"),
+        "v1": cfg.get("v1") or {},
     }
 
 
@@ -141,7 +142,140 @@ PARAM_LABELS = {
     "tp_require_stall": ("TP needs stall", lambda v: "on" if v else "off"),
     "sl_require_reversal": ("SL needs reversal", lambda v: "on" if v else "off"),
     "fair_giveback": ("fair-value giveback", lambda v: "on" if v else "off"),
+    "exit_mode": ("exit rule", lambda v: str(v)),
+    "htf_gate": ("higher-timeframe gate", lambda v: str(v)),
+    "require_vwap_side": ("VWAP-side filter", lambda v: "on" if v else "off"),
 }
+
+V1_PARAM_LABELS = {
+    "min_ask_cents": ("min ask", lambda v: f"{int(v)}¢"),
+    "max_ask_cents": ("max ask", lambda v: f"{int(v)}¢"),
+    "min_strike_gap_usd": ("strike gap", lambda v: f"${float(v):.0f}"),
+    "min_mins_left": ("min minutes left", lambda v: str(int(v))),
+    "require_5m_confirm": ("5m confirm", lambda v: "on" if v else "off"),
+    "htf_gate": ("higher-timeframe gate", lambda v: str(v)),
+    "min_fair_edge": ("fair-value gate", lambda v: "off" if float(v) <= -0.999 else f"{float(v)*100:+.0f}¢"),
+    "max_chop_ratio": ("max chop", lambda v: f"{float(v):.2f}"),
+    "require_vwap_side": ("VWAP-side filter", lambda v: "on" if v else "off"),
+    "min_aligns": ("min chart checks", lambda v: str(int(v))),
+    "exit_mode": ("exit rule", lambda v: str(v)),
+}
+
+
+def describe_v1_diff(old: "bot.V1Params", new: "bot.V1Params") -> str:
+    a, b = old.as_dict(), new.as_dict()
+    parts = [f"{name} from {fmt(a[k])} to {fmt(b[k])}" for k, (name, fmt) in V1_PARAM_LABELS.items() if a.get(k) != b.get(k)]
+    return ", ".join(parts) if parts else "the same rules"
+
+
+def v1_candidate_grid(current: "bot.V1Params") -> list[tuple[str, "bot.V1Params"]]:
+    """Tune Version 1.2 inside its method: one ticket per window, no opposite-side buys."""
+    cands: list[tuple[str, bot.V1Params]] = [("current", current)]
+    seen = {tuple(sorted(current.as_dict().items()))}
+
+    def add(name: str, **overrides) -> None:
+        d = current.as_dict()
+        d.update(overrides)
+        d["max_entries_per_window"] = 1
+        d["allow_flip"] = False
+        if d["min_ask_cents"] >= d["max_ask_cents"]:
+            return
+        p = bot.v1_params_from_dict(d)
+        key = tuple(sorted(p.as_dict().items()))
+        if key in seen:
+            return
+        seen.add(key)
+        cands.append((name, p))
+
+    for g in (20, 25, 30, 35, 40, 50):
+        add(f"v1_gap_{g}", min_strike_gap_usd=g)
+    for mx in (60, 62, 65, 68, 70, 75):
+        add(f"v1_max_ask_{mx}", max_ask_cents=mx)
+    for mn in (35, 40, 45):
+        add(f"v1_min_ask_{mn}", min_ask_cents=mn)
+    add("v1_5m_confirm", require_5m_confirm=not current.require_5m_confirm)
+    for g in ("off", "15m", "1h", "both", "either"):
+        add(f"v1_htf_{g}", htf_gate=g)
+    for e in (-1.0, -0.03, 0.0, 0.02, 0.03):
+        add(f"v1_fair_{e:+.2f}", min_fair_edge=e)
+    for c in (1.0, 0.8, 0.7):
+        add(f"v1_chop_{c:.2f}", max_chop_ratio=c)
+    add("v1_vwap", require_vwap_side=not current.require_vwap_side)
+    for a in (0, 3, 4, 5):
+        add(f"v1_aligns_{a}", min_aligns=a)
+    for m in ("hold", "reversal", "tp90_stall", "tp95"):
+        add(f"v1_exit_{m}", exit_mode=m)
+    return cands
+
+
+def evaluate_v1(windows: list[dict], v1p: "bot.V1Params") -> dict:
+    train, val = split_windows(windows)
+    return {
+        "overall": compact_metrics(bot.simulate_prepared_windows(windows, None, v1=v1p)),
+        "train": compact_metrics(bot.simulate_prepared_windows(train, None, v1=v1p)),
+        "val": compact_metrics(bot.simulate_prepared_windows(val, None, v1=v1p)),
+        "train_windows": len(train),
+        "val_windows": len(val),
+    }
+
+
+def learn_v1(cfg: dict, windows: list[dict], now) -> tuple[dict, dict]:
+    """Walk-forward tune Version 1.2. Same promotion bar: strictly higher unseen dollars."""
+    sec = dict(cfg.get("v1") or {})
+    current = bot.v1_params_from_dict(sec.get("params")) if sec.get("params") else bot.default_v1_config_params()
+    version = int(sec.get("version_n") or 1)
+    scored = [(n, p, evaluate_v1(windows, p)) for n, p in v1_candidate_grid(current)]
+    cur_ev = next(ev for n, _, ev in scored if n == "current")
+    ranked = sorted(
+        scored,
+        key=lambda it: (
+            float(it[2]["val"].get("net_pnl") or -9999),
+            float(it[2]["overall"].get("net_pnl") or -9999),
+            -float(it[2]["overall"].get("max_drawdown_pct") or 99),
+        ),
+        reverse=True,
+    )
+    best_name, best_params, best_ev = ranked[0]
+    eligible = [(n, p, ev, why) for n, p, ev in ranked if n != "current" for ok, why in [beats_current(ev, cur_ev)] if ok]
+    last_promo = sec.get("last_promoted_at")
+    cooldown = bool(last_promo) and (int(now.timestamp()) - bot.to_ts(last_promo)) < bot.PROMOTION_COOLDOWN_SEC
+    promoted = False
+    if eligible and not cooldown:
+        name, params, ev, why = eligible[0]
+        promoted = True
+        note = f"Version 1.2 learner promoted {describe_v1_diff(current, params)}: {why}."
+        sec = {
+            "label": f"{bot.V1_VERSION_LABEL} · {bot.V1_METHOD_NAME}",
+            "version_n": version + 1,
+            "params": params.as_dict(),
+            "metrics": {k: ev[k] for k in ("overall", "train", "val", "train_windows", "val_windows")},
+            "candidate": name,
+            "rules": bot.v1_rules_text(params),
+            "last_promoted_at": bot.iso_utc(now),
+            "last_promoted_at_pt": bot.fmt_pt(now),
+        }
+    else:
+        why = "promotion cooldown still active" if (eligible and cooldown) else (
+            beats_current(best_ev, cur_ev)[1] if best_name != "current" else "no alternate beat the live Version 1.2 rules on unseen windows"
+        )
+        note = f"Kept Version 1.2 rules ({why})."
+        sec.update({
+            "label": f"{bot.V1_VERSION_LABEL} · {bot.V1_METHOD_NAME}",
+            "version_n": version,
+            "params": current.as_dict(),
+            "metrics": {k: cur_ev[k] for k in ("overall", "train", "val", "train_windows", "val_windows")},
+            "rules": bot.v1_rules_text(current),
+        })
+    sec["metrics_updated_at"] = bot.iso_utc(now)
+    sec["metrics_updated_at_pt"] = bot.fmt_pt(now)
+    report = {
+        "promoted": promoted,
+        "takeaway": note,
+        "live": {k: cur_ev[k] for k in ("train", "val", "overall")},
+        "best_candidate": {"name": best_name, "params": best_params.as_dict(), **{k: best_ev[k] for k in ("train", "val", "overall")}},
+        "candidates_tested": len(scored),
+    }
+    return sec, report
 
 
 def describe_diff(old: bot.StrategyParams, new: bot.StrategyParams) -> str:
@@ -223,7 +357,14 @@ def candidate_grid(current: bot.StrategyParams) -> list[tuple[str, bot.StrategyP
         add(f"fair_edge_{int(edge*100)}", min_fair_edge=edge)
     for sp in (3, 4, 6):
         add(f"spread_{sp}", max_spread_cents=sp)
-    add("hold_to_expiry", enable_early_exits=False)
+    add("hold_to_expiry", enable_early_exits=False, exit_mode="hold")
+    for m in ("reversal", "tp90_stall", "tp95", "reversal_tp90"):
+        add(f"exit_{m}", exit_mode=m, enable_early_exits=False)
+    for g in ("off", "15m", "1h", "either"):
+        add(f"htf_{g}", htf_gate=g)
+    add("vwap_side", require_vwap_side=not current.require_vwap_side)
+    for edge in (0.0, 0.001, 0.01):
+        add(f"fair_edge_{edge*100:.1f}c", min_fair_edge=edge)
     add("tp85_gain25", tp_bid=0.85, tp_gain=0.25, enable_early_exits=True)
     add("tp85_stall", tp_bid=0.85, tp_gain=0.25, tp_require_stall=True, enable_early_exits=True)
     add("tp90_gain35", tp_bid=0.90, tp_gain=0.35, enable_early_exits=True)
@@ -718,6 +859,14 @@ def run_learn() -> int:
         scored.append((name, params, ev))
 
     current_ev = next(ev for name, _, ev in scored if name == "current")
+
+    print("  Tuning Version 1.2 (chart-confirmed active) on the same walk-forward split…", flush=True)
+    try:
+        v1_section, v1_report = learn_v1(cfg, windows, now)
+        print(f"  {v1_report['takeaway']}", flush=True)
+    except Exception as exc:  # never let the V1 tuner break the V2 learner
+        print(f"  Version 1.2 tuner skipped: {exc}", flush=True)
+        v1_section, v1_report = (cfg.get("v1") if isinstance(cfg.get("v1"), dict) else None), None
     # Best by validation P&L, then overall P&L, then lower drawdown, then more val trades.
     def sort_key(item):
         name, params, ev = item
@@ -782,6 +931,8 @@ def run_learn() -> int:
             "last_promoted_at": bot.iso_utc(now),
             "last_promoted_at_pt": bot.fmt_pt(now),
         }
+        if v1_section is not None:
+            cfg["v1"] = v1_section
         bot.save_json(bot.STRATEGY_CONFIG_PATH, cfg)
         print(f"  {decision}: {reason}", flush=True)
     else:
@@ -810,6 +961,8 @@ def run_learn() -> int:
             "metrics_updated_at_pt": bot.fmt_pt(now),
         }
         cfg["chart_scorecard"] = chart_scorecard
+        if v1_section is not None:
+            cfg["v1"] = v1_section
         bot.save_json(bot.STRATEGY_CONFIG_PATH, cfg)
         print(f"  {decision}: {reason}", flush=True)
 
@@ -871,6 +1024,8 @@ def run_learn() -> int:
         },
     }
 
+    if v1_report:
+        entry["v1"] = {"takeaway": v1_report.get("takeaway"), "promoted": v1_report.get("promoted"), "live_val": v1_report["live"]["val"], "best": v1_report["best_candidate"]["name"]}
     log = load_json(bot.LEARNING_LOG_PATH, {"runs": []})
     runs = list(log.get("runs") or [])
     runs.append(entry)
@@ -894,6 +1049,7 @@ def run_learn() -> int:
         "decision": decision,
         "takeaway": note,
         "chart_scorecard": chart_scorecard,
+        "v1": v1_report,
         "last_run": entry,
         "runs": list(reversed(runs[-48:])),  # newest first for the dashboard
     }

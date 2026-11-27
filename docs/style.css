@@ -445,3 +445,9 @@ footer a:hover { color: var(--brand-deep); }
   .tf-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .scorecard-row { grid-template-columns: 1fr 1fr; }
 }
+
+/* v1.2 / v2.2 gate summary in the Market & Chart Reader card */
+.gates-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; margin: 12px 0 4px; }
+.gate-box { border: 1px solid rgba(0,0,0,0.08); border-radius: 12px; padding: 10px 12px; }
+.gate-box .gate-line { margin-top: 6px; font-size: 13px; line-height: 1.6; }
+.gate-box .pill { display: inline-block; margin: 2px 2px 0 0; font-size: 11px; }

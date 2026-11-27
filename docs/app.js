@@ -795,8 +795,8 @@
     };
     fillBal("stat-v1-val", v1);
     fillBal("stat-v2-val", v2);
-    if ($("stat-v1-sub")) $("stat-v1-sub").textContent = ((v1.wins || 0) + "–" + (v1.losses || 0)) + " · Multi-trade";
-    if ($("stat-v2-sub")) $("stat-v2-sub").textContent = ((v2.wins || 0) + "–" + (v2.losses || 0)) + " · Strict rules";
+    if ($("stat-v1-sub")) $("stat-v1-sub").textContent = ((v1.wins || 0) + "–" + (v1.losses || 0)) + " · " + (v1.short_name || "Version 1.2").replace("Version ", "V") + " " + (v1.name || "Chart-Confirmed Active");
+    if ($("stat-v2-sub")) $("stat-v2-sub").textContent = ((v2.wins || 0) + "–" + (v2.losses || 0)) + " · " + (v2.short_name || "Version 2.2").replace("Version ", "V") + " " + (v2.name || "Strict + Fair-Value Edge");
     if ($("stat-leader-val")) $("stat-leader-val").textContent = race.leader_label || (race.leader === "tied" ? "Tied" : "—") || "Tied";
     const gap = $("stat-gap-val");
     if (gap) {
@@ -1041,6 +1041,8 @@
     if ($(id + "-contracts")) $(id + "-contracts").textContent = String(bookContracts(book));
     if ($(id + "-record")) $(id + "-record").textContent = (book.wins || 0) + "–" + (book.losses || 0);
     if ($(id + "-badge") && book.badge) $(id + "-badge").textContent = book.badge;
+    if ($(id + "-kicker") && book.short_name) $(id + "-kicker").textContent = book.short_name;
+    if ($(id + "-title") && book.name) $(id + "-title").textContent = book.name;
     const press = $(id + "-press");
     if (press) {
       const label = book.next_stake_label || "Next stake: $4–$8 flat (no press)";
@@ -1080,7 +1082,44 @@
     }
   }
 
+  function renderRaceArchive(list, market) {
+    const el = $("race-archive");
+    if (!el) return;
+    if (!list || !list.length) {
+      el.innerHTML = '<p class="empty">No finished races yet.</p>';
+      return;
+    }
+    el.innerHTML = list.slice().reverse().map((r) => {
+      const books = r.books || {};
+      const card = (key) => {
+        const b = books[key] || {};
+        const trades = (b.trades || []).slice().sort((a, c) => Date.parse(c.entry_time || 0) - Date.parse(a.entry_time || 0));
+        return `<details class="details"><summary>${esc(b.name || key)} — ${esc(money(b.starting_balance || 100))} → ${esc(money(b.equity))} · ${b.wins || 0}–${b.losses || 0} · ${esc(money(b.pnl, true))}</summary>${tradeRows(trades, "No trades in this race.", market)}</details>`;
+      };
+      return `<article class="card"><div class="card-kicker">Race ${esc(String(r.race_number || ""))} · archived</div>
+        <div class="card-title" style="font-size:18px">${esc(r.label || "")}</div>
+        <div class="card-range">${esc(r.start_pt || "")} → ${esc(r.ended_at_pt || "")}</div>
+        ${card("v1")}${card("v2")}</article>`;
+    }).join("");
+  }
+
+  function renderGates(data) {
+    const el = $("reader-gates");
+    if (!el) return;
+    const gates = ((data && data.race) || {}).gates || {};
+    const box = (key) => {
+      const g = gates[key];
+      if (!g) return "";
+      const chips = (g.entry || []).map((x) => `<span class="pill BASE">${esc(x)}</span>`).join(" ");
+      return `<div class="gate-box ${key}"><div class="card-kicker">${esc(g.label || key)}</div>
+        <div class="gate-line"><strong>Entry gates:</strong> ${chips}</div>
+        <div class="gate-line"><strong>Exit:</strong> ${esc(g.exit || "hold to settlement")}</div></div>`;
+    };
+    el.innerHTML = box("v1") + box("v2");
+  }
+
   function renderRace(data, live) {
+    renderGates(data);
     const race = (data && data.race) || {};
     renderRaceBar(data, live || {});
     const choice = race.choice || {};
@@ -1098,9 +1137,10 @@
     if ($("v2-checks")) $("v2-checks").innerHTML = checkRows(sessionChecks(v2));
     if ($("race-trades-range")) {
       $("race-trades-range").textContent = race.start_pt
-        ? ("Both books started together and now each run a $100 bankroll (started " + race.start_pt + "). Version 1 can take up to 3 tickets in a window; Version 2 takes at most one, and only when every strict rule passes.")
-        : "Two books started together at $100. Version 1 can take up to 3 tickets in a window; Version 2 takes at most one, and only when every strict rule passes.";
+        ? ("Race " + (race.race_number || 2) + ": both books restarted together at $100 / 0–0 (started " + race.start_pt + "). Version 1.2 takes at most one chart-confirmed ticket per window; Version 2.2 takes at most one, only when every strict rule and the fair-value gate pass.")
+        : "Both books start together at $100. Version 1.2 takes at most one chart-confirmed ticket per window; Version 2.2 takes at most one, only when every strict rule passes.";
     }
+    renderRaceArchive((DATA && DATA.race_archive) || [], market);
     const sessTrades = ((sess && sess.trades) || []).slice().sort((a, b) => Date.parse(b.entry_time || 0) - Date.parse(a.entry_time || 0));
     if ($("archive-session-range") && sess && sess.start_pt && sess.end_pt) {
       $("archive-session-range").textContent = "Completed " + (sess.window_label || "") + " · " + sess.start_pt + " → " + sess.end_pt + ". Kept here so nothing is lost.";

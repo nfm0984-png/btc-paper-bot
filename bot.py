@@ -90,7 +90,7 @@ DECISION_OFFSET_SEC = 60  # backtest snapshot: 1 minute after the window opens
 BACKTEST_DAYS = 5
 BACKTEST_CANDLE_PAD_HOURS = 6
 
-USER_AGENT = "btc-paper-bot/1.2 (+https://github.com/nfm0984-png/btc-paper-bot)"
+USER_AGENT = "btc-paper-bot/2.2 (+https://github.com/nfm0984-png/btc-paper-bot)"
 HTTP_TIMEOUT = 20
 MAX_RETRIES = 3
 
@@ -624,6 +624,10 @@ class StrategyParams:
     tp_require_stall: bool = False
     sl_require_reversal: bool = False
     fair_giveback: bool = False
+    # v2.2: chart-based exits ("hold" = hold to settlement) and extra multi-TF gates.
+    exit_mode: str = "hold"  # hold | reversal | tp90_stall | tp95 | reversal_tp90 (legacy TP/SL uses enable_early_exits)
+    htf_gate: str = "off"  # off | 15m | 1h | both | either — higher timeframe must not point against the side
+    require_vwap_side: bool = False  # 1m close must be on the trade's side of VWAP
 
     @property
     def min_entry(self) -> float:
@@ -669,6 +673,9 @@ class StrategyParams:
             "tp_require_stall": bool(self.tp_require_stall),
             "sl_require_reversal": bool(self.sl_require_reversal),
             "fair_giveback": bool(self.fair_giveback),
+            "exit_mode": str(self.exit_mode or "hold"),
+            "htf_gate": str(self.htf_gate or "off"),
+            "require_vwap_side": bool(self.require_vwap_side),
         }
 
 
@@ -682,6 +689,227 @@ def params_from_dict(d: Optional[dict]) -> StrategyParams:
         if k in d and d[k] is not None:
             kw[k] = type(fields[k])(d[k])
     return StrategyParams(**{**fields, **kw})
+
+
+# ---------------------------------------------------------------------------
+# Version 1 method parameters (chart-confirmed active book)
+# ---------------------------------------------------------------------------
+
+SMART_EXIT_MODES = ("reversal", "tp90_stall", "tp95", "reversal_tp90")
+HTF_GATES = ("off", "15m", "1h", "both", "either")
+
+
+@dataclass
+class V1Params:
+    """Version 1 rules. Defaults reproduce the legacy (Race 1) Version 1 entry logic."""
+
+    min_ask_cents: int = 35
+    max_ask_cents: int = 75
+    min_strike_gap_usd: float = 20.0
+    min_mins_left: int = 2
+    max_entries_per_window: int = 3
+    allow_flip: bool = True  # legacy: could buy the other side of its own ticket
+    require_5m_confirm: bool = False  # 5-minute EMA trend must agree (not just add score)
+    htf_gate: str = "off"  # off | 15m | 1h | both | either — "not against" (flat is OK)
+    min_fair_edge: float = -1.0  # spot fair prob − ask must be ≥ this (−1 = off)
+    max_chop_ratio: float = 1.0
+    min_volatility_usd: float = 0.0
+    require_vwap_side: bool = False
+    min_aligns: int = 0  # how many of the 6 chart checks must line up
+    skip_lo_cents: int = 0  # optional skipped ask band [lo, hi] (0 = off)
+    skip_hi_cents: int = 0
+    exit_mode: str = "hold"
+
+    @property
+    def min_ask(self) -> float:
+        return float(self.min_ask_cents) / 100.0
+
+    @property
+    def max_ask(self) -> float:
+        return float(self.max_ask_cents) / 100.0
+
+    def as_dict(self) -> dict:
+        return {
+            "min_ask_cents": int(self.min_ask_cents),
+            "max_ask_cents": int(self.max_ask_cents),
+            "min_strike_gap_usd": float(self.min_strike_gap_usd),
+            "min_mins_left": int(self.min_mins_left),
+            "max_entries_per_window": int(self.max_entries_per_window),
+            "allow_flip": bool(self.allow_flip),
+            "require_5m_confirm": bool(self.require_5m_confirm),
+            "htf_gate": str(self.htf_gate or "off"),
+            "min_fair_edge": float(self.min_fair_edge),
+            "max_chop_ratio": float(self.max_chop_ratio),
+            "min_volatility_usd": float(self.min_volatility_usd),
+            "require_vwap_side": bool(self.require_vwap_side),
+            "min_aligns": int(self.min_aligns),
+            "skip_lo_cents": int(self.skip_lo_cents),
+            "skip_hi_cents": int(self.skip_hi_cents),
+            "exit_mode": str(self.exit_mode or "hold"),
+        }
+
+
+LEGACY_V1 = V1Params()
+
+
+def v1_params_from_dict(d: Optional[dict]) -> V1Params:
+    base = V1Params()
+    if not d:
+        return base
+    fields = base.as_dict()
+    kw = {}
+    for k in fields:
+        if k in d and d[k] is not None:
+            kw[k] = type(fields[k])(d[k])
+    return V1Params(**kw)
+
+
+def default_v1_config_params() -> V1Params:
+    """Version 1.2 · Chart-Confirmed Active defaults (overridden by strategy_config.json["v1"]).
+
+    Chosen on the Nov 27 walk-forward (929 train / 399 unseen windows): $30 gap, 35–65¢ ask,
+    15m trend not against, spot fair value ≥ ask, one ticket per window, hold to settlement.
+    """
+    return V1Params(
+        min_ask_cents=35,
+        max_ask_cents=65,
+        min_strike_gap_usd=30.0,
+        min_mins_left=2,
+        max_entries_per_window=1,
+        allow_flip=False,
+        require_5m_confirm=False,
+        htf_gate="15m",
+        min_fair_edge=0.0,
+        max_chop_ratio=1.0,
+        min_volatility_usd=0.0,
+        require_vwap_side=False,
+        min_aligns=0,
+        exit_mode="hold",
+    )
+
+
+V1_VERSION_LABEL = "Version 1.2"
+V1_METHOD_NAME = "Chart-Confirmed Active"
+V2_VERSION_LABEL = "Version 2.2"
+V2_METHOD_NAME = "Strict + Fair-Value Edge"
+
+
+def load_v1_params(cfg: Optional[dict] = None) -> V1Params:
+    if cfg is None:
+        try:
+            cfg = load_strategy_config()
+        except Exception:
+            cfg = {}
+    v1 = (cfg or {}).get("v1") if isinstance(cfg, dict) else None
+    if isinstance(v1, dict) and isinstance(v1.get("params"), dict):
+        return v1_params_from_dict(v1["params"])
+    return default_v1_config_params()
+
+
+def v1_rules_text(v1: V1Params) -> str:
+    band = f"{v1.min_ask_cents}–{v1.max_ask_cents}¢"
+    bits = [
+        f"Buys the side BTC is on (Yes above the strike, No below) when BTC is at least ${v1.min_strike_gap_usd:.0f} from the strike, the ask is {band}, and {v1.min_mins_left}+ minutes remain.",
+        "Scores the 1m EMA 9/21/50, MACD, RSI and the 5-minute trend to pick its conviction.",
+    ]
+    if v1.require_5m_confirm:
+        bits.append("The 5-minute trend must confirm.")
+    gate = {
+        "15m": "The 15-minute trend must not point against the side.",
+        "1h": "The 1-hour trend must not point against the side.",
+        "both": "Neither the 15-minute nor the 1-hour trend may point against the side.",
+        "either": "The 15-minute and 1-hour trends may not both point against the side.",
+    }.get(v1.htf_gate)
+    if gate:
+        bits.append(gate)
+    if v1.min_fair_edge > -0.999:
+        if abs(v1.min_fair_edge) < 1e-9:
+            bits.append("Spot-derived fair value must be at least the ask (no overpaying).")
+        else:
+            bits.append(f"Spot-derived fair value minus the ask must be at least {v1.min_fair_edge*100:.0f}¢.")
+    if v1.max_chop_ratio < 0.999:
+        bits.append(f"Skips choppy tapes (chop above {v1.max_chop_ratio:.2f}).")
+    if v1.require_vwap_side:
+        bits.append("Price must be on the trade’s side of 1m VWAP.")
+    if v1.min_aligns:
+        bits.append(f"At least {v1.min_aligns} of 6 chart checks must line up.")
+    n = int(v1.max_entries_per_window)
+    bits.append(f"At most {n} ticket{'s' if n != 1 else ''} per 15-minute window" + ("" if v1.allow_flip else " and never the opposite side of a held ticket") + ".")
+    bits.append(exit_rules_text(v1))
+    return " ".join(bits)
+
+
+def v1_gates_payload(v1: V1Params) -> dict:
+    entry = ["1m + 5m chart score", f"${v1.min_strike_gap_usd:.0f}+ strike gap", f"{v1.min_ask_cents}–{v1.max_ask_cents}¢ ask"]
+    if v1.require_5m_confirm:
+        entry.append("5m confirm")
+    if v1.htf_gate != "off":
+        entry.append({"15m": "15m not against", "1h": "1h not against", "both": "15m & 1h not against", "either": "15m/1h not both against"}[v1.htf_gate])
+    if v1.min_fair_edge > -0.999:
+        entry.append("fair value ≥ ask" if abs(v1.min_fair_edge) < 1e-9 else f"fair edge ≥ {v1.min_fair_edge*100:.0f}¢")
+    if v1.max_chop_ratio < 0.999:
+        entry.append(f"chop ≤ {v1.max_chop_ratio:.2f}")
+    if v1.require_vwap_side:
+        entry.append("VWAP side")
+    entry.append(f"max {int(v1.max_entries_per_window)}/window")
+    if not v1.allow_flip:
+        entry.append("no opposite-side buys")
+    exit_ = "hold to settlement" if not exits_enabled(v1) else {"reversal": "reversal exit (strike break + 1m EMA/MACD flip) at live bid", "tp90_stall": "TP 90¢+ on stall at live bid", "tp95": "TP 95¢+ at live bid", "reversal_tp90": "reversal exit or TP 90¢+ on stall at live bid"}.get(v1.exit_mode, v1.exit_mode)
+    return {"label": f"{V1_VERSION_LABEL} · {V1_METHOD_NAME}", "entry": entry, "exit": exit_, "rules": v1_rules_text(v1), "params": v1.as_dict()}
+
+
+def v2_gates_payload(p: "StrategyParams") -> dict:
+    mode = effective_chart_mode(p)
+    entry = ["1m EMA 9/21 + EMA 50 + MACD + RSI band"]
+    entry.append({"1m": "1m only", "1m_5m": "5m trend agrees", "1m_15m": "15m trend agrees", "1m_1h": "1h trend agrees", "mtf": "multi-TF consensus"}.get(mode, "5m trend agrees"))
+    if p.require_15m_align and mode != "1m_15m":
+        entry.append("15m agrees")
+    if p.require_1h_align and mode != "1m_1h":
+        entry.append("1h agrees")
+    if getattr(p, "htf_gate", "off") != "off":
+        entry.append(f"HTF gate {p.htf_gate} not against")
+    entry.append(f"${p.min_strike_gap_usd:.0f}+ strike gap")
+    entry.append(f"{p.min_entry_cents}–{p.max_entry_cents}¢ ask")
+    if p.min_fair_edge > 0:
+        entry.append("fair value ≥ ask" if p.min_fair_edge < 0.005 else f"fair edge ≥ {p.min_fair_edge*100:.0f}¢")
+    if p.max_chop_ratio < 0.999:
+        entry.append(f"chop ≤ {p.max_chop_ratio:.2f}")
+    entry.append("max 1/window")
+    mode_x = str(getattr(p, "exit_mode", "hold") or "hold")
+    if mode_x in SMART_EXIT_MODES:
+        exit_ = {"reversal": "reversal exit (strike break + 1m EMA/MACD flip) at live bid", "tp90_stall": "TP 90¢+ on stall at live bid", "tp95": "TP 95¢+ at live bid", "reversal_tp90": "reversal exit or TP 90¢+ on stall at live bid"}[mode_x]
+    elif p.enable_early_exits:
+        exit_ = "legacy TP/SL at live bid"
+    else:
+        exit_ = "hold to settlement"
+    return {"label": f"{V2_VERSION_LABEL} · {V2_METHOD_NAME}", "entry": entry, "exit": exit_, "rules": plain_english_params(p), "params": p.as_dict()}
+
+
+def htf_not_against(gate: str, side: str, ind15, ind1h, flat_dollars: float = 8.0) -> tuple[bool, Optional[str]]:
+    """Higher-timeframe gate: the 15m / 1h trend must not point against the side (flat is OK)."""
+    gate = (gate or "off").strip()
+    if gate == "off":
+        return True, None
+
+    def against(ind) -> Optional[bool]:
+        if not ind or not getattr(ind, "ready", False):
+            return None
+        bias = market_reader.chart_bias(ind, flat_dollars)
+        return (side == "yes" and bias == "down") or (side == "no" and bias == "up")
+
+    a15, a1h = against(ind15), against(ind1h)
+    if gate == "15m" and a15:
+        return False, "the 15-minute trend points against it"
+    if gate == "1h" and a1h:
+        return False, "the 1-hour trend points against it"
+    if gate == "both":
+        if a15:
+            return False, "the 15-minute trend points against it"
+        if a1h:
+            return False, "the 1-hour trend points against it"
+    if gate == "either" and a15 and a1h:
+        return False, "both the 15-minute and 1-hour trends point against it"
+    return True, None
 
 
 def default_strategy_config(now: Optional[datetime] = None) -> dict:
@@ -719,7 +947,20 @@ def plain_english_params(p: StrategyParams) -> str:
     if p.require_1h_align and mode not in ("1m_1h", "mtf"):
         bits.append("Also requires the 1-hour trend to agree.")
     if p.min_fair_edge > 0:
-        bits.append(f"Only buys when the spot-derived fair probability beats the ask by at least {p.min_fair_edge * 100:.0f}¢ of edge.")
+        if p.min_fair_edge < 0.005:
+            bits.append("Only buys when the spot-derived fair probability is at least the ask (no overpaying vs fair value).")
+        else:
+            bits.append(f"Only buys when the spot-derived fair probability beats the ask by at least {p.min_fair_edge * 100:.0f}¢ of edge.")
+    htf_txt = {
+        "15m": "The 15-minute trend must not point against the side.",
+        "1h": "The 1-hour trend must not point against the side.",
+        "both": "Neither the 15-minute nor the 1-hour trend may point against the side.",
+        "either": "The 15-minute and 1-hour trends may not both point against the side.",
+    }.get(str(getattr(p, "htf_gate", "off") or "off"))
+    if htf_txt:
+        bits.append(htf_txt)
+    if getattr(p, "require_vwap_side", False):
+        bits.append("Price must be on the trade’s side of 1m VWAP.")
     if p.max_spread_cents < 19.99:
         bits.append(f"Skips contracts whose Yes/No spread is wider than {p.max_spread_cents:.0f}¢.")
     if p.min_volatility_usd > 0 or p.max_chop_ratio < 0.999:
@@ -769,9 +1010,24 @@ def effective_chart_mode(p: StrategyParams) -> str:
     return "1m_5m" if p.require_5m_align else "1m"
 
 
-def exit_rules_text(p: Optional[StrategyParams] = None) -> str:
+def exits_enabled(p) -> bool:
+    return bool(getattr(p, "enable_early_exits", False)) or str(getattr(p, "exit_mode", "hold") or "hold") in SMART_EXIT_MODES
+
+
+SMART_EXIT_TEXT = {
+    "reversal": "Sells early at the live Kalshi bid only when BTC breaks back through the strike and the 1m EMA 9/21 plus MACD both flip against the ticket. Otherwise holds to official settlement.",
+    "tp90_stall": "Takes profit at the live Kalshi bid once it reaches 90¢+ and 1m momentum stalls. Otherwise holds to official settlement.",
+    "tp95": "Takes profit at the live Kalshi bid once it reaches 95¢+. Otherwise holds to official settlement.",
+    "reversal_tp90": "Sells at the live Kalshi bid on a confirmed strike-break reversal (1m EMA + MACD flipped) or takes profit at 90¢+ once momentum stalls. Otherwise holds to official settlement.",
+}
+
+
+def exit_rules_text(p=None) -> str:
     p = p or StrategyParams()
-    if not p.enable_early_exits:
+    mode = str(getattr(p, "exit_mode", "hold") or "hold")
+    if mode in SMART_EXIT_TEXT:
+        return SMART_EXIT_TEXT[mode]
+    if not getattr(p, "enable_early_exits", False):
         return "Holds every ticket to official Kalshi settlement (no early exits)."
     bits = []
     tp = f"take profit if the live bid reaches {int(round(p.tp_bid * 100))}¢ or +{int(round(p.tp_gain * 100))}¢ from entry"
@@ -866,6 +1122,8 @@ def parse_exit_row(row) -> Optional[dict]:
 
 def features_from_window(w: dict) -> dict:
     feats = {
+        "ind_1m": indicators_from_payload(w.get("ind_1m")),
+        "ind_5m": indicators_from_payload(w.get("ind_5m")),
         "volatility_usd": w.get("volatility_usd"),
         "chop_ratio": w.get("chop_ratio"),
         "ind_15m": indicators_from_payload(w.get("ind_15m")),
@@ -951,6 +1209,8 @@ def build_live_features(
     )
     flow_bias = (btc_flow or {}).get("bias") or "neutral"
     return {
+        "ind_1m": ind_1m,
+        "ind_5m": ind_5m,
         "volatility_usd": vol,
         "chop_ratio": chop,
         "ind_15m": ind_15m,
@@ -1201,6 +1461,16 @@ def extra_entry_block(
         higher_ready = cons.get("higher_ready") or []
         if len(higher_ready) >= 2 and int(cons.get("higher_agree") or 0) < 2:
             return "multi-timeframe charts are not in agreement (need two of 5m/15m/1h)"
+    htf_gate = str(getattr(p, "htf_gate", "off") or "off")
+    if htf_gate != "off":
+        ok, why = htf_not_against(htf_gate, side, ind15, ind1h, p.ema_flat_dollars)
+        if not ok:
+            return why
+    if getattr(p, "require_vwap_side", False):
+        ind1 = features.get("ind_1m")
+        if ind1 is not None and getattr(ind1, "vwap", None) is not None and ind1.close is not None:
+            if (side == "yes" and ind1.close < ind1.vwap) or (side == "no" and ind1.close > ind1.vwap):
+                return "price is on the wrong side of VWAP"
     if p.min_fair_edge > 0:
         fair_yes = features.get("fair_yes")
         if fair_yes is not None and ask is not None:
@@ -1428,6 +1698,57 @@ def _reversal_confirmed(side: str, ind: Optional[Indicators], btc_price: float, 
     return True
 
 
+def smart_exit_signal(
+    position: dict,
+    bid: Optional[float],
+    ind: Optional[Indicators],
+    btc_price: float,
+    strike: Optional[float],
+    remaining_sec: Optional[int],
+    mode: str,
+) -> Optional[Signal]:
+    """Chart-based exits, priced at the live Kalshi bid.
+
+    reversal:   sell only when BTC has broken back through the strike AND the 1m EMA 9/21 and
+                MACD both turned against the ticket (and the bid is below entry).
+    tp90_stall: take profit at a 90¢+ bid once 1m momentum stalls.
+    tp95:       take profit at a 95¢+ bid.
+    """
+    if bid is None or position is None:
+        return None
+    if remaining_sec is not None and remaining_sec < EARLY_EXIT_CUTOFF_SEC:
+        return None
+    side = position.get("side")
+    entry = float(position.get("entry_price") or 0)
+    bid = float(bid)
+    if mode in ("tp90_stall", "reversal_tp90") and bid >= 0.90 and _momentum_stalled(side, ind):
+        return Signal(
+            "TAKE_PROFIT", f"SELL NOW @ {cents_label(bid)}",
+            f"Take profit: {side.upper()} bid is {cents_label(bid)} (entry {cents_label(entry)}) and 1m momentum stalled.",
+            side=side, bid=bid,
+        )
+    if mode == "tp95" and bid >= 0.95:
+        return Signal(
+            "TAKE_PROFIT", f"SELL NOW @ {cents_label(bid)}",
+            f"Take profit: {side.upper()} bid reached {cents_label(bid)} (entry {cents_label(entry)}).",
+            side=side, bid=bid,
+        )
+    if mode in ("reversal", "reversal_tp90") and strike is not None and ind is not None and ind.ready and bid < entry:
+        dist = float(btc_price) - float(strike)
+        broke = (side == "yes" and dist < 0) or (side == "no" and dist > 0)
+        if side == "yes":
+            flip = (ind.ema9 or 0) < (ind.ema21 or 0) and (ind.macd_hist or 0) < 0
+        else:
+            flip = (ind.ema9 or 0) > (ind.ema21 or 0) and (ind.macd_hist or 0) > 0
+        if broke and flip:
+            return Signal(
+                "CUT_LOSS", f"CUT LOSS @ {cents_label(bid)}",
+                f"Reversal exit: BTC broke back through the strike and the 1m EMA/MACD flipped against {side.upper()}. Selling at {cents_label(bid)} (entry {cents_label(entry)}).",
+                side=side, bid=bid,
+            )
+    return None
+
+
 def _exit_signal(
     position: dict,
     bid: Optional[float],
@@ -1439,7 +1760,10 @@ def _exit_signal(
     features: Optional[dict] = None,
 ) -> Optional[Signal]:
     p = params or StrategyParams()
-    if not p.enable_early_exits:
+    mode = str(getattr(p, "exit_mode", "hold") or "hold")
+    if mode in SMART_EXIT_MODES:
+        return smart_exit_signal(position, bid, ind, btc_price, strike, remaining_sec, mode)
+    if not getattr(p, "enable_early_exits", False):
         return None
     if remaining_sec is not None and remaining_sec < EARLY_EXIT_CUTOFF_SEC:
         return None  # hold to settlement
@@ -2059,7 +2383,7 @@ def run_backtest(
         cash, position, _log = opened
         close_dt = parse_iso(m.get("settlement_ts") or m["close_time"])
         exited = False
-        if params.enable_early_exits:
+        if exits_enabled(params):
             path = build_exit_path(
                 sticks.get(m["ticker"]) or [],
                 candles_1m,
@@ -2177,10 +2501,17 @@ def run_backtest(
 
 def simulate_prepared_windows(
     windows: list[dict],
-    params: StrategyParams,
+    params: Optional[StrategyParams],
     starting: float = STARTING_BALANCE,
+    v1: Optional["V1Params"] = None,
 ) -> dict:
-    """Replay settled feature-windows with live $4–$8 sizing and fees (no press)."""
+    """Replay settled feature-windows with live $4–$8 sizing and fees (no press).
+
+    With ``v1`` set, entries come from the Version 1 method (one decision per window at the
+    1-minute snapshot) instead of the strict Version 2 rules.
+    """
+    params = params or StrategyParams()
+    exit_params = v1 if v1 is not None else params
     cash = float(starting)
     press_next = False
     last_win_stake: Optional[float] = None
@@ -2191,20 +2522,39 @@ def simulate_prepared_windows(
         ind1 = indicators_from_payload(w.get("ind_1m"))
         ind5 = indicators_from_payload(w.get("ind_5m"))
         feats = features_from_window(w)
-        sig = make_signal(
-            ind_1m=ind1,
-            ind_5m=ind5,
-            btc_price=float(w["btc_price"]),
-            strike=w.get("strike"),
-            yes_ask=w.get("yes_ask"),
-            yes_bid=w.get("yes_bid"),
-            no_ask=w.get("no_ask"),
-            no_bid=w.get("no_bid"),
-            remaining_sec=w.get("remaining_sec"),
-            position=None,
-            params=params,
-            features=feats,
-        )
+        if v1 is not None:
+            sig = make_v1_signal(
+                ind_1m=ind1,
+                ind_5m=ind5,
+                btc_price=float(w["btc_price"]),
+                strike=w.get("strike"),
+                yes_ask=w.get("yes_ask"),
+                yes_bid=w.get("yes_bid"),
+                no_ask=w.get("no_ask"),
+                no_bid=w.get("no_bid"),
+                remaining_sec=w.get("remaining_sec"),
+                open_positions=[],
+                window_trade_count=0,
+                last_entry=None,
+                ticker=w.get("ticker"),
+                v1=v1,
+                features=feats,
+            )
+        else:
+            sig = make_signal(
+                ind_1m=ind1,
+                ind_5m=ind5,
+                btc_price=float(w["btc_price"]),
+                strike=w.get("strike"),
+                yes_ask=w.get("yes_ask"),
+                yes_bid=w.get("yes_bid"),
+                no_ask=w.get("no_ask"),
+                no_bid=w.get("no_bid"),
+                remaining_sec=w.get("remaining_sec"),
+                position=None,
+                params=params,
+                features=feats,
+            )
         if sig.action not in ("BUY_YES", "BUY_NO") or sig.ask is None:
             continue
         base = float(sig.base_stake or STAKE_NORMAL)
@@ -2226,7 +2576,7 @@ def simulate_prepared_windows(
         result = (w.get("result") or "").lower()
         close_when = parse_iso(w.get("close_time") or w.get("decision_ts") or when)
         exited = False
-        if params.enable_early_exits:
+        if exits_enabled(exit_params):
             entry_ts = to_ts(when)
             close_ts = to_ts(close_when)
             for raw in (w.get("exit_path") or []):
@@ -2253,7 +2603,7 @@ def simulate_prepared_windows(
                     )
                 exit_sig = _exit_signal(
                     position, bid, ind, btc, w.get("strike"), remaining,
-                    params=params, features=step_feats,
+                    params=exit_params, features=step_feats,
                 )
                 if exit_sig and exit_sig.bid is not None:
                     fee = kalshi_taker_fee(int(position["contracts"]), float(exit_sig.bid))
@@ -2622,6 +2972,7 @@ def run_live(
         "updated_at_pt": fmt_pt(now),
         "session": state.get("session"),
         "race": state.get("race"),
+        "race_archive": state.get("race_archive") or [],
     }
     return new_state, sig, events
 
@@ -2819,8 +3170,60 @@ def run_session(
 # Head-to-head $100 race: Version 1 (multi-trade) vs Version 2 (strict rules)
 # ---------------------------------------------------------------------------
 
-def tradable_v1_ask(ask: Optional[float]) -> bool:
-    return ask is not None and V1_ASK_MIN - 1e-12 <= float(ask) <= V1_ASK_MAX + 1e-12
+def tradable_v1_ask(ask: Optional[float], v1: Optional["V1Params"] = None) -> bool:
+    v1 = v1 or LEGACY_V1
+    if ask is None:
+        return False
+    a = float(ask)
+    if not (v1.min_ask - 1e-12 <= a <= v1.max_ask + 1e-12):
+        return False
+    if v1.skip_lo_cents and v1.skip_hi_cents:
+        c = int(round(a * 100))
+        if int(v1.skip_lo_cents) <= c <= int(v1.skip_hi_cents):
+            return False
+    return True
+
+
+def v1_entry_block(
+    side: str,
+    ask: Optional[float],
+    aligns: int,
+    ind_1m: Optional[Indicators],
+    ind_5m: Optional[Indicators],
+    v1: "V1Params",
+    features: Optional[dict],
+) -> Optional[str]:
+    """Version 1.2 chart + market-reader gates on the picked side. None = OK to buy."""
+    feats = features or {}
+    if v1.require_5m_confirm:
+        if not ind_5m or not ind_5m.ready:
+            return "the 5-minute chart is not ready"
+        up = (ind_5m.ema9 or 0) >= (ind_5m.ema21 or 0)
+        if (side == "yes" and not up) or (side == "no" and up):
+            return "the 5-minute trend does not confirm it"
+    if v1.htf_gate != "off":
+        ok, why = htf_not_against(v1.htf_gate, side, feats.get("ind_15m"), feats.get("ind_1h"))
+        if not ok:
+            return why
+    if v1.min_fair_edge > -0.999:
+        fair_yes = feats.get("fair_yes")
+        if fair_yes is not None and ask is not None:
+            fair_side = float(fair_yes) if side == "yes" else 1.0 - float(fair_yes)
+            edge = fair_side - float(ask)
+            if edge < float(v1.min_fair_edge) - 1e-9:
+                return f"the ask is rich vs spot fair value (fair {cents_label(fair_side)} vs ask {cents_label(ask)})"
+    chop = feats.get("chop_ratio")
+    if v1.max_chop_ratio < 0.999 and chop is not None and float(chop) > float(v1.max_chop_ratio):
+        return f"the tape is choppy (chop {float(chop):.2f} > {v1.max_chop_ratio:.2f})"
+    vol = feats.get("volatility_usd")
+    if v1.min_volatility_usd > 0 and vol is not None and float(vol) < float(v1.min_volatility_usd):
+        return f"BTC barely moved (${float(vol):.0f} 15m range)"
+    if v1.require_vwap_side and ind_1m is not None and getattr(ind_1m, "vwap", None) is not None and ind_1m.close is not None:
+        if (side == "yes" and ind_1m.close < ind_1m.vwap) or (side == "no" and ind_1m.close > ind_1m.vwap):
+            return "price is on the wrong side of VWAP"
+    if v1.min_aligns and int(aligns) < int(v1.min_aligns):
+        return f"only {aligns} of 6 chart checks line up (need {v1.min_aligns})"
+    return None
 
 
 def dist_phrase(btc_price: float, strike: Optional[float]) -> str:
@@ -2948,12 +3351,16 @@ def make_v1_signal(
     window_trade_count: int = 0,
     last_entry: Optional[dict] = None,
     ticker: Optional[str] = None,
+    v1: Optional["V1Params"] = None,
+    features: Optional[dict] = None,
 ) -> Signal:
-    """Version 1: pick a side every window; may add or flip up to 3 times per contract."""
+    """Version 1: pick the side BTC is on; legacy may add/flip up to 3×, v1.2 gates on charts + fair value."""
+    v1 = v1 or LEGACY_V1
+    band = f"{v1.min_ask_cents}¢–{v1.max_ask_cents}¢"
     positions = [p for p in (open_positions or []) if p and (not ticker or p.get("ticker") == ticker)]
     if remaining_sec is not None and remaining_sec <= 0:
         return Signal("WAIT", "WAIT — Window closed", "This 15-minute window has closed. Waiting for the next contract.")
-    if remaining_sec is not None and remaining_sec < V1_MIN_REMAINING_SEC:
+    if remaining_sec is not None and remaining_sec < int(v1.min_mins_left) * 60:
         mm, ss = divmod(max(0, remaining_sec), 60)
         label = "HOLD" if positions else "WAIT"
         return Signal(
@@ -2962,24 +3369,24 @@ def make_v1_signal(
             f"Only {mm}:{ss:02d} left in this window, so Version 1 won’t open another ticket.",
             side=(positions[-1].get("side") if positions else None),
         )
-    yes_ok, no_ok = tradable_v1_ask(yes_ask), tradable_v1_ask(no_ask)
+    yes_ok, no_ok = tradable_v1_ask(yes_ask, v1), tradable_v1_ask(no_ask, v1)
     if not yes_ok and not no_ok:
         return Signal(
             "HOLD" if positions else "WAIT",
             "WAIT — No tradable ask",
-            "Neither Yes nor No is between 35¢ and 75¢, so Version 1 stands aside.",
+            f"Neither Yes nor No is in Version 1’s {band} buy band, so it stands aside.",
             side=(positions[-1].get("side") if positions else None),
         )
     if strike is None:
         return Signal("WAIT", "WAIT — No Trade", "The contract strike is not posted yet.")
 
     dist = float(btc_price) - float(strike)
-    if abs(dist) < V1_MIN_STRIKE_GAP:
+    if abs(dist) < float(v1.min_strike_gap_usd):
         dist_txt = dist_phrase(btc_price, strike)
         return Signal(
             "HOLD" if positions else "WAIT",
             ("HOLD open trades — " if positions else "") + "WAIT — Too close to strike",
-            f"{dist_txt}. That’s inside a ${V1_MIN_STRIKE_GAP:.0f} band, so settlement could still flip either way.",
+            f"{dist_txt}. That’s inside a ${float(v1.min_strike_gap_usd):.0f} band, so settlement could still flip either way.",
             side=(positions[-1].get("side") if positions else None),
         )
 
@@ -2991,17 +3398,17 @@ def make_v1_signal(
     if not yes_ok and not no_ok:
         dist_txt = dist_phrase(btc_price, strike)
         expensive = None
-        if dist > 0 and yes_ask is not None and float(yes_ask) > V1_ASK_MAX:
-            expensive = f"Yes is already {cents_label(yes_ask)} — too expensive (bot only buys 35¢–75¢)"
-        elif dist < 0 and no_ask is not None and float(no_ask) > V1_ASK_MAX:
-            expensive = f"No is already {cents_label(no_ask)} — too expensive (bot only buys 35¢–75¢)"
+        if dist > 0 and yes_ask is not None and float(yes_ask) > v1.max_ask:
+            expensive = f"Yes is already {cents_label(yes_ask)} — too expensive (bot only buys {band})"
+        elif dist < 0 and no_ask is not None and float(no_ask) > v1.max_ask:
+            expensive = f"No is already {cents_label(no_ask)} — too expensive (bot only buys {band})"
         if expensive:
             reason = f"{dist_txt}, but {expensive}."
             label = "WAIT — No Edge"
         else:
             reason = (
                 f"{dist_txt}. Version 1 will not fade price location "
-                "(only buys Yes above the strike, No below) and has no tradable aligned ask in the 35¢–75¢ band."
+                f"(only buys Yes above the strike, No below) and has no tradable aligned ask in the {band} band."
             )
             label = "WAIT — No fade"
         return Signal(
@@ -3029,7 +3436,7 @@ def make_v1_signal(
     bits = _trend_bits(pick, ind_1m, ind_5m)
     entry_n = int(window_trade_count) + 1
 
-    if window_trade_count >= V1_MAX_TRADES_PER_WINDOW:
+    if window_trade_count >= int(v1.max_entries_per_window):
         reason = f"Already have {window_trade_count} trades in this window — holding to settlement. {dist_txt}."
         if positions:
             side = positions[-1].get("side")
@@ -3044,8 +3451,20 @@ def make_v1_signal(
     elif positions:
         last_side = positions[-1].get("side")
 
+    held_sides = {p.get("side") for p in positions if p.get("side")}
+    if not v1.allow_flip and held_sides and pick not in held_sides:
+        reason = f"Holding {'/'.join(sorted(s.upper() for s in held_sides))} — Version 1 never buys the opposite side of a ticket it already holds. {dist_txt}."
+        return Signal("HOLD", "HOLD · no opposite-side buy", reason, side=positions[-1].get("side"), bid=bid)
+
+    block = v1_entry_block(pick, ask, aligns, ind_1m, ind_5m, v1, features)
+    if block:
+        reason = f"{pick.upper()} @ {cents_label(ask)} looks possible ({dist_txt}), but {block}."
+        if positions:
+            return Signal("HOLD", "HOLD · chart gate", reason, side=positions[-1].get("side"), bid=bid)
+        return Signal("WAIT", "WAIT — Chart gate", reason)
+
     if window_trade_count > 0 and last_side:
-        flipped = pick != last_side and margin >= 0.8
+        flipped = v1.allow_flip and pick != last_side and margin >= 0.8
         confirm = False
         if pick == last_side:
             better_ask = False
@@ -3150,10 +3569,10 @@ def crisp_signal_reason(sig: Signal) -> str:
 
 def new_race_book(book_id: str, now: datetime, strategy_version: Optional[int] = None) -> dict:
     if book_id == "v1":
-        name, short, badge = "Active Multi-Trade", "Version 1", "MULTI-TRADE · UP TO 3 PER WINDOW"
+        name, short, badge = V1_METHOD_NAME, V1_VERSION_LABEL, "CHART-CONFIRMED · 1 PER WINDOW"
     else:
         ver = int(strategy_version or 2)
-        name, short, badge = "Strict Rules", "Version 2", f"STRICT RULES · v{ver}"
+        name, short, badge = V2_METHOD_NAME, V2_VERSION_LABEL, f"STRICT + FAIR VALUE · v{ver}"
     return {
         "id": book_id,
         "name": name,
@@ -3193,9 +3612,116 @@ def new_race(now: datetime, strategy_version: Optional[int] = None) -> dict:
     }
 
 
+# Bump to start a fresh $100 / 0–0 race. The finished race is archived in state["race_archive"].
+RACE_RESET_ID = "race2-v1.2-v2.2-2026-11-27"
+RACE_RESET_LABELS = {
+    "race2-v1.2-v2.2-2026-11-27": {
+        "number": 2,
+        "prev_names": {"v1": "Version 1 · Active Multi-Trade", "v2": "Version 2 · Strict Rules"},
+    }
+}
+
+
+def archive_race(race: dict, now: datetime, number: int, names: Optional[dict] = None) -> dict:
+    names = names or {}
+    out = {
+        "race_number": number,
+        "label": None,
+        "start": race.get("start"),
+        "start_pt": race.get("start_pt"),
+        "ended_at": iso_utc(now),
+        "ended_at_pt": fmt_pt(now),
+        "books": {},
+    }
+    parts = []
+    for key in ("v1", "v2"):
+        book = race.get(key) or {}
+        trades = dedupe_trades(book.get("trades") or [])
+        stats = trade_stats(trades)
+        opens = positions_of(book)
+        cash = round_money(float(book.get("cash") or 0))
+        equity = round_money(float(book.get("equity") if book.get("equity") is not None else cash))
+        start = float(book.get("starting_balance") or RACE_STARTING)
+        name = names.get(key) or f"{book.get('short_name') or key} · {book.get('name') or ''}".strip(" ·")
+        out["books"][key] = {
+            "name": name,
+            "starting_balance": start,
+            "cash": cash,
+            "equity": equity,
+            "pnl": round_money(equity - start),
+            "wins": stats["wins"],
+            "losses": stats["losses"],
+            "trade_count": stats["trade_count"],
+            "win_rate": stats["win_rate"],
+            "net_pnl": stats["net_pnl"],
+            "open_at_end": opens,
+            "trades": trades,
+        }
+        parts.append(f"{'V1' if key == 'v1' else 'V2'} ${equity:,.2f} ({stats['wins']}–{stats['losses']})")
+    pending = any(out["books"][k]["open_at_end"] for k in out["books"])
+    out["label"] = f"Race {number}, ended {fmt_pt(now)}: " + " / ".join(parts) + (" (1+ ticket still settling)" if pending else "")
+    return out
+
+
+def grade_archived_open_tickets(state: dict, settled: list[dict], market: Optional[dict], now: datetime) -> None:
+    """Settle tickets that were still open when a race was archived, so its final numbers are exact."""
+    for arc in (state.get("race_archive") or [])[-2:]:
+        changed = False
+        for key, book in (arc.get("books") or {}).items():
+            opens = [p for p in (book.get("open_at_end") or []) if p]
+            if not opens:
+                continue
+            events: list[str] = []
+            cash, still, trades, events, closed, _, _ = settle_open_positions(
+                float(book.get("cash") or 0), opens, list(book.get("trades") or []), events, settled,
+                [market] if market else [], now,
+            )
+            if not closed:
+                continue
+            stats = trade_stats(trades)
+            book["cash"] = round_money(cash)
+            book["open_at_end"] = still
+            book["trades"] = trades
+            # Remaining open tickets (if any) keep their cost basis until they settle.
+            book["equity"] = round_money(cash + sum(float(p.get("total_in") or 0) for p in still))
+            book["pnl"] = round_money(book["equity"] - float(book.get("starting_balance") or RACE_STARTING))
+            book.update({k: stats[k] for k in ("wins", "losses", "trade_count", "win_rate", "net_pnl")})
+            changed = True
+        if changed:
+            b = arc.get("books") or {}
+            parts = [
+                f"{'V1' if k == 'v1' else 'V2'} ${float(b[k].get('equity') or 0):,.2f} ({b[k].get('wins', 0)}–{b[k].get('losses', 0)})"
+                for k in ("v1", "v2") if k in b
+            ]
+            pending = any((b[k].get("open_at_end") or []) for k in b)
+            arc["label"] = f"Race {arc.get('race_number')}, ended {arc.get('ended_at_pt')}: " + " / ".join(parts) + (" (1+ ticket still settling)" if pending else "")
+
+
 def ensure_race(state: dict, now: datetime, strategy_version: Optional[int] = None) -> dict:
-    """Upgrade existing state in place. Never resets the $100 book or the 1-hour session."""
+    """Upgrade existing state in place. Never resets the $100 book or the 1-hour session.
+
+    When RACE_RESET_ID changes, the current race is archived (state["race_archive"]) and both
+    race books restart at $100 / 0–0.
+    """
     race = state.get("race") if isinstance(state, dict) else None
+    if (
+        isinstance(state, dict)
+        and isinstance(race, dict)
+        and isinstance(race.get("v1"), dict)
+        and race.get("reset_id") != RACE_RESET_ID
+    ):
+        meta = RACE_RESET_LABELS.get(RACE_RESET_ID, {})
+        number = int(meta.get("number") or (int(race.get("race_number") or 1) + 1))
+        prev_number = int(race.get("race_number") or (number - 1) or 1)
+        archive = list(state.get("race_archive") or [])
+        archive.append(archive_race(race, now, prev_number, meta.get("prev_names")))
+        state["race_archive"] = archive[-10:]
+        fresh = new_race(now, strategy_version)
+        fresh["reset_id"] = RACE_RESET_ID
+        fresh["race_number"] = number
+        state["race"] = fresh
+        print(f"  Reset race: archived {archive[-1]['label']}. Race {number} starts at $100 / 0–0.", flush=True)
+        return fresh
     if isinstance(race, dict) and isinstance(race.get("v1"), dict) and isinstance(race.get("v2"), dict):
         lift_race(race)
         for key in ("v1", "v2"):
@@ -3207,6 +3733,8 @@ def ensure_race(state: dict, now: datetime, strategy_version: Optional[int] = No
             book.setdefault("id", key)
         return race
     race = new_race(now, strategy_version)
+    race["reset_id"] = RACE_RESET_ID
+    race["race_number"] = int(RACE_RESET_LABELS.get(RACE_RESET_ID, {}).get("number") or 1)
     print(
         f"  Starting Head-to-Head $100 Race at {race['start_pt']}: "
         "Version 1 Active Multi-Trade vs Version 2 Strict Rules",
@@ -3347,10 +3875,15 @@ def finalize_race_book(book: dict, yes_bid: Optional[float], no_bid: Optional[fl
             contracts = open_ct
     stats = trade_stats(trades)
     out = dict(book)
-    if out.get("id") == "v2" and strategy_version:
-        out["badge"] = f"STRICT RULES · v{int(strategy_version)}"
-        out["name"] = "Strict Rules"
-        out["short_name"] = "Version 2"
+    if out.get("id") == "v2":
+        if strategy_version:
+            out["badge"] = f"STRICT + FAIR VALUE · v{int(strategy_version)}"
+        out["name"] = V2_METHOD_NAME
+        out["short_name"] = V2_VERSION_LABEL
+    elif out.get("id") == "v1":
+        out["name"] = V1_METHOD_NAME
+        out["short_name"] = V1_VERSION_LABEL
+        out["badge"] = "CHART-CONFIRMED · 1 PER WINDOW"
     out["cash"] = cash
     out["open_positions"] = opens
     out["position"] = opens[-1] if opens else None
@@ -3381,8 +3914,10 @@ def step_v1_book(
     now: datetime,
     params: Optional[StrategyParams] = None,
     features: Optional[dict] = None,
+    v1: Optional[V1Params] = None,
 ) -> tuple[dict, Signal]:
-    """Version 1: up to 3 tickets per window; early exits use the same learned TP/SL rules."""
+    """Version 1 book. v1.2: chart-confirmed entries, one ticket per window, its own exit rules."""
+    v1 = v1 or LEGACY_V1
     ensure_press_fields(book)
     events: list[str] = list(book.get("events") or [])
     cash = float(book.get("cash") or RACE_STARTING)
@@ -3417,7 +3952,7 @@ def step_v1_book(
         bid = yes_bid if position.get("side") == "yes" else no_bid
         exit_sig = _exit_signal(
             position, bid, ind_1m, btc_price, strike, remaining,
-            params=params, features=features,
+            params=v1, features=features,
         )
         if exit_sig and exit_sig.bid is not None:
             fee = kalshi_taker_fee(int(position["contracts"]), float(exit_sig.bid))
@@ -3458,9 +3993,11 @@ def step_v1_book(
         window_trade_count=count,
         last_entry=last,
         ticker=ticker,
+        v1=v1,
+        features=features,
     )
 
-    if market and sig.action in ("BUY_YES", "BUY_NO") and sig.ask is not None and count < V1_MAX_TRADES_PER_WINDOW:
+    if market and sig.action in ("BUY_YES", "BUY_NO") and sig.ask is not None and count < int(v1.max_entries_per_window):
         base = float(sig.base_stake or STAKE_NORMAL)
         entry_stake, pressed = resolve_entry_stake(base, press_next, last_win_stake, cash)
         opened = open_trade(
@@ -3594,11 +4131,17 @@ def run_race(
     params: Optional[StrategyParams] = None,
     features: Optional[dict] = None,
     strategy_version: Optional[int] = None,
+    v1_params: Optional[V1Params] = None,
 ) -> tuple[dict, Signal, Signal]:
     race = ensure_race(state, now, strategy_version)
+    try:
+        grade_archived_open_tickets(state, settled, market, now)
+    except Exception as exc:
+        print(f"  Could not grade archived race tickets yet: {exc}", flush=True)
+    v1p = v1_params or load_v1_params()
     v1, sig1 = step_v1_book(
         dict(race["v1"]), market, settled, ind_1m, ind_5m, btc_price, now,
-        params=params, features=features,
+        params=params, features=features, v1=v1p,
     )
     v2, sig2 = step_v2_book(
         dict(race["v2"]), market, settled, ind_1m, ind_5m, btc_price, now,
@@ -3609,6 +4152,9 @@ def run_race(
         "starting_balance": RACE_STARTING,
         "start": race.get("start") or iso_utc(now),
         "start_pt": race.get("start_pt") or fmt_pt(now),
+        "race_number": race.get("race_number") or 1,
+        "reset_id": race.get("reset_id"),
+        "gates": {"v1": v1_gates_payload(v1p), "v2": v2_gates_payload(params or StrategyParams())},
         "v1": v1,
         "v2": v2,
         "leader": lead["leader"],
@@ -3674,13 +4220,13 @@ def rules_summary_from_params(p: StrategyParams) -> dict:
             "is acceptable — never just because profit factor rose. That run is free — it does not use Grok Bot."
         ),
         "race": (
-            "A live Head-to-Head $100 Race compares two books that start together at $100. "
-            "Version 1 (Active Multi-Trade) can take up to 3 tickets in the same 15-minute window — one new entry "
-            "per 5-minute check — adding to its side on confirmation or flipping if momentum turns, but only when "
-            "the ask is 35¢–75¢, BTC is at least $20 from the strike, and the side agrees with price location "
-            "(Yes only above the strike, No only below). "
-            "Version 2 (Strict Rules) follows the learned strategy config and takes at most one trade per window, "
-            "only when every trend, strike-gap, and price filter passes. Both use flat $4–$8 sizing (no press)."
+            "A live Head-to-Head $100 Race compares two books that start together at $100 (Race 2 restarted both at "
+            "$100 / 0–0 on Nov 27; Race 1 is archived on the Trades tab). "
+            "Version 1.2 (Chart-Confirmed Active) buys the side BTC is on when the 1m/5m chart score, a $30+ strike gap, "
+            "a 35¢–65¢ ask, a 15-minute trend that is not against it, and spot fair value ≥ ask all line up — at most one "
+            "ticket per window and never the opposite side of a held ticket. "
+            "Version 2.2 (Strict + Fair-Value Edge) follows the learned strategy config, takes at most one trade per window, "
+            "only when every trend, strike-gap, price, and fair-value filter passes. Both use flat $4–$8 sizing (no press)."
         ),
     }
 
@@ -3740,7 +4286,7 @@ def main() -> int:
     # Limit to the most recent BACKTEST_DAYS of settled windows to stay inside rate limits.
     cutoff = int((now - timedelta(days=BACKTEST_DAYS)).timestamp())
     settled_window = [m for m in settled if m.get("open_time") and to_ts(m["open_time"]) >= cutoff]
-    first_minutes = 15 if params.enable_early_exits else 3
+    first_minutes = 15 if exits_enabled(params) else 3
     print(
         f"  Backtest windows in last {BACKTEST_DAYS} days: {len(settled_window)}. "
         f"Fetching {first_minutes}-minute Kalshi quotes…",
@@ -3824,9 +4370,11 @@ def main() -> int:
     race, sig_v1, sig_v2 = run_race(
         state, market, settled, ind_1m, ind_5m, btc_price, now,
         params=params, features=features, strategy_version=strategy_cfg.get("version", 2),
+        v1_params=load_v1_params(strategy_cfg),
     )
     new_state["session"] = session
     new_state["race"] = race
+    new_state["race_archive"] = state.get("race_archive") or []
     save_json(STATE_PATH, new_state)
 
     mp = market_payload(market, now)
@@ -3913,9 +4461,11 @@ def main() -> int:
             "plain_english": strategy_cfg.get("plain_english") or plain_english_params(params),
             "metrics": strategy_cfg.get("metrics") or {},
             "chart_scorecard": strategy_cfg.get("chart_scorecard") or {},
+            "v1": strategy_cfg.get("v1") or {},
         },
+        "race_archive": state.get("race_archive") or [],
         "learning": load_existing_dashboard().get("learning"),
-        "fee_note": "Every paper trade uses Kalshi’s taker fee, ceil(0.07 × contracts × price × (1 − price)), rounded up to the next cent. The Head-to-Head $100 Race starts two books at $100 together (Version 1 Active Multi-Trade vs Version 2 Strict Rules). Existing $40 race books are lifted to $100 by adding the cash delta, so prior trades and P&L stay accurate. The completed 1-hour $40 run and the ongoing $100 book stay in the Trades tab. All books use flat $4–$8 sizing by signal strength (no 2× press). Every ticket costs $4–$8 including fees.",
+        "fee_note": "Every paper trade uses Kalshi’s taker fee, ceil(0.07 × contracts × price × (1 − price)), rounded up to the next cent. The Head-to-Head $100 Race starts two books at $100 together (Race 2: Version 1.2 Chart-Confirmed Active vs Version 2.2 Strict + Fair-Value Edge; Race 1 is archived). Existing $40 race books are lifted to $100 by adding the cash delta, so prior trades and P&L stay accurate. The completed 1-hour $40 run and the ongoing $100 book stay in the Trades tab. All books use flat $4–$8 sizing by signal strength (no 2× press). Every ticket costs $4–$8 including fees.",
         "rules_summary": rules_summary_from_params(params),
     }
     save_json(DASHBOARD_PATH, dashboard)

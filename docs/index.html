@@ -8,7 +8,7 @@
   <title>BTC 15-Min Bot</title>
   <meta name="description" content="Version 1 vs Version 2 head-to-head $100 paper race on Kalshi’s 15-minute Bitcoin contracts." />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23F7931A'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-size='18' font-family='Georgia' fill='%231C140A'%3E%E2%82%BF%3C/text%3E%3C/svg%3E" />
-  <link rel="stylesheet" href="style.css?v=20261127-ui9" />
+  <link rel="stylesheet" href="style.css?v=20261127-ui10" />
 </head>
 <body>
   <div class="wrap">
@@ -32,12 +32,12 @@
       <div class="stat">
         <div class="lbl">Version 1</div>
         <div class="val" id="stat-v1-val">$100.00</div>
-        <div class="sub" id="stat-v1-sub">Active Multi-Trade</div>
+        <div class="sub" id="stat-v1-sub">V1.2 · Chart-Confirmed Active</div>
       </div>
       <div class="stat">
         <div class="lbl">Version 2</div>
         <div class="val" id="stat-v2-val">$100.00</div>
-        <div class="sub" id="stat-v2-sub">Strict Rules</div>
+        <div class="sub" id="stat-v2-sub">V2.2 · Strict + Fair-Value Edge</div>
       </div>
       <div class="stat">
         <div class="lbl">Leader</div>
@@ -99,6 +99,7 @@
         </div>
         <div class="tf-grid" id="reader-charts"></div>
         <div class="metrics" id="reader-metrics"></div>
+        <div class="gates-grid" id="reader-gates"></div>
         <p class="note" id="reader-rules"></p>
       </article>
 
@@ -112,12 +113,12 @@
         <article class="card session-card race-book v1-card">
           <div class="card-head">
             <div>
-              <div class="card-kicker">Version 1</div>
-              <div class="card-title">Active Multi-Trade</div>
+              <div class="card-kicker" id="v1-kicker">Version 1.2</div>
+              <div class="card-title" id="v1-title">Chart-Confirmed Active</div>
               <div class="card-range">$100 start · $4–$8 flat per trade (no press)</div>
             </div>
             <div class="pill-stack">
-              <div id="v1-badge" class="pill V1">MULTI-TRADE · UP TO 3 PER WINDOW</div>
+              <div id="v1-badge" class="pill V1">CHART-CONFIRMED · 1 PER WINDOW</div>
               <div id="v1-press" class="pill BASE">Next stake: $4–$8 flat (no press)</div>
             </div>
           </div>
@@ -144,12 +145,12 @@
         <article class="card session-card race-book v2-card">
           <div class="card-head">
             <div>
-              <div class="card-kicker">Version 2</div>
-              <div class="card-title">Strict Rules</div>
+              <div class="card-kicker" id="v2-kicker">Version 2.2</div>
+              <div class="card-title" id="v2-title">Strict + Fair-Value Edge</div>
               <div class="card-range">$100 start · $4–$8 flat per trade (no press)</div>
             </div>
             <div class="pill-stack">
-              <div id="v2-badge" class="pill V2">STRICT RULES · v2</div>
+              <div id="v2-badge" class="pill V2">STRICT + FAIR VALUE</div>
               <div id="v2-press" class="pill BASE">Next stake: $4–$8 flat (no press)</div>
             </div>
           </div>
@@ -178,7 +179,7 @@
     <section id="panel-trades" class="panel" role="tabpanel" hidden>
       <div class="section-head">
         <h2>Head-to-head $100 race</h2>
-        <p id="race-trades-range">Two books started together at $100. Version 1 can take up to 3 tickets in a window; Version 2 takes at most one, and only when every strict rule passes.</p>
+        <p id="race-trades-range">Race 2: both books restarted at $100 / 0–0. Version 1.2 takes at most one chart-confirmed ticket per window; Version 2.2 takes at most one, only when every strict rule and the fair-value gate pass.</p>
       </div>
       <article class="card" id="race-log-card">
         <div class="card-head">
@@ -202,6 +203,12 @@
         <h2>Version 2 activity</h2>
         <div id="v2-checks"></div>
       </article>
+
+      <div class="section-head" style="margin-top:22px">
+        <h2>Previous races (archived)</h2>
+        <p id="race-archive-range">Finished races are kept here with every trade so nothing is lost.</p>
+      </div>
+      <div id="race-archive"></div>
 
       <div class="section-head" style="margin-top:22px">
         <h2>Archived 1-Hour $40 run</h2>
@@ -325,12 +332,12 @@
         <p class="note" style="margin-bottom:10px">This is a paper bot for Kalshi’s <strong>KXBTC15M</strong> market — “BTC price up in the next 15 mins?” It never places a real order. Yes wins if the CF Benchmarks BRTI average in the last 60 seconds of the window is at or above the strike. No wins if it finishes below.</p>
         <ol class="rules">
           <li><strong>Head-to-head $100 race.</strong> Two paper books start at the same moment with $100 each so you can watch which style actually makes more money. Both use flat $4–$8 per trade ($4 / $6 / $8 by signal strength, no 2× press), plus real Kalshi taker fees. Every ticket’s total cost (including fees) stays between $4 and $8.</li>
-          <li><strong>Version 1 · Active Multi-Trade</strong> can take more than one trade in the same 15-minute window — up to 3 tickets, one new entry per 5-minute check, as long as at least 2 minutes remain, the ask is 35¢–75¢, BTC is at least $20 from the strike, the side agrees with price location (Yes only above the strike, No only below), and cash allows. It scores Yes vs No from BTC vs strike, EMA 9/21/50, MACD, RSI, the 5-minute trend, and the ask, then adds to its side on confirmation (or a better price) or flips if momentum turns — never fading a move or buying a 76¢+ favorite. Every entry gets a one-sentence reason. Tickets are held to official settlement unless a walk-forward-validated early-exit rule is turned on.</li>
-          <li><strong>Version 2 · Strict Rules</strong> follows the learned strategy in <code>strategy_config.json</code>. It takes <strong>at most one trade per 15-minute window</strong>, and only when every trend, strike-gap, price, and (if enabled) market-reader filter passes. Otherwise it logs WAIT with a one-line reason.</li>
+          <li><strong>Version 1.2 · Chart-Confirmed Active</strong> (Race 2, from Nov 27) still trades more often than Version 2, but fixes Race 1’s timing problems. It buys the side BTC is on (Yes above the strike, No below) when BTC is at least <strong>$30</strong> from the strike, the ask is <strong>35¢–65¢</strong>, and 2+ minutes remain; it scores the 1m EMA 9/21/50, MACD, RSI and the 5-minute trend for conviction; the <strong>15-minute trend must not point against it</strong>; and the <strong>spot-derived fair value must be at least the ask</strong>. It takes <strong>at most one ticket per window</strong> and <strong>never buys the opposite side of a ticket it holds</strong>. It holds to official settlement (every early exit tested lost unseen dollars for V1). The hourly learner keeps tuning these numbers inside the same method. Race 1’s Version 1 (Active Multi-Trade, up to 3 tickets per window with flips) is archived on the Trades tab.</li>
+          <li><strong>Version 2.2 · Strict + Fair-Value Edge</strong> follows the learned strategy in <code>strategy_config.json</code>: clean 1m trend (EMA 9/21, EMA 50, MACD, RSI band), the 5-minute trend agrees, BTC $40+ from the strike, a 35¢–75¢ ask, and now <strong>spot fair value at or above the ask</strong>. At most one trade per window. It sells early at the live Kalshi bid only on a confirmed reversal (BTC back through the strike and the 1m EMA + MACD flipped against it); otherwise it holds to settlement.</li>
           <li><strong>Buy Yes</strong> (Version 2) when the 1-minute trend is cleanly bullish (EMA 9 above 21, price above EMA 50, MACD histogram positive, RSI in its bullish band), the learned higher-timeframe chart agrees (currently the 5-minute trend), BTC is far enough from the strike, the Yes ask is inside the learned band, and enough time remains. A spot-fair probability from realized volatility is shown on every check and can be used as an edge gate if the hourly learner promotes one.</li>
           <li><strong>Buy No</strong> (Version 2) is the bearish mirror.</li>
           <li><strong>Wait</strong> (Version 2) when those conditions conflict, the EMAs are flat, the window is almost over, Kalshi’s price is already too expensive, or (if enabled) the ask is rich vs spot-fair value or the spread is too wide.</li>
-          <li><strong>Exits.</strong> Walk-forward tests on 15-minute Kalshi bid paths found that the old 80¢ / +15¢ take-profit and −12¢ stop-loss rules lost money vs holding to official settlement, so both books now <strong>hold to Kalshi settlement</strong> by default. The bot still evaluates early take-profit / cut-loss rules on every 5-minute tick, and the hourly learner will only turn one on if it improves unseen dollar P&amp;L and drawdown. Early sells show as <strong>TP</strong> or <strong>SL / EARLY EXIT</strong> in Recent Checks &amp; Trades.</li>
+          <li><strong>Exits.</strong> On Nov 27 every exit was re-tested on the walk-forward split, priced at the Kalshi bid: a reversal exit (BTC back through the strike plus a 1m EMA/MACD flip), take-profit at 90¢+ on a momentum stall, and take-profit at 95¢+. For <strong>Version 1.2</strong> every early exit lost unseen dollars, so it <strong>holds to settlement</strong>. For <strong>Version 2.2</strong> the reversal exit added unseen dollars without a worse drawdown, so it is <strong>on</strong>; the take-profit rules stay off. Early sells show as <strong>TP</strong> or <strong>SL / EARLY EXIT</strong> in Recent Checks &amp; Trades.</li>
           <li><strong>Market &amp; Chart Reader.</strong> Each 5-minute tick reads Coinbase 1-minute, 5-minute, 15-minute, and 1-hour BTC candles (Kraken fallback), plus Coinbase/Kraken order-book and taker-flow and the live Kalshi KXBTC15M book. The Live tab shows the snapshot; the Learning tab shows which chart and exit rule won on unseen windows.</li>
           <li><strong>Sizing.</strong> Flat <strong>$4–$8 per trade (no press)</strong>. A normal qualifying signal buys a <strong>$4</strong> ticket. A strong signal (clearer EMA / MACD / RSI alignment and more distance from the strike) buys <strong>$6</strong>. A top-conviction signal buys <strong>$8</strong>. Every ticket’s total cost, including the Kalshi taker fee, stays between $4 and $8. If cash is under $4 the book skips the trade. The $100 race books, the archived 1-hour $40 run, and the ongoing $100 book each use the same flat sizing. Historical 2× PRESS badges on already-settled tickets stay in the log for accuracy.</li>
           <li><strong>Fees.</strong> Each race book starts at $100 (earlier $40 race books were lifted to $100 by adding cash, so past trades and P&amp;L stayed the same). The ongoing book starts at $100. The completed 10:59–11:59 AM PT 1-hour $40 run is archived on the Trades tab. Every ticket uses Kalshi’s real taker fee: ceil(0.07 × contracts × price × (1 − price)).</li>
@@ -344,6 +351,6 @@
       <div><a href="https://github.com/nfm0984-png/btc-paper-bot">GitHub repo</a> · Bot runs every 5 minutes · Learns every hour · BTC price polls live every 20 seconds</div>
     </footer>
   </div>
-  <script src="app.js?v=20261127-ui9"></script>
+  <script src="app.js?v=20261127-ui10"></script>
 </body>
 </html>

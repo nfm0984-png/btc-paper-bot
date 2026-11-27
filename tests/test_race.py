@@ -9,6 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+import bot as bot_mod
 from bot import (
     Indicators,
     RACE_STARTING,
@@ -256,6 +257,7 @@ def test_ensure_race_does_not_reset_existing_books():
         "session": state["session"],
         "trades": state["trades"],
         "race": {
+            "reset_id": bot_mod.RACE_RESET_ID,
             "starting_balance": 40.0,
             "start": race["start"],
             "start_pt": race["start_pt"],
@@ -350,13 +352,14 @@ def test_v1_takes_profit_when_bid_hits_target():
     ticker = "KXBTC15M-TEST-TP"
     book = new_race_book("v1", now)
     m1 = market(now, ticker=ticker, strike=60400, yes=0.50, no=0.51, remaining=12 * 60)
-    exits = StrategyParams(enable_early_exits=True, tp_bid=0.80, tp_gain=0.15, sl_drop=0.12)
-    book, _ = step_v1_book(book, m1, [], bull(), bull(), 60540, now, params=exits)
+    # v1.2: Version 1 uses its own exit rule (here the 95¢ take-profit), priced at the live bid.
+    exits = bot_mod.V1Params(exit_mode="tp95")
+    book, _ = step_v1_book(book, m1, [], bull(), bull(), 60540, now, v1=exits)
     assert len(book["open_positions"]) == 1
     entry = book["open_positions"][0]["entry_price"]
     now2 = now + timedelta(minutes=5)
-    m2 = market(now2, ticker=ticker, strike=60400, yes=0.88, no=0.15, remaining=7 * 60)
-    book, sig = step_v1_book(book, m2, [], bull(), bull(), 60680, now2, params=exits)
+    m2 = market(now2, ticker=ticker, strike=60400, yes=0.98, no=0.03, remaining=7 * 60)
+    book, sig = step_v1_book(book, m2, [], bull(), bull(), 60680, now2, v1=exits)
     closed = [t for t in book["trades"] if t.get("status") == "closed"]
     assert closed, (sig, book["events"], book["trades"])
     assert closed[-1]["outcome"] == "early_exit"
