@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-11-27T14:53:59Z",
-  "updated_at_pt": "Nov 27, 2026, 6:53 AM PT",
+  "updated_at": "2026-11-27T15:58:49Z",
+  "updated_at_pt": "Nov 27, 2026, 7:58 AM PT",
   "runs": [
     {
       "t": "2026-11-26T20:02:10Z",
@@ -1918,6 +1918,120 @@
         "best_exit": "hold to expiry",
         "best_reader": "no fair-edge gate",
         "takeaway": "Best unseen chart is 5m (+$41.23, 78.1% WR on 32 trades). Best market-reader gate is no fair-edge gate (+$41.23). Best exit rule is hold to expiry (+$41.23, 78.1% WR on 32 trades) on 1328 windows with a full bid path.",
+        "windows_with_exit_path": 1328
+      }
+    },
+    {
+      "t": "2026-11-27T15:58:49Z",
+      "t_pt": "Nov 27, 2026, 7:58 AM PT",
+      "windows": 1328,
+      "train_windows": 929,
+      "val_windows": 399,
+      "candidates_tested": 56,
+      "live_version": 7,
+      "live": {
+        "train": {
+          "trade_count": 66,
+          "wins": 49,
+          "losses": 17,
+          "win_rate": 74.2,
+          "net_pnl": 55.73,
+          "profit_factor": 1.447,
+          "max_drawdown_pct": 19.22,
+          "ending_equity": 155.73
+        },
+        "val": {
+          "trade_count": 33,
+          "wins": 26,
+          "losses": 7,
+          "win_rate": 78.8,
+          "net_pnl": 43.79,
+          "profit_factor": 1.867,
+          "max_drawdown_pct": 8.32,
+          "ending_equity": 143.79
+        },
+        "overall": {
+          "trade_count": 99,
+          "wins": 75,
+          "losses": 24,
+          "win_rate": 75.8,
+          "net_pnl": 99.52,
+          "profit_factor": 1.568,
+          "max_drawdown_pct": 19.22,
+          "ending_equity": 199.52
+        }
+      },
+      "best_candidate": {
+        "name": "chart_1m",
+        "params": {
+          "min_entry_cents": 35,
+          "max_entry_cents": 75,
+          "min_strike_gap_usd": 40.0,
+          "min_mins_left": 2,
+          "max_mins_left": 15,
+          "rsi_bull_min": 54.0,
+          "rsi_bull_max": 72.0,
+          "rsi_bear_min": 30.0,
+          "rsi_bear_max": 45.0,
+          "require_ema50_align": true,
+          "require_5m_align": false,
+          "min_volatility_usd": 0.0,
+          "max_chop_ratio": 0.8,
+          "ema_flat_dollars": 8.0,
+          "chart_mode": "1m",
+          "require_15m_align": false,
+          "require_1h_align": false,
+          "min_fair_edge": 0.0,
+          "max_spread_cents": 20.0,
+          "enable_early_exits": false,
+          "tp_bid": 0.8,
+          "tp_gain": 0.15,
+          "sl_drop": 0.12,
+          "tp_require_stall": false,
+          "sl_require_reversal": false,
+          "fair_giveback": false
+        },
+        "train": {
+          "trade_count": 106,
+          "wins": 64,
+          "losses": 42,
+          "win_rate": 60.4,
+          "net_pnl": -71.31,
+          "profit_factor": 0.763,
+          "max_drawdown_pct": 87.59,
+          "ending_equity": 28.69
+        },
+        "val": {
+          "trade_count": 52,
+          "wins": 39,
+          "losses": 13,
+          "win_rate": 75.0,
+          "net_pnl": 49.79,
+          "profit_factor": 1.553,
+          "max_drawdown_pct": 10.59,
+          "ending_equity": 149.79
+        },
+        "overall": {
+          "trade_count": 158,
+          "wins": 103,
+          "losses": 55,
+          "win_rate": 65.2,
+          "net_pnl": -21.52,
+          "profit_factor": 0.945,
+          "max_drawdown_pct": 87.59,
+          "ending_equity": 78.48
+        }
+      },
+      "promoted_to": null,
+      "promoted_params": null,
+      "decision": "KEPT v7",
+      "takeaway": "A candidate that changed 5-minute filter from on to off and chart mode from 1m_5m to 1m looked better on unseen windows (+$49.79 vs live +$43.79), but a promotion landed too recently \u2014 kept v7.",
+      "reason": "overall P&L is \u2212$21.52, not positive",
+      "chart_scorecard": {
+        "best_chart": "5m",
+        "best_exit": "hold to expiry",
+        "best_reader": "no fair-edge gate",
+        "takeaway": "Best unseen chart is 5m (+$43.79, 78.8% WR on 33 trades). Best market-reader gate is no fair-edge gate (+$43.79). Best exit rule is hold to expiry (+$43.79, 78.8% WR on 33 trades) on 1328 windows with a full bid path.",
         "windows_with_exit_path": 1328
       }
     }
