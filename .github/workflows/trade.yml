@@ -6,6 +6,10 @@ on:
     # (GitHub throttles */5 crons on this repo to roughly hourly, so a 5-minute
     # cron is not a reliable 5-minute loop.)
     - cron: "2 * * * *"
+    # Backup kickoff: GitHub dropped the 08:02 and 09:02 UTC scheduled runs on Nov 27,
+    # idling the paper book for over an hour. The loop stops 8 min before the next :02
+    # and the concurrency group queues any overlap.
+    - cron: "32 * * * *"
   workflow_dispatch:
     inputs:
       single_shot:
