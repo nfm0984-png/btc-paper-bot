@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-27T13:09:30Z",
-  "generated_at_pt": "Nov 27, 2026, 5:09 AM PT",
+  "generated_at": "2026-11-27T13:14:30Z",
+  "generated_at_pt": "Nov 27, 2026, 5:14 AM PT",
   "series_ticker": "KXBTC15M",
   "price_source": "coinbase",
   "candle_source_1m": "coinbase",
@@ -11,35 +11,35 @@
     "charts": {
       "1m": {
         "tf": "1m",
-        "bias": "down",
+        "bias": "flat",
         "ready": true,
-        "ema9": 61451.57,
-        "ema21": 61459.6,
-        "ema50": 61480.98,
-        "rsi14": 49.21,
-        "macd_hist": -2.42,
-        "ema_slope": -18.41,
-        "vwap": 61450.34,
-        "vwap_dist": 6.08,
-        "atr": 51.27,
-        "momentum": 11.83,
-        "close": 61456.42
+        "ema9": 61451.64,
+        "ema21": 61457.02,
+        "ema50": 61475.96,
+        "rsi14": 47.2,
+        "macd_hist": -0.3,
+        "ema_slope": -4.16,
+        "vwap": 61447.82,
+        "vwap_dist": -8.7,
+        "atr": 46.65,
+        "momentum": -35.22,
+        "close": 61439.12
       },
       "5m": {
         "tf": "5m",
         "bias": "down",
         "ready": true,
-        "ema9": 61484.86,
-        "ema21": 61514.31,
-        "ema50": 61552.81,
-        "rsi14": 47.56,
-        "macd_hist": -2.06,
-        "ema_slope": -4.02,
-        "vwap": 61503.28,
-        "vwap_dist": -9.37,
-        "atr": 112.25,
-        "momentum": 79.01,
-        "close": 61493.91
+        "ema9": 61477.8,
+        "ema21": 61508.43,
+        "ema50": 61548.76,
+        "rsi14": 44.59,
+        "macd_hist": -2.51,
+        "ema_slope": 12.37,
+        "vwap": 61500.93,
+        "vwap_dist": -51.39,
+        "atr": 112.69,
+        "momentum": 77.92,
+        "close": 61449.54
       },
       "15m": {
         "tf": "15m",
@@ -86,7 +86,6 @@
         "1h"
       ],
       "down": [
-        "1m",
         "5m",
         "15m"
       ],
@@ -100,7 +99,7 @@
         "1h"
       ],
       "higher_agree": 2,
-      "score": -2,
+      "score": -1,
       "label": "Bearish alignment"
     },
     "best_chart": "5m",
@@ -112,116 +111,116 @@
           "name": "1m",
           "kind": "chart",
           "train": {
-            "trade_count": 104,
-            "wins": 62,
+            "trade_count": 103,
+            "wins": 61,
             "losses": 42,
-            "win_rate": 59.6,
-            "net_pnl": -75.93,
-            "profit_factor": 0.748,
-            "max_drawdown_pct": 89.94,
-            "ending_equity": 24.07
+            "win_rate": 59.2,
+            "net_pnl": -80.06,
+            "profit_factor": 0.735,
+            "max_drawdown_pct": 93.14,
+            "ending_equity": 19.94
           },
           "val": {
-            "trade_count": 50,
-            "wins": 37,
+            "trade_count": 51,
+            "wins": 38,
             "losses": 13,
-            "win_rate": 74.0,
-            "net_pnl": 41.17,
-            "profit_factor": 1.457,
+            "win_rate": 74.5,
+            "net_pnl": 44.52,
+            "profit_factor": 1.494,
             "max_drawdown_pct": 10.37,
-            "ending_equity": 141.17
+            "ending_equity": 144.52
           },
           "overall": {
             "trade_count": 154,
             "wins": 99,
             "losses": 55,
             "win_rate": 64.3,
-            "net_pnl": -34.76,
-            "profit_factor": 0.911,
-            "max_drawdown_pct": 89.94,
-            "ending_equity": 65.24
+            "net_pnl": -35.54,
+            "profit_factor": 0.909,
+            "max_drawdown_pct": 93.14,
+            "ending_equity": 64.46
           }
         },
         {
           "name": "5m",
           "kind": "chart",
           "train": {
-            "trade_count": 66,
-            "wins": 48,
+            "trade_count": 65,
+            "wins": 47,
             "losses": 18,
-            "win_rate": 72.7,
-            "net_pnl": 44.65,
-            "profit_factor": 1.337,
-            "max_drawdown_pct": 19.9,
-            "ending_equity": 144.65
+            "win_rate": 72.3,
+            "net_pnl": 41.09,
+            "profit_factor": 1.31,
+            "max_drawdown_pct": 20.42,
+            "ending_equity": 141.09
           },
           "val": {
-            "trade_count": 31,
-            "wins": 24,
+            "trade_count": 32,
+            "wins": 25,
             "losses": 7,
-            "win_rate": 77.4,
-            "net_pnl": 37.88,
-            "profit_factor": 1.75,
+            "win_rate": 78.1,
+            "net_pnl": 41.23,
+            "profit_factor": 1.817,
             "max_drawdown_pct": 8.32,
-            "ending_equity": 137.88
+            "ending_equity": 141.23
           },
           "overall": {
             "trade_count": 97,
             "wins": 72,
             "losses": 25,
             "win_rate": 74.2,
-            "net_pnl": 82.53,
-            "profit_factor": 1.451,
-            "max_drawdown_pct": 19.9,
-            "ending_equity": 182.53
+            "net_pnl": 82.32,
+            "profit_factor": 1.45,
+            "max_drawdown_pct": 20.42,
+            "ending_equity": 182.32
           }
         },
         {
           "name": "15m",
           "kind": "chart",
           "train": {
-            "trade_count": 53,
-            "wins": 35,
+            "trade_count": 52,
+            "wins": 34,
             "losses": 18,
-            "win_rate": 66.0,
-            "net_pnl": 1.98,
-            "profit_factor": 1.015,
-            "max_drawdown_pct": 31.55,
-            "ending_equity": 101.98
+            "win_rate": 65.4,
+            "net_pnl": -1.58,
+            "profit_factor": 0.988,
+            "max_drawdown_pct": 32.36,
+            "ending_equity": 98.42
           },
           "val": {
-            "trade_count": 29,
-            "wins": 22,
+            "trade_count": 30,
+            "wins": 23,
             "losses": 7,
-            "win_rate": 75.9,
-            "net_pnl": 31.79,
-            "profit_factor": 1.677,
+            "win_rate": 76.7,
+            "net_pnl": 35.14,
+            "profit_factor": 1.748,
             "max_drawdown_pct": 9.13,
-            "ending_equity": 131.79
+            "ending_equity": 135.14
           },
           "overall": {
             "trade_count": 82,
             "wins": 57,
             "losses": 25,
             "win_rate": 69.5,
-            "net_pnl": 33.77,
-            "profit_factor": 1.186,
-            "max_drawdown_pct": 31.55,
-            "ending_equity": 133.77
+            "net_pnl": 33.56,
+            "profit_factor": 1.185,
+            "max_drawdown_pct": 32.36,
+            "ending_equity": 133.56
           }
         },
         {
           "name": "1h",
           "kind": "chart",
           "train": {
-            "trade_count": 61,
-            "wins": 38,
+            "trade_count": 60,
+            "wins": 37,
             "losses": 23,
-            "win_rate": 62.3,
-            "net_pnl": -24.39,
-            "profit_factor": 0.857,
-            "max_drawdown_pct": 34.41,
-            "ending_equity": 75.61
+            "win_rate": 61.7,
+            "net_pnl": -27.95,
+            "profit_factor": 0.836,
+            "max_drawdown_pct": 35.57,
+            "ending_equity": 72.05
           },
           "val": {
             "trade_count": 27,
@@ -234,82 +233,82 @@
             "ending_equity": 115.15
           },
           "overall": {
-            "trade_count": 88,
-            "wins": 57,
+            "trade_count": 87,
+            "wins": 56,
             "losses": 31,
-            "win_rate": 64.8,
-            "net_pnl": -9.24,
-            "profit_factor": 0.959,
-            "max_drawdown_pct": 34.43,
-            "ending_equity": 90.76
+            "win_rate": 64.4,
+            "net_pnl": -12.8,
+            "profit_factor": 0.943,
+            "max_drawdown_pct": 35.59,
+            "ending_equity": 87.2
           }
         },
         {
           "name": "multi-TF",
           "kind": "chart",
           "train": {
-            "trade_count": 54,
-            "wins": 36,
+            "trade_count": 53,
+            "wins": 35,
             "losses": 18,
-            "win_rate": 66.7,
-            "net_pnl": 0.39,
-            "profit_factor": 1.003,
-            "max_drawdown_pct": 30.74,
-            "ending_equity": 100.39
+            "win_rate": 66.0,
+            "net_pnl": -3.17,
+            "profit_factor": 0.976,
+            "max_drawdown_pct": 31.55,
+            "ending_equity": 96.83
           },
           "val": {
-            "trade_count": 28,
-            "wins": 21,
+            "trade_count": 29,
+            "wins": 22,
             "losses": 7,
-            "win_rate": 75.0,
-            "net_pnl": 29.05,
-            "profit_factor": 1.619,
+            "win_rate": 75.9,
+            "net_pnl": 32.4,
+            "profit_factor": 1.69,
             "max_drawdown_pct": 9.29,
-            "ending_equity": 129.05
+            "ending_equity": 132.4
           },
           "overall": {
             "trade_count": 82,
             "wins": 57,
             "losses": 25,
             "win_rate": 69.5,
-            "net_pnl": 29.44,
-            "profit_factor": 1.162,
-            "max_drawdown_pct": 30.74,
-            "ending_equity": 129.44
+            "net_pnl": 29.23,
+            "profit_factor": 1.161,
+            "max_drawdown_pct": 31.55,
+            "ending_equity": 129.23
           }
         },
         {
           "name": "no fair-edge gate",
           "kind": "reader",
           "train": {
-            "trade_count": 66,
-            "wins": 48,
+            "trade_count": 65,
+            "wins": 47,
             "losses": 18,
-            "win_rate": 72.7,
-            "net_pnl": 44.65,
-            "profit_factor": 1.337,
-            "max_drawdown_pct": 19.9,
-            "ending_equity": 144.65
+            "win_rate": 72.3,
+            "net_pnl": 41.09,
+            "profit_factor": 1.31,
+            "max_drawdown_pct": 20.42,
+            "ending_equity": 141.09
           },
           "val": {
-            "trade_count": 31,
-            "wins": 24,
+            "trade_count": 32,
+            "wins": 25,
             "losses": 7,
-            "win_rate": 77.4,
-            "net_pnl": 37.88,
-            "profit_factor": 1.75,
+            "win_rate": 78.1,
+            "net_pnl": 41.23,
+            "profit_factor": 1.817,
             "max_drawdown_pct": 8.32,
-            "ending_equity": 137.88
+            "ending_equity": 141.23
           },
           "overall": {
             "trade_count": 97,
             "wins": 72,
             "losses": 25,
             "win_rate": 74.2,
-            "net_pnl": 82.53,
-            "profit_factor": 1.451,
-            "max_drawdown_pct": 19.9,
-            "ending_equity": 182.53
+            "net_pnl": 82.32,
+            "profit_factor": 1.45,
+            "max_drawdown_pct": 20.42,
+            "ending_equity": 182.32
           }
         },
         {
@@ -418,358 +417,358 @@
           "name": "spread \u22644\u00a2",
           "kind": "reader",
           "train": {
-            "trade_count": 66,
-            "wins": 48,
+            "trade_count": 65,
+            "wins": 47,
             "losses": 18,
-            "win_rate": 72.7,
-            "net_pnl": 44.65,
-            "profit_factor": 1.337,
-            "max_drawdown_pct": 19.9,
-            "ending_equity": 144.65
+            "win_rate": 72.3,
+            "net_pnl": 41.09,
+            "profit_factor": 1.31,
+            "max_drawdown_pct": 20.42,
+            "ending_equity": 141.09
           },
           "val": {
-            "trade_count": 31,
-            "wins": 24,
+            "trade_count": 32,
+            "wins": 25,
             "losses": 7,
-            "win_rate": 77.4,
-            "net_pnl": 37.88,
-            "profit_factor": 1.75,
+            "win_rate": 78.1,
+            "net_pnl": 41.23,
+            "profit_factor": 1.817,
             "max_drawdown_pct": 8.32,
-            "ending_equity": 137.88
+            "ending_equity": 141.23
           },
           "overall": {
             "trade_count": 97,
             "wins": 72,
             "losses": 25,
             "win_rate": 74.2,
-            "net_pnl": 82.53,
-            "profit_factor": 1.451,
-            "max_drawdown_pct": 19.9,
-            "ending_equity": 182.53
+            "net_pnl": 82.32,
+            "profit_factor": 1.45,
+            "max_drawdown_pct": 20.42,
+            "ending_equity": 182.32
           }
         },
         {
           "name": "spread \u22646\u00a2",
           "kind": "reader",
           "train": {
-            "trade_count": 66,
-            "wins": 48,
+            "trade_count": 65,
+            "wins": 47,
             "losses": 18,
-            "win_rate": 72.7,
-            "net_pnl": 44.65,
-            "profit_factor": 1.337,
-            "max_drawdown_pct": 19.9,
-            "ending_equity": 144.65
+            "win_rate": 72.3,
+            "net_pnl": 41.09,
+            "profit_factor": 1.31,
+            "max_drawdown_pct": 20.42,
+            "ending_equity": 141.09
           },
           "val": {
-            "trade_count": 31,
-            "wins": 24,
+            "trade_count": 32,
+            "wins": 25,
             "losses": 7,
-            "win_rate": 77.4,
-            "net_pnl": 37.88,
-            "profit_factor": 1.75,
+            "win_rate": 78.1,
+            "net_pnl": 41.23,
+            "profit_factor": 1.817,
             "max_drawdown_pct": 8.32,
-            "ending_equity": 137.88
+            "ending_equity": 141.23
           },
           "overall": {
             "trade_count": 97,
             "wins": 72,
             "losses": 25,
             "win_rate": 74.2,
-            "net_pnl": 82.53,
-            "profit_factor": 1.451,
-            "max_drawdown_pct": 19.9,
-            "ending_equity": 182.53
+            "net_pnl": 82.32,
+            "profit_factor": 1.45,
+            "max_drawdown_pct": 20.42,
+            "ending_equity": 182.32
           }
         },
         {
           "name": "hold to expiry",
           "kind": "exit",
           "train": {
-            "trade_count": 66,
-            "wins": 48,
+            "trade_count": 65,
+            "wins": 47,
             "losses": 18,
-            "win_rate": 72.7,
-            "net_pnl": 44.65,
-            "profit_factor": 1.337,
-            "max_drawdown_pct": 19.9,
-            "ending_equity": 144.65
+            "win_rate": 72.3,
+            "net_pnl": 41.09,
+            "profit_factor": 1.31,
+            "max_drawdown_pct": 20.42,
+            "ending_equity": 141.09
           },
           "val": {
-            "trade_count": 31,
-            "wins": 24,
+            "trade_count": 32,
+            "wins": 25,
             "losses": 7,
-            "win_rate": 77.4,
-            "net_pnl": 37.88,
-            "profit_factor": 1.75,
+            "win_rate": 78.1,
+            "net_pnl": 41.23,
+            "profit_factor": 1.817,
             "max_drawdown_pct": 8.32,
-            "ending_equity": 137.88
+            "ending_equity": 141.23
           },
           "overall": {
             "trade_count": 97,
             "wins": 72,
             "losses": 25,
             "win_rate": 74.2,
-            "net_pnl": 82.53,
-            "profit_factor": 1.451,
-            "max_drawdown_pct": 19.9,
-            "ending_equity": 182.53
+            "net_pnl": 82.32,
+            "profit_factor": 1.45,
+            "max_drawdown_pct": 20.42,
+            "ending_equity": 182.32
           }
         },
         {
           "name": "current TP/SL",
           "kind": "exit",
           "train": {
-            "trade_count": 66,
-            "wins": 40,
+            "trade_count": 65,
+            "wins": 39,
             "losses": 26,
-            "win_rate": 60.6,
-            "net_pnl": -6.05,
-            "profit_factor": 0.913,
-            "max_drawdown_pct": 22.85,
-            "ending_equity": 93.95
+            "win_rate": 60.0,
+            "net_pnl": -7.51,
+            "profit_factor": 0.892,
+            "max_drawdown_pct": 23.14,
+            "ending_equity": 92.49
           },
           "val": {
-            "trade_count": 31,
+            "trade_count": 32,
             "wins": 14,
-            "losses": 17,
-            "win_rate": 45.2,
-            "net_pnl": -28.32,
-            "profit_factor": 0.412,
-            "max_drawdown_pct": 30.29,
-            "ending_equity": 71.68
+            "losses": 18,
+            "win_rate": 43.8,
+            "net_pnl": -30.12,
+            "profit_factor": 0.397,
+            "max_drawdown_pct": 32.04,
+            "ending_equity": 69.88
           },
           "overall": {
             "trade_count": 97,
-            "wins": 54,
-            "losses": 43,
-            "win_rate": 55.7,
-            "net_pnl": -34.37,
-            "profit_factor": 0.708,
-            "max_drawdown_pct": 42.58,
-            "ending_equity": 65.63
+            "wins": 53,
+            "losses": 44,
+            "win_rate": 54.6,
+            "net_pnl": -37.63,
+            "profit_factor": 0.685,
+            "max_drawdown_pct": 44.72,
+            "ending_equity": 62.37
           }
         },
         {
           "name": "TP 85\u00a2 / +25\u00a2 + stall",
           "kind": "exit",
           "train": {
-            "trade_count": 66,
+            "trade_count": 65,
             "wins": 30,
-            "losses": 36,
-            "win_rate": 45.5,
-            "net_pnl": -10.75,
-            "profit_factor": 0.893,
-            "max_drawdown_pct": 25.85,
-            "ending_equity": 89.25
+            "losses": 35,
+            "win_rate": 46.2,
+            "net_pnl": -8.17,
+            "profit_factor": 0.917,
+            "max_drawdown_pct": 25.24,
+            "ending_equity": 91.83
           },
           "val": {
-            "trade_count": 31,
+            "trade_count": 32,
             "wins": 7,
-            "losses": 24,
-            "win_rate": 22.6,
-            "net_pnl": -43.78,
-            "profit_factor": 0.318,
-            "max_drawdown_pct": 43.78,
-            "ending_equity": 56.22
+            "losses": 25,
+            "win_rate": 21.9,
+            "net_pnl": -45.58,
+            "profit_factor": 0.31,
+            "max_drawdown_pct": 45.58,
+            "ending_equity": 54.42
           },
           "overall": {
             "trade_count": 97,
             "wins": 37,
             "losses": 60,
             "win_rate": 38.1,
-            "net_pnl": -54.53,
-            "profit_factor": 0.67,
-            "max_drawdown_pct": 57.46,
-            "ending_equity": 45.47
+            "net_pnl": -53.75,
+            "profit_factor": 0.673,
+            "max_drawdown_pct": 57.75,
+            "ending_equity": 46.25
           }
         },
         {
           "name": "TP 90\u00a2 / +35\u00a2",
           "kind": "exit",
           "train": {
-            "trade_count": 66,
+            "trade_count": 65,
             "wins": 30,
-            "losses": 36,
-            "win_rate": 45.5,
-            "net_pnl": -20.3,
-            "profit_factor": 0.799,
-            "max_drawdown_pct": 28.59,
-            "ending_equity": 79.7
+            "losses": 35,
+            "win_rate": 46.2,
+            "net_pnl": -17.72,
+            "profit_factor": 0.82,
+            "max_drawdown_pct": 27.88,
+            "ending_equity": 82.28
           },
           "val": {
-            "trade_count": 31,
+            "trade_count": 32,
             "wins": 7,
-            "losses": 24,
-            "win_rate": 22.6,
-            "net_pnl": -47.44,
-            "profit_factor": 0.262,
-            "max_drawdown_pct": 47.44,
-            "ending_equity": 52.56
+            "losses": 25,
+            "win_rate": 21.9,
+            "net_pnl": -49.24,
+            "profit_factor": 0.254,
+            "max_drawdown_pct": 49.24,
+            "ending_equity": 50.76
           },
           "overall": {
             "trade_count": 97,
             "wins": 37,
             "losses": 60,
             "win_rate": 38.1,
-            "net_pnl": -67.74,
-            "profit_factor": 0.59,
-            "max_drawdown_pct": 68.51,
-            "ending_equity": 32.26
+            "net_pnl": -66.96,
+            "profit_factor": 0.593,
+            "max_drawdown_pct": 68.54,
+            "ending_equity": 33.04
           }
         },
         {
           "name": "SL only on reversal",
           "kind": "exit",
           "train": {
-            "trade_count": 66,
-            "wins": 55,
+            "trade_count": 65,
+            "wins": 54,
             "losses": 11,
-            "win_rate": 83.3,
-            "net_pnl": 21.0,
-            "profit_factor": 1.303,
-            "max_drawdown_pct": 20.9,
-            "ending_equity": 121.0
+            "win_rate": 83.1,
+            "net_pnl": 19.54,
+            "profit_factor": 1.282,
+            "max_drawdown_pct": 21.15,
+            "ending_equity": 119.54
           },
           "val": {
-            "trade_count": 31,
-            "wins": 24,
+            "trade_count": 32,
+            "wins": 25,
             "losses": 7,
-            "win_rate": 77.4,
-            "net_pnl": -2.51,
-            "profit_factor": 0.941,
+            "win_rate": 78.1,
+            "net_pnl": -1.26,
+            "profit_factor": 0.97,
             "max_drawdown_pct": 10.69,
-            "ending_equity": 97.49
+            "ending_equity": 98.74
           },
           "overall": {
             "trade_count": 97,
             "wins": 79,
             "losses": 18,
             "win_rate": 81.4,
-            "net_pnl": 18.49,
-            "profit_factor": 1.165,
-            "max_drawdown_pct": 20.9,
-            "ending_equity": 118.49
+            "net_pnl": 18.28,
+            "profit_factor": 1.163,
+            "max_drawdown_pct": 21.15,
+            "ending_equity": 118.28
           }
         },
         {
           "name": "fair giveback",
           "kind": "exit",
           "train": {
-            "trade_count": 66,
-            "wins": 41,
+            "trade_count": 65,
+            "wins": 40,
             "losses": 25,
-            "win_rate": 62.1,
-            "net_pnl": -5.26,
-            "profit_factor": 0.922,
-            "max_drawdown_pct": 23.58,
-            "ending_equity": 94.74
+            "win_rate": 61.5,
+            "net_pnl": -6.72,
+            "profit_factor": 0.901,
+            "max_drawdown_pct": 23.88,
+            "ending_equity": 93.28
           },
           "val": {
-            "trade_count": 31,
+            "trade_count": 32,
             "wins": 14,
-            "losses": 17,
-            "win_rate": 45.2,
-            "net_pnl": -28.32,
-            "profit_factor": 0.412,
-            "max_drawdown_pct": 30.29,
-            "ending_equity": 71.68
+            "losses": 18,
+            "win_rate": 43.8,
+            "net_pnl": -30.12,
+            "profit_factor": 0.397,
+            "max_drawdown_pct": 32.04,
+            "ending_equity": 69.88
           },
           "overall": {
             "trade_count": 97,
-            "wins": 55,
-            "losses": 42,
-            "win_rate": 56.7,
-            "net_pnl": -33.58,
-            "profit_factor": 0.71,
-            "max_drawdown_pct": 42.95,
-            "ending_equity": 66.42
+            "wins": 54,
+            "losses": 43,
+            "win_rate": 55.7,
+            "net_pnl": -36.84,
+            "profit_factor": 0.687,
+            "max_drawdown_pct": 45.06,
+            "ending_equity": 63.16
           }
         },
         {
           "name": "protective exits",
           "kind": "exit",
           "train": {
-            "trade_count": 66,
+            "trade_count": 65,
             "wins": 50,
-            "losses": 16,
-            "win_rate": 75.8,
-            "net_pnl": 33.49,
-            "profit_factor": 1.324,
-            "max_drawdown_pct": 22.01,
-            "ending_equity": 133.49
+            "losses": 15,
+            "win_rate": 76.9,
+            "net_pnl": 37.37,
+            "profit_factor": 1.376,
+            "max_drawdown_pct": 21.4,
+            "ending_equity": 137.37
           },
           "val": {
-            "trade_count": 31,
-            "wins": 23,
+            "trade_count": 32,
+            "wins": 24,
             "losses": 8,
-            "win_rate": 74.2,
-            "net_pnl": 8.79,
-            "profit_factor": 1.175,
+            "win_rate": 75.0,
+            "net_pnl": 12.14,
+            "profit_factor": 1.241,
             "max_drawdown_pct": 9.52,
-            "ending_equity": 108.79
+            "ending_equity": 112.14
           },
           "overall": {
             "trade_count": 97,
-            "wins": 73,
-            "losses": 24,
-            "win_rate": 75.3,
-            "net_pnl": 42.28,
-            "profit_factor": 1.275,
-            "max_drawdown_pct": 22.01,
-            "ending_equity": 142.28
+            "wins": 74,
+            "losses": 23,
+            "win_rate": 76.3,
+            "net_pnl": 49.51,
+            "profit_factor": 1.331,
+            "max_drawdown_pct": 21.4,
+            "ending_equity": 149.51
           }
         }
       ],
       "best_chart": "5m",
       "best_exit": "hold to expiry",
       "best_reader": "no fair-edge gate",
-      "takeaway": "Best unseen chart is 5m (+$37.88, 77.4% WR on 31 trades). Best market-reader gate is no fair-edge gate (+$37.88). Best exit rule is hold to expiry (+$37.88, 77.4% WR on 31 trades) on 1328 windows with a full bid path."
+      "takeaway": "Best unseen chart is 5m (+$41.23, 78.1% WR on 32 trades). Best market-reader gate is no fair-edge gate (+$41.23). Best exit rule is hold to expiry (+$41.23, 78.1% WR on 32 trades) on 1328 windows with a full bid path."
     },
-    "fair_yes": 0.2046,
-    "fair_no": 0.7954,
-    "implied_yes": 0.15,
-    "yes_edge": 0.0546,
-    "no_edge": -0.0646,
-    "yes_bid": 0.14,
-    "yes_ask": 0.15,
-    "no_bid": 0.85,
-    "no_ask": 0.86,
-    "sigma_usd_per_sqrt_min": 39.82,
-    "minutes_left": 5.5,
+    "fair_yes": 0.01,
+    "fair_no": 0.99,
+    "implied_yes": 0.001,
+    "yes_edge": 0.009,
+    "no_edge": -0.01,
+    "yes_bid": 0.0,
+    "yes_ask": 0.001,
+    "no_bid": 0.999,
+    "no_ask": 1.0,
+    "sigma_usd_per_sqrt_min": 38.11,
+    "minutes_left": 0.5,
     "btc_book": {
-      "best_bid": 61464.2,
-      "best_ask": 61464.3,
-      "spread": 0.10000000000582077,
-      "mid": 61464.25,
-      "bid_depth": 1.385,
-      "ask_depth": 1.551,
-      "imbalance": -0.0565,
-      "bias": "neutral",
+      "best_bid": 61425.3,
+      "best_ask": 61425.4,
+      "spread": 0.09999999999854481,
+      "mid": 61425.350000000006,
+      "bid_depth": 1.805,
+      "ask_depth": 1.318,
+      "imbalance": 0.1559,
+      "bias": "buy",
       "levels": 10,
       "source": "kraken"
     },
     "btc_flow": {
       "source": "coinbase",
       "trades": 80,
-      "buy_volume": 0.595562,
-      "sell_volume": 0.151316,
-      "delta": 0.5948,
-      "bias": "buy"
+      "buy_volume": 0.12524,
+      "sell_volume": 1.00399,
+      "delta": -0.7782,
+      "bias": "sell"
     },
-    "btc_bias": "buy",
+    "btc_bias": "mixed",
     "btc_spread_usd": 0.1,
     "kalshi_book": {
-      "yes_depth": 47824.49,
-      "no_depth": 47343.87,
-      "imbalance": 0.0051,
+      "yes_depth": 0,
+      "no_depth": 0,
+      "imbalance": 0.0,
       "bias": "neutral",
-      "yes_bid": 0.14,
-      "yes_ask": 0.15,
-      "spread": 0.01,
-      "spread_cents": 1.0,
-      "yes_levels": 20,
-      "no_levels": 20,
+      "yes_bid": 0.0,
+      "yes_ask": 0.001,
+      "spread": 0.001,
+      "spread_cents": 0.1,
+      "yes_levels": 0,
+      "no_levels": 0,
       "ok": true
     },
     "buy_rules": "Buys Yes/No when the 1-minute trend is clean, BTC is at least $40 from the strike, the ask is 35\u201375\u00a2, and 2\u201315 minutes remain in the window. Requires the 50-period EMA to agree. Requires the 5-minute trend to agree. Also skips choppy tapes (chop ratio above 0.80). Holds every ticket to official Kalshi settlement (no early exits).",
@@ -781,12 +780,12 @@
     "note": "The dashboard polls Coinbase\u2019s public API every 20 seconds for a live BTC price and 1-minute indicators (CORS is open). Kalshi\u2019s public API blocks browser CORS, so contract quotes, the official Buy/Sell/Wait call, and paper-trade grading refresh with each GitHub Actions run (every 5 minutes)."
   },
   "live": {
-    "btc_price": 61452.02,
+    "btc_price": 61416.28,
     "strike": 61529.09,
-    "distance": -77.07,
+    "distance": -112.81,
     "call": "WAIT",
-    "call_label": "WAIT \u2014 No Trade",
-    "reason": "Choppy / no clean edge: price is below the strike, but the 1-minute trend/momentum is not cleanly bearish (RSI 49 is not in the bearish 30\u201345 band); Yes ask 15\u00a2.",
+    "call_label": "WAIT \u2014 Too close to expiry",
+    "reason": "Only 0:30 left in this window. The bot stands aside under 2 minutes.",
     "side": null,
     "ask": null,
     "bid": null,
@@ -801,45 +800,45 @@
       "open_time_pt": "Nov 27, 2026, 5:00 AM PT",
       "close_time": "2026-11-27T13:15:00Z",
       "close_time_pt": "Nov 27, 2026, 5:15 AM PT",
-      "remaining_sec": 330,
-      "yes_bid": 0.14,
-      "yes_ask": 0.15,
-      "no_bid": 0.85,
-      "no_ask": 0.86,
-      "last": 0.15,
-      "volume": 1364460.89,
+      "remaining_sec": 30,
+      "yes_bid": 0.0,
+      "yes_ask": 0.001,
+      "no_bid": 0.999,
+      "no_ask": 1.0,
+      "last": 0.001,
+      "volume": 2842532.05,
       "result": null,
       "expiration_value": null,
       "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov270815-15",
       "rules": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 8:15 AM EST on Nov 27, 2026 is at least the simple average of the sixty seconds of CF Benchmarks' BRTI before 8:00 AM EST on November 27, 2026, then the market resolves to Yes."
     },
     "indicators_1m": {
-      "ema9": 61451.57,
-      "ema21": 61459.6,
-      "ema50": 61480.98,
-      "rsi14": 49.21,
-      "macd_hist": -2.42,
-      "close": 61456.42,
+      "ema9": 61451.64,
+      "ema21": 61457.02,
+      "ema50": 61475.96,
+      "rsi14": 47.2,
+      "macd_hist": -0.3,
+      "close": 61439.12,
       "ready": true,
-      "ema_slope": -18.41,
-      "vwap": 61450.34,
-      "vwap_dist": 6.08,
-      "atr": 51.27,
-      "momentum": 11.83
+      "ema_slope": -4.16,
+      "vwap": 61447.82,
+      "vwap_dist": -8.7,
+      "atr": 46.65,
+      "momentum": -35.22
     },
     "indicators_5m": {
-      "ema9": 61484.86,
-      "ema21": 61514.31,
-      "ema50": 61552.81,
-      "rsi14": 47.56,
-      "macd_hist": -2.06,
-      "close": 61493.91,
+      "ema9": 61477.8,
+      "ema21": 61508.43,
+      "ema50": 61548.76,
+      "rsi14": 44.59,
+      "macd_hist": -2.51,
+      "close": 61449.54,
       "ready": true,
-      "ema_slope": -4.02,
-      "vwap": 61503.28,
-      "vwap_dist": -9.37,
-      "atr": 112.25,
-      "momentum": 79.01
+      "ema_slope": 12.37,
+      "vwap": 61500.93,
+      "vwap_dist": -51.39,
+      "atr": 112.69,
+      "momentum": 77.92
     },
     "indicators_15m": {
       "ema9": 61543.71,
@@ -869,8 +868,8 @@
       "atr": 404.65,
       "momentum": 2.71
     },
-    "last_1m_close": 61456.42,
-    "last_1m_time_pt": "Nov 27, 2026, 5:08 AM PT",
+    "last_1m_close": 61439.12,
+    "last_1m_time_pt": "Nov 27, 2026, 5:13 AM PT",
     "cash": 85.85,
     "equity": 85.85,
     "pnl": -14.15,
@@ -1117,6 +1116,11 @@
       {
         "t": 1795784970,
         "t_pt": "Nov 27, 2026, 5:09 AM PT",
+        "equity": 85.85
+      },
+      {
+        "t": 1795785270,
+        "t_pt": "Nov 27, 2026, 5:14 AM PT",
         "equity": 85.85
       }
     ],
@@ -2769,6 +2773,30 @@
           "book_id": "v1",
           "book_label": "Version 1",
           "open_count": 0
+        },
+        {
+          "t": "2026-11-27T13:14:30Z",
+          "t_pt": "Nov 27, 2026, 5:14 AM PT",
+          "ticker": "KXBTC15M-26NOV270815-15",
+          "close_time": "2026-11-27T13:15:00Z",
+          "close_time_pt": "Nov 27, 2026, 5:15 AM PT",
+          "window_label": "5:00 AM \u2013 5:15 AM PT",
+          "action": "WAIT",
+          "label": "Too close to expiry",
+          "reason": "Only 0:30 left in this window, so Version 1 won\u2019t open another ticket.",
+          "reason_full": "Only 0:30 left in this window, so Version 1 won\u2019t open another ticket.",
+          "btc_price": 61416.28,
+          "strike": 61529.09,
+          "yes_ask": 0.001,
+          "no_ask": 1.0,
+          "side": null,
+          "ask": null,
+          "contracts": null,
+          "entry_price": null,
+          "cash": 65.27,
+          "book_id": "v1",
+          "book_label": "Version 1",
+          "open_count": 0
         }
       ],
       "equity": 65.27,
@@ -2805,8 +2833,8 @@
         "Settled NO on KXBTC15M-26NOV270800-00: Settled YES at BTC 61529.09 vs strike 61487.52. PnL -5.56"
       ],
       "net_pnl": -34.73,
-      "updated_at": "2026-11-27T13:09:30Z",
-      "updated_at_pt": "Nov 27, 2026, 5:09 AM PT"
+      "updated_at": "2026-11-27T13:14:30Z",
+      "updated_at_pt": "Nov 27, 2026, 5:14 AM PT"
     },
     "v2": {
       "id": "v2",
@@ -3844,6 +3872,30 @@
           "book_id": "v2",
           "book_label": "Version 2",
           "open_count": 0
+        },
+        {
+          "t": "2026-11-27T13:14:30Z",
+          "t_pt": "Nov 27, 2026, 5:14 AM PT",
+          "ticker": "KXBTC15M-26NOV270815-15",
+          "close_time": "2026-11-27T13:15:00Z",
+          "close_time_pt": "Nov 27, 2026, 5:15 AM PT",
+          "window_label": "5:00 AM \u2013 5:15 AM PT",
+          "action": "WAIT",
+          "label": "WAIT \u2014 Too close to expiry",
+          "reason": "Only 0:30 left in this window. The bot stands aside under 2 minutes.",
+          "reason_full": "Only 0:30 left in this window. The bot stands aside under 2 minutes.",
+          "btc_price": 61416.28,
+          "strike": 61529.09,
+          "yes_ask": 0.001,
+          "no_ask": 1.0,
+          "side": null,
+          "ask": null,
+          "contracts": null,
+          "entry_price": null,
+          "cash": 90.55,
+          "book_id": "v2",
+          "book_label": "Version 2",
+          "open_count": 0
         }
       ],
       "equity": 90.55,
@@ -3859,8 +3911,8 @@
       "created_at": "2026-11-26T20:22:54Z",
       "events": [],
       "net_pnl": -9.45,
-      "updated_at": "2026-11-27T13:09:30Z",
-      "updated_at_pt": "Nov 27, 2026, 5:09 AM PT"
+      "updated_at": "2026-11-27T13:14:30Z",
+      "updated_at_pt": "Nov 27, 2026, 5:14 AM PT"
     },
     "leader": "v2",
     "leader_label": "Version 2 ahead",
@@ -3869,8 +3921,8 @@
     "choice": {
       "v1": {
         "action": "WAIT",
-        "label": "WAIT \u2014 No tradable ask",
-        "reason": "Neither Yes nor No is between 35\u00a2 and 75\u00a2, so Version 1 stands aside.",
+        "label": "Too close to expiry",
+        "reason": "Only 0:30 left in this window, so Version 1 won\u2019t open another ticket.",
         "side": null,
         "ask": null,
         "strength": null,
@@ -3878,16 +3930,16 @@
       },
       "v2": {
         "action": "WAIT",
-        "label": "WAIT \u2014 No Trade",
-        "reason": "Choppy / no clean edge: price is below the strike, but the 1-minute trend/momentum is not cleanly bearish (RSI 49 is not in the bearish 30\u201345 band); Yes ask 15\u00a2.",
+        "label": "WAIT \u2014 Too close to expiry",
+        "reason": "Only 0:30 left in this window. The bot stands aside under 2 minutes.",
         "side": null,
         "ask": null,
         "strength": null,
         "base_stake": null
       }
     },
-    "updated_at": "2026-11-27T13:09:30Z",
-    "updated_at_pt": "Nov 27, 2026, 5:09 AM PT"
+    "updated_at": "2026-11-27T13:14:30Z",
+    "updated_at_pt": "Nov 27, 2026, 5:14 AM PT"
   },
   "backtest": {
     "start": "2026-11-22T13:15:00Z",
@@ -7359,8 +7411,8 @@
     ],
     "assumption_note": "Each window is evaluated once, 1 minute after it opens, using the real Kalshi Yes/No quotes at that minute and Coinbase 1-minute / 5-minute / 15-minute / 1-hour BTC candles, plus a spot-derived fair probability from realized 1-minute volatility. Trades use a $4\u2013$8 flat stake by signal strength (no 2\u00d7 press) and the official quadratic taker fee. When a full 15-minute Kalshi bid path is available, early take-profit and cut-loss rules are applied on that path; otherwise the ticket is held to official Yes/No settlement. The live bot can also enter later in a window (on a 5-minute scan) and uses live order-book and taker-flow data as a market reader; those live-only prints are not in this backtest.",
     "fee_note": "Paper PnL includes Kalshi\u2019s taker fee: ceil(0.07 \u00d7 contracts \u00d7 price \u00d7 (1 \u2212 price)), rounded up to the next cent.",
-    "generated_at": "2026-11-27T13:09:30Z",
-    "generated_at_pt": "Nov 27, 2026, 5:09 AM PT",
+    "generated_at": "2026-11-27T13:14:30Z",
+    "generated_at_pt": "Nov 27, 2026, 5:14 AM PT",
     "candle_source_1m": "coinbase",
     "candle_source_5m": "coinbase",
     "candle_source_15m": "coinbase",
@@ -8060,9 +8112,7 @@
       "best_exit": "hold to expiry",
       "best_reader": "no fair-edge gate",
       "takeaway": "Best unseen chart is 5m (+$41.23, 78.1% WR on 32 trades). Best market-reader gate is no fair-edge gate (+$41.23). Best exit rule is hold to expiry (+$41.23, 78.1% WR on 32 trades) on 1328 windows with a full bid path."
-    },
-    "last_promoted_at": "2026-11-27T10:57:58Z",
-    "last_promoted_at_pt": "Nov 27, 2026, 2:57 AM PT"
+    }
   },
   "learning": {
     "generated_at": "2026-11-27T13:13:03Z",
