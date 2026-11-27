@@ -67,8 +67,8 @@
     "val_windows": 399,
     "promoted_from": 6,
     "candidate": "rsi_bull_54_72",
-    "metrics_updated_at": "2026-11-27T18:56:55Z",
-    "metrics_updated_at_pt": "Nov 27, 2026, 10:56 AM PT"
+    "metrics_updated_at": "2026-11-27T19:57:50Z",
+    "metrics_updated_at_pt": "Nov 27, 2026, 11:57 AM PT"
   },
   "plain_english": "Buys Yes/No when the 1-minute trend is clean, BTC is at least $40 from the strike, the ask is 35\u201375\u00a2, and 2\u201315 minutes remain in the window. Requires the 50-period EMA to agree. Requires the 5-minute trend to agree. Also skips choppy tapes (chop ratio above 0.80). Holds every ticket to official Kalshi settlement (no early exits).",
   "last_promoted_at": "2026-11-27T14:53:59Z",
