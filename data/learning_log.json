@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-11-27T06:06:15Z",
-  "updated_at_pt": "Nov 26, 2026, 10:06 PM PT",
+  "updated_at": "2026-11-27T07:21:47Z",
+  "updated_at_pt": "Nov 26, 2026, 11:21 PM PT",
   "runs": [
     {
       "t": "2026-11-26T20:02:10Z",
@@ -996,6 +996,116 @@
       "decision": "KEPT v4",
       "takeaway": "Current v4 still leads on unseen windows \u2014 kept.",
       "reason": "promotion cooldown still active"
+    },
+    {
+      "t": "2026-11-27T07:21:47Z",
+      "t_pt": "Nov 26, 2026, 11:21 PM PT",
+      "windows": 1328,
+      "train_windows": 929,
+      "val_windows": 399,
+      "candidates_tested": 40,
+      "live_version": 4,
+      "live": {
+        "train": {
+          "trade_count": 100,
+          "wins": 65,
+          "losses": 35,
+          "win_rate": 65.0,
+          "net_pnl": -32.48,
+          "profit_factor": 0.936,
+          "max_drawdown_pct": 77.6,
+          "ending_equity": 67.52
+        },
+        "val": {
+          "trade_count": 46,
+          "wins": 34,
+          "losses": 12,
+          "win_rate": 73.9,
+          "net_pnl": 105.0,
+          "profit_factor": 1.581,
+          "max_drawdown_pct": 24.07,
+          "ending_equity": 205.0
+        },
+        "overall": {
+          "trade_count": 146,
+          "wins": 99,
+          "losses": 47,
+          "win_rate": 67.8,
+          "net_pnl": 79.22,
+          "profit_factor": 1.116,
+          "max_drawdown_pct": 77.6,
+          "ending_equity": 179.22
+        }
+      },
+      "best_candidate": {
+        "name": "current",
+        "params": {
+          "min_entry_cents": 35,
+          "max_entry_cents": 75,
+          "min_strike_gap_usd": 20.0,
+          "min_mins_left": 2,
+          "max_mins_left": 15,
+          "rsi_bull_min": 55.0,
+          "rsi_bull_max": 70.0,
+          "rsi_bear_min": 30.0,
+          "rsi_bear_max": 45.0,
+          "require_ema50_align": true,
+          "require_5m_align": true,
+          "min_volatility_usd": 0.0,
+          "max_chop_ratio": 1.0,
+          "ema_flat_dollars": 8.0
+        },
+        "train": {
+          "trade_count": 100,
+          "wins": 65,
+          "losses": 35,
+          "win_rate": 65.0,
+          "net_pnl": -32.48,
+          "profit_factor": 0.936,
+          "max_drawdown_pct": 77.6,
+          "ending_equity": 67.52
+        },
+        "val": {
+          "trade_count": 46,
+          "wins": 34,
+          "losses": 12,
+          "win_rate": 73.9,
+          "net_pnl": 105.0,
+          "profit_factor": 1.581,
+          "max_drawdown_pct": 24.07,
+          "ending_equity": 205.0
+        },
+        "overall": {
+          "trade_count": 146,
+          "wins": 99,
+          "losses": 47,
+          "win_rate": 67.8,
+          "net_pnl": 79.22,
+          "profit_factor": 1.116,
+          "max_drawdown_pct": 77.6,
+          "ending_equity": 179.22
+        }
+      },
+      "promoted_to": 5,
+      "promoted_params": {
+        "min_entry_cents": 35,
+        "max_entry_cents": 75,
+        "min_strike_gap_usd": 40.0,
+        "min_mins_left": 2,
+        "max_mins_left": 15,
+        "rsi_bull_min": 55.0,
+        "rsi_bull_max": 70.0,
+        "rsi_bear_min": 30.0,
+        "rsi_bear_max": 45.0,
+        "require_ema50_align": true,
+        "require_5m_align": true,
+        "min_volatility_usd": 0.0,
+        "max_chop_ratio": 1.0,
+        "ema_flat_dollars": 8.0
+      },
+      "decision": "PROMOTED v4 \u2192 v5",
+      "takeaway": "Changing strike gap from $20 to $40 improved unseen P&L by \u2212$14.83 after fees (78.8% WR on 33 trades). Promoted v4 \u2192 v5.",
+      "reason": "profit factor 1.79 vs live 1.58"
     }
   ]
 }
