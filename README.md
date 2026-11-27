@@ -9,8 +9,8 @@ This bot uses only public market data and simulated money. There are no API keys
 ## What it does
 
 - Reads the live `KXBTC15M` contract (ticker, strike, time left, Yes/No bid and ask) from Kalshi’s public API.
-- Pairs it with Coinbase 1-minute and 5-minute BTC/USD candles (Kraken fallback) for EMA + momentum indicators.
-- Makes a plain-English call: **BUY YES**, **BUY NO**, **SELL / TAKE PROFIT**, **CUT LOSS**, or **WAIT**.
+- Pairs it with Coinbase 1-minute, 5-minute, 15-minute, and 1-hour BTC/USD candles (Kraken fallback) for EMA, RSI, MACD, VWAP, ATR, and momentum, plus a live market reader (Coinbase/Kraken order-book and taker flow, Kalshi KXBTC15M book, and a spot-fair probability from realized volatility).
+- Makes a plain-English call: **BUY YES**, **BUY NO**, **HOLD**, **SELL / TAKE PROFIT**, **CUT LOSS**, or **WAIT**. Early exits only fire if a walk-forward-validated rule is turned on.
 - Papers a **$100** book with a flat **$4 / $6 / $8** stake by signal strength (**no 2× press**). Every ticket’s total cost, including Kalshi’s real quadratic taker fee, stays between **$4 and $8**.
 - Grades each ticket against Kalshi’s official Yes/No settlement.
 - Can run a separate **1-hour $40 paper session** (the completed run is archived on the Trades tab) alongside the ongoing $100 book, with a live countdown and a check log of every 5-minute scan.
@@ -25,7 +25,7 @@ Starting rules (**v1**): **Buy Yes** when all of these are true: 1-minute EMA 9 
 
 **Wait** if the tape is choppy, the quotes are too expensive, or the window is almost over. The bot will not buy a very expensive Yes just to be “right.”
 
-**Exit early** on a take-profit (bid ≥ 80¢ or +15¢ from entry), a 12¢ stop, or a momentum + strike flip. Otherwise hold to official settlement.
+**Hold to official settlement** by default. A walk-forward test on 15-minute Kalshi bid paths found that the old 80¢ / +15¢ take-profit and −12¢ stop-loss rules lost money on unseen windows versus holding to expiry. The hourly learner still scores those exit rules (and 1m/5m/15m/1h chart modes plus fair-value edge gates) and will only turn an early-exit or extra chart/market-reader filter on if it improves unseen dollar P&L and drawdown.
 
 ## How it runs
 

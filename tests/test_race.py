@@ -14,6 +14,7 @@ from bot import (
     RACE_STARTING,
     STAKE_NORMAL,
     STAKE_MAX,
+    StrategyParams,
     V1_ASK_MAX,
     V1_ASK_MIN,
     V1_MIN_STRIKE_GAP,
@@ -109,7 +110,8 @@ def test_v1_can_add_and_flip_up_to_three_then_caps():
     ticker = "KXBTC15M-TEST-MULTI"
     book = new_race_book("v1", now)
     m1 = market(now, ticker=ticker, strike=60400, yes=0.58, no=0.43, remaining=12 * 60)
-    book, sig1 = step_v1_book(book, m1, [], bull(), bull(), 60540, now)
+    hold = StrategyParams(enable_early_exits=False)
+    book, sig1 = step_v1_book(book, m1, [], bull(), bull(), 60540, now, params=hold)
     assert sig1.action in ("HOLD", "BUY_YES")
     assert len(book["open_positions"]) == 1
     assert book["open_positions"][0]["side"] == "yes"
@@ -118,7 +120,7 @@ def test_v1_can_add_and_flip_up_to_three_then_caps():
     # Confirmation / better price a few minutes later — add YES.
     now2 = now + timedelta(minutes=5)
     m2 = market(now2, ticker=ticker, strike=60400, yes=0.52, no=0.49, remaining=7 * 60)
-    book, sig2 = step_v1_book(book, m2, [], bull(close=60580, ema9=60560), bull(), 60590, now2)
+    book, sig2 = step_v1_book(book, m2, [], bull(close=60580, ema9=60560), bull(), 60590, now2, params=hold)
     assert len(book["open_positions"]) == 2, (sig2, book["events"])
     assert all(p["side"] == "yes" for p in book["open_positions"])
     assert "Entry #2" in sig2.reason
@@ -126,7 +128,7 @@ def test_v1_can_add_and_flip_up_to_three_then_caps():
     # Momentum flips — enter NO as a third ticket.
     now3 = now + timedelta(minutes=10)
     m3 = market(now3, ticker=ticker, strike=60400, yes=0.70, no=0.42, remaining=4 * 60)
-    book, sig3 = step_v1_book(book, m3, [], bear(), bear(), 60280, now3)
+    book, sig3 = step_v1_book(book, m3, [], bear(), bear(), 60280, now3, params=hold)
     assert len(book["open_positions"]) == 3, (sig3.reason, book["events"])
     assert book["open_positions"][-1]["side"] == "no"
     assert "Entry #3" in sig3.reason
@@ -134,7 +136,7 @@ def test_v1_can_add_and_flip_up_to_three_then_caps():
     # Fourth check cannot add another ticket.
     now4 = now + timedelta(minutes=11)
     m4 = market(now4, ticker=ticker, strike=60400, yes=0.30, no=0.71, remaining=3 * 60)
-    book, sig4 = step_v1_book(book, m4, [], bear(), bear(), 60250, now4)
+    book, sig4 = step_v1_book(book, m4, [], bear(), bear(), 60250, now4, params=hold)
     assert len(book["open_positions"]) == 3
     assert "3 trades" in sig4.reason or "cap" in sig4.label.lower() or "cap" in sig4.reason.lower() or "Already" in sig4.reason
     assert window_trade_count(book["trades"], ticker, book["open_positions"]) == 3
@@ -343,7 +345,24 @@ def test_v1_rejects_expensive_favorite_close_strike_and_fade():
     assert fade_wait.action == "WAIT", fade_wait
     assert "fade" in (fade_wait.reason or "").lower() or "expensive" in (fade_wait.reason or "").lower() or "35" in (fade_wait.reason or "")
 
-
+def test_v1_takes_profit_when_bid_hits_target():
+    now = utc_now()
+    ticker = "KXBTC15M-TEST-TP"
+    book = new_race_book("v1", now)
+    m1 = market(now, ticker=ticker, strike=60400, yes=0.50, no=0.51, remaining=12 * 60)
+    exits = StrategyParams(enable_early_exits=True, tp_bid=0.80, tp_gain=0.15, sl_drop=0.12)
+    book, _ = step_v1_book(book, m1, [], bull(), bull(), 60540, now, params=exits)
+    assert len(book["open_positions"]) == 1
+    entry = book["open_positions"][0]["entry_price"]
+    now2 = now + timedelta(minutes=5)
+    m2 = market(now2, ticker=ticker, strike=60400, yes=0.88, no=0.15, remaining=7 * 60)
+    book, sig = step_v1_book(book, m2, [], bull(), bull(), 60680, now2, params=exits)
+    closed = [t for t in book["trades"] if t.get("status") == "closed"]
+    assert closed, (sig, book["events"], book["trades"])
+    assert closed[-1]["outcome"] == "early_exit"
+    assert closed[-1]["pnl_kind"] == "tp"
+    assert closed[-1]["exit_price"] >= 0.80
+    assert any("TAKE_PROFIT" in e for e in book["events"])
 
 if __name__ == "__main__":
     tests = [
@@ -353,6 +372,7 @@ if __name__ == "__main__":
         test_v2_is_strict_one_trade_and_waits_without_edge,
         test_ensure_race_does_not_reset_existing_books,
         test_v1_rejects_expensive_favorite_close_strike_and_fade,
+        test_v1_takes_profit_when_bid_hits_target,
     ]
     for fn in tests:
         fn()

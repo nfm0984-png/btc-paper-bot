@@ -397,3 +397,51 @@ footer a:hover { color: var(--brand-deep); }
 @media (max-width: 640px) {
   .filter-pills { justify-content: flex-start; margin-top: 10px; }
 }
+
+.pill.TP, .pill.EARLY { background: var(--green-soft); color: var(--green-ink); border-color: #86EFAC; }
+.pill.SL { background: var(--red-soft); color: var(--red-ink); border-color: #FECACA; }
+.pill.UP { background: var(--green-soft); color: var(--green-ink); border-color: #86EFAC; }
+.pill.DOWN { background: var(--red-soft); color: var(--red-ink); border-color: #FECACA; }
+.pill.MIXED, .pill.FLAT, .pill.NEUTRAL { background: var(--amber-soft); color: var(--amber-ink); border-color: #FCD34D; }
+
+.choice-box.TAKE_PROFIT .choice-action { color: var(--green-ink); }
+.choice-box.CUT_LOSS .choice-action { color: var(--red-ink); }
+
+.reader-card { margin-bottom: 16px; }
+.tf-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin: 4px 0 12px;
+}
+.tf-cell {
+  background: var(--page);
+  border: 1px solid var(--brand-line);
+  border-radius: 14px;
+  padding: 12px 14px;
+}
+.tf-cell .tf-name { font-size: 11px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.tf-cell .tf-bias { font-size: 18px; font-weight: 900; letter-spacing: -0.03em; margin-top: 4px; text-transform: capitalize; }
+.tf-cell .tf-meta { font-size: 12px; font-weight: 700; color: var(--muted); margin-top: 4px; line-height: 1.4; }
+.tf-cell.up .tf-bias { color: var(--green-ink); }
+.tf-cell.down .tf-bias { color: var(--red-ink); }
+.tf-cell.flat .tf-bias, .tf-cell.mixed .tf-bias { color: var(--amber-ink); }
+.scorecard-table { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+.scorecard-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) repeat(3, minmax(0, 1fr));
+  gap: 8px 12px;
+  align-items: baseline;
+  padding: 10px 12px;
+  border: 1px solid var(--brand-line);
+  border-radius: 14px;
+  background: var(--page);
+}
+.scorecard-row .name { font-weight: 800; color: var(--ink); }
+.scorecard-row .kind { font-size: 11px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin-top: 2px; }
+.scorecard-row .v { font-weight: 800; font-variant-numeric: tabular-nums; }
+.scorecard-row.best { border-color: #86EFAC; background: var(--green-soft); }
+@media (max-width: 767px) {
+  .tf-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .scorecard-row { grid-template-columns: 1fr 1fr; }
+}

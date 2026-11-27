@@ -19,6 +19,8 @@ from pathlib import Path
 from typing import Any, Optional
 from zoneinfo import ZoneInfo
 
+import market_reader
+
 PT = ZoneInfo("America/Los_Angeles")
 UTC = timezone.utc
 
@@ -88,7 +90,7 @@ DECISION_OFFSET_SEC = 60  # backtest snapshot: 1 minute after the window opens
 BACKTEST_DAYS = 5
 BACKTEST_CANDLE_PAD_HOURS = 6
 
-USER_AGENT = "btc-paper-bot/1.1 (+https://github.com/nfm0984-png/btc-paper-bot)"
+USER_AGENT = "btc-paper-bot/1.2 (+https://github.com/nfm0984-png/btc-paper-bot)"
 HTTP_TIMEOUT = 20
 MAX_RETRIES = 3
 
@@ -402,11 +404,21 @@ def fetch_kraken_ohlc(interval_min: int, start_ts: int) -> list[dict]:
     return out
 
 
+def min_candles_for(granularity: int) -> int:
+    """1m/5m need a long EMA warmup; 15m/1h only need ~50 bars for EMA 50."""
+    if granularity >= 3600:
+        return 50
+    if granularity >= 900:
+        return 60
+    return 80
+
+
 def fetch_btc_candles(start_ts: int, end_ts: int, granularity: int) -> tuple[list[dict], str]:
     errors = []
+    need = min_candles_for(granularity)
     try:
         candles = fetch_coinbase_candles(start_ts, end_ts, granularity)
-        if len(candles) >= 80:
+        if len(candles) >= need:
             return candles, "coinbase"
         errors.append(f"coinbase returned only {len(candles)} candles")
     except Exception as exc:
@@ -415,7 +427,7 @@ def fetch_btc_candles(start_ts: int, end_ts: int, granularity: int) -> tuple[lis
         interval = max(1, granularity // 60)
         candles = fetch_kraken_ohlc(interval, start_ts)
         candles = [c for c in candles if c["time"] <= end_ts]
-        if len(candles) >= 80:
+        if len(candles) >= need:
             return candles, "kraken"
         errors.append(f"kraken returned only {len(candles)} candles")
     except Exception as exc:
@@ -487,9 +499,14 @@ class Indicators:
     macd_hist: Optional[float]
     close: Optional[float]
     ready: bool = False
+    ema_slope: Optional[float] = None
+    vwap: Optional[float] = None
+    vwap_dist: Optional[float] = None
+    atr: Optional[float] = None
+    momentum: Optional[float] = None
 
 
-def compute_indicators(candles: list[dict]) -> list[Indicators]:
+def compute_indicators(candles: list[dict], vwap_lookback: int = 30) -> list[Indicators]:
     closes = [c["close"] for c in candles]
     opts: list[Optional[float]] = list(closes)
     ema9 = series_ema(opts, FAST_EMA)
@@ -515,7 +532,7 @@ def compute_indicators(candles: list[dict]) -> list[Indicators]:
         )
         ind.ready = None not in (ind.ema9, ind.ema21, ind.ema50, ind.rsi14, ind.macd_hist)
         out.append(ind)
-    return out
+    return market_reader.enrich_indicator_series(candles, out, vwap_lookback=vwap_lookback)
 
 
 def indicators_at(candles: list[dict], series: list[Indicators], ts: int) -> Optional[tuple[dict, Indicators]]:
@@ -531,7 +548,11 @@ def indicators_at(candles: list[dict], series: list[Indicators], ts: int) -> Opt
 
 def ind_payload(ind: Optional[Indicators]) -> dict:
     if not ind:
-        return {"ema9": None, "ema21": None, "ema50": None, "rsi14": None, "macd_hist": None, "close": None, "ready": False}
+        return {
+            "ema9": None, "ema21": None, "ema50": None, "rsi14": None, "macd_hist": None,
+            "close": None, "ready": False, "ema_slope": None, "vwap": None, "vwap_dist": None,
+            "atr": None, "momentum": None,
+        }
     return {
         "ema9": None if ind.ema9 is None else round_px(ind.ema9, 2),
         "ema21": None if ind.ema21 is None else round_px(ind.ema21, 2),
@@ -540,6 +561,11 @@ def ind_payload(ind: Optional[Indicators]) -> dict:
         "macd_hist": None if ind.macd_hist is None else round_px(ind.macd_hist, 2),
         "close": None if ind.close is None else round_px(ind.close, 2),
         "ready": ind.ready,
+        "ema_slope": None if getattr(ind, "ema_slope", None) is None else round_px(ind.ema_slope, 2),
+        "vwap": None if getattr(ind, "vwap", None) is None else round_px(ind.vwap, 2),
+        "vwap_dist": None if getattr(ind, "vwap_dist", None) is None else round_px(ind.vwap_dist, 2),
+        "atr": None if getattr(ind, "atr", None) is None else round_px(ind.atr, 2),
+        "momentum": None if getattr(ind, "momentum", None) is None else round_px(ind.momentum, 2),
     }
 
 
@@ -554,6 +580,11 @@ def indicators_from_payload(d: Optional[dict]) -> Optional[Indicators]:
         macd_hist=d.get("macd_hist"),
         close=d.get("close"),
         ready=bool(d.get("ready")),
+        ema_slope=d.get("ema_slope"),
+        vwap=d.get("vwap"),
+        vwap_dist=d.get("vwap_dist"),
+        atr=d.get("atr"),
+        momentum=d.get("momentum"),
     )
     if not ind.ready:
         ind.ready = None not in (ind.ema9, ind.ema21, ind.ema50, ind.rsi14, ind.macd_hist)
@@ -580,6 +611,19 @@ class StrategyParams:
     min_volatility_usd: float = 0.0
     max_chop_ratio: float = 1.0
     ema_flat_dollars: float = 8.0
+    # Multi-timeframe + market-reader gates. Defaults preserve the live v5 rules.
+    chart_mode: str = "1m_5m"  # 1m | 1m_5m | 1m_15m | 1m_1h | mtf
+    require_15m_align: bool = False
+    require_1h_align: bool = False
+    min_fair_edge: float = 0.0  # require fair_prob - ask >= this (0 = off)
+    max_spread_cents: float = 20.0  # skip if Yes/No spread wider than this
+    enable_early_exits: bool = False  # walk-forward: current TP/SL hurt unseen P&L vs hold-to-expiry
+    tp_bid: float = 0.80
+    tp_gain: float = 0.15
+    sl_drop: float = 0.12
+    tp_require_stall: bool = False
+    sl_require_reversal: bool = False
+    fair_giveback: bool = False
 
     @property
     def min_entry(self) -> float:
@@ -613,6 +657,18 @@ class StrategyParams:
             "min_volatility_usd": float(self.min_volatility_usd),
             "max_chop_ratio": float(self.max_chop_ratio),
             "ema_flat_dollars": float(self.ema_flat_dollars),
+            "chart_mode": str(self.chart_mode or "1m_5m"),
+            "require_15m_align": bool(self.require_15m_align),
+            "require_1h_align": bool(self.require_1h_align),
+            "min_fair_edge": float(self.min_fair_edge),
+            "max_spread_cents": float(self.max_spread_cents),
+            "enable_early_exits": bool(self.enable_early_exits),
+            "tp_bid": float(self.tp_bid),
+            "tp_gain": float(self.tp_gain),
+            "sl_drop": float(self.sl_drop),
+            "tp_require_stall": bool(self.tp_require_stall),
+            "sl_require_reversal": bool(self.sl_require_reversal),
+            "fair_giveback": bool(self.fair_giveback),
         }
 
 
@@ -645,11 +701,27 @@ def default_strategy_config(now: Optional[datetime] = None) -> dict:
 
 
 def plain_english_params(p: StrategyParams) -> str:
+    mode = effective_chart_mode(p)
+    mode_txt = {
+        "1m": "Uses the 1-minute chart only.",
+        "1m_5m": "Requires the 5-minute trend to agree.",
+        "1m_15m": "Requires the 15-minute trend to agree.",
+        "1m_1h": "Requires the 1-hour trend to agree.",
+        "mtf": "Requires a multi-timeframe consensus (at least two of the 5-minute, 15-minute, and 1-hour charts agreeing).",
+    }.get(mode, "Requires the 5-minute trend to agree.")
     bits = [
         f"Buys Yes/No when the 1-minute trend is clean, BTC is at least ${p.min_strike_gap_usd:.0f} from the strike, the ask is {p.min_entry_cents}–{p.max_entry_cents}¢, and {p.min_mins_left}–{p.max_mins_left} minutes remain in the window.",
         ("Requires the 50-period EMA to agree." if p.require_ema50_align else "Does not require the 50-period EMA to agree."),
-        ("Requires the 5-minute trend to agree." if p.require_5m_align else "Does not require the 5-minute trend to agree."),
+        mode_txt,
     ]
+    if p.require_15m_align and mode not in ("1m_15m", "mtf"):
+        bits.append("Also requires the 15-minute trend to agree.")
+    if p.require_1h_align and mode not in ("1m_1h", "mtf"):
+        bits.append("Also requires the 1-hour trend to agree.")
+    if p.min_fair_edge > 0:
+        bits.append(f"Only buys when the spot-derived fair probability beats the ask by at least {p.min_fair_edge * 100:.0f}¢ of edge.")
+    if p.max_spread_cents < 19.99:
+        bits.append(f"Skips contracts whose Yes/No spread is wider than {p.max_spread_cents:.0f}¢.")
     if p.min_volatility_usd > 0 or p.max_chop_ratio < 0.999:
         chop = []
         if p.min_volatility_usd > 0:
@@ -659,6 +731,7 @@ def plain_english_params(p: StrategyParams) -> str:
         bits.append("Also " + " and ".join(chop) + ".")
     else:
         bits.append("No extra chop filter.")
+    bits.append(exit_rules_text(p))
     return " ".join(bits)
 
 
@@ -686,6 +759,219 @@ def active_params(cfg: Optional[dict] = None) -> StrategyParams:
         except Exception:
             return StrategyParams()
     return params_from_dict((cfg or {}).get("params"))
+
+
+
+def effective_chart_mode(p: StrategyParams) -> str:
+    mode = str(getattr(p, "chart_mode", "") or "").strip()
+    if mode in ("1m", "1m_5m", "1m_15m", "1m_1h", "mtf"):
+        return mode
+    return "1m_5m" if p.require_5m_align else "1m"
+
+
+def exit_rules_text(p: Optional[StrategyParams] = None) -> str:
+    p = p or StrategyParams()
+    if not p.enable_early_exits:
+        return "Holds every ticket to official Kalshi settlement (no early exits)."
+    bits = []
+    tp = f"take profit if the live bid reaches {int(round(p.tp_bid * 100))}¢ or +{int(round(p.tp_gain * 100))}¢ from entry"
+    if p.tp_require_stall:
+        tp += " and chart momentum stalls or the bid looks rich vs spot fair value"
+    bits.append(tp)
+    if p.sl_require_reversal:
+        bits.append(
+            f"cut a loss if the bid drops {int(round(p.sl_drop * 100))}¢ and BTC plus the chart both flip against the position"
+        )
+    else:
+        bits.append(f"cut a loss if the bid drops {int(round(p.sl_drop * 100))}¢ from entry")
+        bits.append("or momentum and BTC-vs-strike both flip against the position")
+    if p.fair_giveback:
+        bits.append("also sell a winner early if spot fair value falls below the live bid")
+    return "Sells early to " + "; ".join(bits) + ". Otherwise holds to official settlement."
+
+
+def quotes_path(candles: list[dict], open_ts: int, close_ts: int) -> list[dict]:
+    """Extract 1-minute Yes bid/ask prints along a 15-minute window."""
+    out: list[dict] = []
+    for c in candles or []:
+        end = int(c.get("end_period_ts") or 0)
+        if end <= int(open_ts) or end > int(close_ts) + 5:
+            continue
+        yes_ask = dollars((c.get("yes_ask") or {}).get("close_dollars"))
+        yes_bid = dollars((c.get("yes_bid") or {}).get("close_dollars"))
+        if yes_ask is None or yes_bid is None:
+            continue
+        if yes_ask >= 0.99 or yes_ask <= 0.01:
+            continue
+        out.append(
+            {
+                "t": end,
+                "yes_ask": yes_ask,
+                "yes_bid": yes_bid,
+                "no_bid": max(0.0, min(1.0, 1.0 - yes_ask)),
+                "no_ask": max(0.0, min(1.0, 1.0 - yes_bid)),
+            }
+        )
+    return out
+
+
+def build_exit_path(
+    sticks: list[dict],
+    candles_1m: list[dict],
+    series_1m: list[Indicators],
+    open_ts: int,
+    close_ts: int,
+) -> list[list]:
+    """Compact intra-window path: [t, yes_bid, yes_ask, btc, ema9, ema21, macd_hist]."""
+    rows = []
+    for q in quotes_path(sticks, open_ts, close_ts):
+        snap = indicators_at(candles_1m, series_1m, int(q["t"]) - 1)
+        if not snap:
+            continue
+        bar, ind = snap
+        rows.append(
+            [
+                int(q["t"]),
+                round(float(q["yes_bid"]), 4),
+                round(float(q["yes_ask"]), 4),
+                round(float(bar["close"]), 2),
+                None if not ind or ind.ema9 is None else round(float(ind.ema9), 2),
+                None if not ind or ind.ema21 is None else round(float(ind.ema21), 2),
+                None if not ind or ind.macd_hist is None else round(float(ind.macd_hist), 2),
+            ]
+        )
+    return rows
+
+
+def parse_exit_row(row) -> Optional[dict]:
+    if not row:
+        return None
+    if isinstance(row, dict):
+        return row
+    if not isinstance(row, (list, tuple)) or len(row) < 4:
+        return None
+    yes_bid, yes_ask = row[1], row[2]
+    return {
+        "t": int(row[0]),
+        "yes_bid": yes_bid,
+        "yes_ask": yes_ask,
+        "no_bid": None if yes_ask is None else max(0.0, min(1.0, 1.0 - float(yes_ask))),
+        "no_ask": None if yes_bid is None else max(0.0, min(1.0, 1.0 - float(yes_bid))),
+        "btc": row[3],
+        "ema9": row[4] if len(row) > 4 else None,
+        "ema21": row[5] if len(row) > 5 else None,
+        "macd_hist": row[6] if len(row) > 6 else None,
+    }
+
+
+def features_from_window(w: dict) -> dict:
+    feats = {
+        "volatility_usd": w.get("volatility_usd"),
+        "chop_ratio": w.get("chop_ratio"),
+        "ind_15m": indicators_from_payload(w.get("ind_15m")),
+        "ind_1h": indicators_from_payload(w.get("ind_1h")),
+        "fair_yes": w.get("fair_yes"),
+        "sigma_usd": w.get("sigma_usd"),
+        "yes_edge": w.get("yes_edge"),
+        "no_edge": w.get("no_edge"),
+        "spread_cents": w.get("spread_cents"),
+        "exit_path": w.get("exit_path"),
+    }
+    return feats
+
+
+def build_live_features(
+    *,
+    candles_1m: list[dict],
+    series_1m: list[Indicators],
+    ind_1m: Optional[Indicators],
+    ind_5m: Optional[Indicators],
+    ind_15m: Optional[Indicators],
+    ind_1h: Optional[Indicators],
+    btc_price: float,
+    strike: Optional[float],
+    remaining_sec: Optional[int],
+    yes_ask: Optional[float],
+    yes_bid: Optional[float],
+    no_ask: Optional[float],
+    no_bid: Optional[float],
+    ticker: Optional[str] = None,
+    ts: Optional[int] = None,
+    include_live_books: bool = True,
+    scorecard: Optional[dict] = None,
+    best_chart: Optional[str] = None,
+    params: Optional["StrategyParams"] = None,
+) -> dict:
+    p = params or StrategyParams()
+    now_ts = int(ts or int(utc_now().timestamp()))
+    vol, chop = window_chop_features(candles_1m, now_ts)
+    sigma = market_reader.realized_vol_per_sqrt_min(candles_1m, now_ts)
+    minutes = None if remaining_sec is None else max(0.0, float(remaining_sec) / 60.0)
+    fair_yes = market_reader.fair_yes_probability(btc_price, strike, sigma, minutes)
+    fair_no = None if fair_yes is None else round(1.0 - float(fair_yes), 4)
+    yes_edge = market_reader.side_edge(fair_yes, yes_ask)
+    no_edge = market_reader.side_edge(fair_no, no_ask)
+    spread_cents = None
+    if yes_bid is not None and yes_ask is not None:
+        spread_cents = round((float(yes_ask) - float(yes_bid)) * 100.0, 1)
+    snaps = {
+        "1m": market_reader.chart_snapshot("1m", ind_1m),
+        "5m": market_reader.chart_snapshot("5m", ind_5m),
+        "15m": market_reader.chart_snapshot("15m", ind_15m),
+        "1h": market_reader.chart_snapshot("1h", ind_1h),
+    }
+    consensus = market_reader.multi_tf_consensus(snaps, flat_dollars=p.ema_flat_dollars)
+    btc_flow = None
+    kalshi_book = None
+    if include_live_books:
+        try:
+            btc_flow = market_reader.fetch_btc_book_and_flow()
+        except Exception:
+            btc_flow = None
+        try:
+            kalshi_book = market_reader.fetch_kalshi_book_metrics(ticker, yes_bid, yes_ask)
+        except Exception:
+            kalshi_book = market_reader.kalshi_book_metrics(None, yes_bid, yes_ask)
+    reader = market_reader.build_reader_payload(
+        snaps=snaps,
+        consensus=consensus,
+        best_chart=best_chart or (scorecard or {}).get("best_chart") or mode_best_chart(p),
+        scorecard=scorecard,
+        fair_yes=fair_yes,
+        yes_ask=yes_ask,
+        no_ask=no_ask,
+        yes_bid=yes_bid,
+        no_bid=no_bid,
+        btc_flow=btc_flow,
+        kalshi_book=kalshi_book,
+        sigma=sigma,
+        minutes_left=minutes,
+        buy_rules=plain_english_params(p),
+        sell_rules=exit_rules_text(p),
+    )
+    flow_bias = (btc_flow or {}).get("bias") or "neutral"
+    return {
+        "volatility_usd": vol,
+        "chop_ratio": chop,
+        "ind_15m": ind_15m,
+        "ind_1h": ind_1h,
+        "fair_yes": fair_yes,
+        "fair_no": fair_no,
+        "sigma_usd": sigma,
+        "yes_edge": yes_edge,
+        "no_edge": no_edge,
+        "spread_cents": spread_cents,
+        "btc_flow_bias": flow_bias,
+        "kalshi_book": kalshi_book,
+        "charts": snaps,
+        "consensus": consensus,
+        "reader": reader,
+    }
+
+
+def mode_best_chart(p: StrategyParams) -> str:
+    mode = effective_chart_mode(p)
+    return {"1m": "1m", "1m_5m": "5m", "1m_15m": "15m", "1m_1h": "1h", "mtf": "multi-TF"}.get(mode, "5m")
 
 
 def window_chop_features(candles: list[dict], ts: int, lookback: int = 15) -> tuple[Optional[float], Optional[float]]:
@@ -878,6 +1164,62 @@ def apply_strength(
     return sig
 
 
+
+def _tf_ready_agrees(ind: Optional[Indicators], side: str, p: StrategyParams) -> Optional[bool]:
+    return market_reader.tf_agrees(ind, side, p.ema_flat_dollars)
+
+
+def extra_entry_block(
+    side: str,
+    ask: Optional[float],
+    bid: Optional[float],
+    p: StrategyParams,
+    features: dict,
+) -> Optional[str]:
+    """Return a wait reason if a higher-timeframe or market-reader gate fails."""
+    mode = effective_chart_mode(p)
+    ind15 = features.get("ind_15m")
+    ind1h = features.get("ind_1h")
+    ind5 = features.get("ind_5m")
+    if mode == "1m_15m" or p.require_15m_align:
+        agrees = _tf_ready_agrees(ind15, side, p)
+        if agrees is False:
+            return "the 15-minute trend does not agree"
+    if mode == "1m_1h" or p.require_1h_align:
+        agrees = _tf_ready_agrees(ind1h, side, p)
+        if agrees is False:
+            return "the 1-hour trend does not agree"
+    if mode == "mtf":
+        snaps = features.get("charts")
+        if not snaps:
+            snaps = {
+                "5m": market_reader.chart_snapshot("5m", ind5),
+                "15m": market_reader.chart_snapshot("15m", ind15),
+                "1h": market_reader.chart_snapshot("1h", ind1h),
+            }
+        cons = features.get("consensus") or market_reader.multi_tf_consensus(snaps, side=side, flat_dollars=p.ema_flat_dollars)
+        higher_ready = cons.get("higher_ready") or []
+        if len(higher_ready) >= 2 and int(cons.get("higher_agree") or 0) < 2:
+            return "multi-timeframe charts are not in agreement (need two of 5m/15m/1h)"
+    if p.min_fair_edge > 0:
+        fair_yes = features.get("fair_yes")
+        if fair_yes is not None and ask is not None:
+            fair_side = float(fair_yes) if side == "yes" else 1.0 - float(fair_yes)
+            edge = fair_side - float(ask)
+            if edge < p.min_fair_edge:
+                return (
+                    f"the ask is rich vs spot fair value "
+                    f"(fair {cents_label(fair_side)} vs ask {cents_label(ask)}, edge {edge*100:.0f}¢, need {p.min_fair_edge*100:.0f}¢)"
+                )
+    if p.max_spread_cents < 19.99:
+        spread = features.get("spread_cents")
+        if spread is None and ask is not None and bid is not None:
+            spread = (float(ask) - float(bid)) * 100.0
+        if spread is not None and float(spread) > float(p.max_spread_cents):
+            return f"the Kalshi spread is {float(spread):.1f}¢, wider than the {p.max_spread_cents:.0f}¢ gate"
+    return None
+
+
 def make_signal(
     *,
     ind_1m: Optional[Indicators],
@@ -903,7 +1245,7 @@ def make_signal(
         side = position["side"]
         entry = float(position["entry_price"])
         bid = yes_bid if side == "yes" else no_bid
-        exit_sig = _exit_signal(position, bid, ind_1m, btc_price, strike, remaining_sec)
+        exit_sig = _exit_signal(position, bid, ind_1m, btc_price, strike, remaining_sec, params=p, features=feats)
         if exit_sig:
             return exit_sig
         held = f"Holding {side.upper()} from {cents_label(entry)}"
@@ -955,8 +1297,12 @@ def make_signal(
             f"{dist_txt}. That’s inside a ${p.min_strike_gap_usd:.0f} band, so settlement could still flip either way.",
         )
 
-    bull_ok, bull_yes, bull_no = _bullish(ind_1m, ind_5m, p)
-    bear_ok, bear_yes, bear_no = _bearish(ind_1m, ind_5m, p)
+    mode = effective_chart_mode(p)
+    p_chart = params_from_dict({**p.as_dict(), "require_5m_align": mode == "1m_5m"})
+    feats = dict(feats)
+    feats.setdefault("ind_5m", ind_5m)
+    bull_ok, bull_yes, bull_no = _bullish(ind_1m, ind_5m, p_chart)
+    bear_ok, bear_yes, bear_no = _bearish(ind_1m, ind_5m, p_chart)
     band = f"{p.min_entry_cents}¢–{p.max_entry_cents}¢"
 
     if bull_ok and dist > 0:
@@ -974,7 +1320,17 @@ def make_signal(
                 "WAIT — No Edge",
                 f"{'; '.join(bull_yes)}. {dist_txt}, but Yes ask is only {cents_label(yes_ask)} (below the {p.min_entry_cents}¢ floor — something looks off).",
             )
+        blocked = extra_entry_block("yes", yes_ask, yes_bid, p, feats)
+        if blocked:
+            return Signal(
+                "WAIT",
+                "WAIT — No Edge",
+                f"{'; '.join(bull_yes)}. {dist_txt}, Yes ask {cents_label(yes_ask)}, but {blocked}.",
+            )
         reason = f"{'; '.join(bull_yes)}. {dist_txt}, Yes ask {cents_label(yes_ask)} — Buy Yes."
+        edge = feats.get("yes_edge")
+        if edge is not None:
+            reason += f" Spot-fair edge {edge*100:+.0f}¢."
         return apply_strength(
             Signal("BUY_YES", f"BUY YES @ {cents_label(yes_ask)}", reason, side="yes", ask=yes_ask, bid=yes_bid),
             ind_1m, ind_5m, btc_price, strike,
@@ -995,7 +1351,17 @@ def make_signal(
                 "WAIT — No Edge",
                 f"{'; '.join(bear_yes)}. {dist_txt}, but No ask is only {cents_label(no_ask)} (below the {p.min_entry_cents}¢ floor — something looks off).",
             )
+        blocked = extra_entry_block("no", no_ask, no_bid, p, feats)
+        if blocked:
+            return Signal(
+                "WAIT",
+                "WAIT — No Edge",
+                f"{'; '.join(bear_yes)}. {dist_txt}, No ask {cents_label(no_ask)}, but {blocked}.",
+            )
         reason = f"{'; '.join(bear_yes)}. {dist_txt}, No ask {cents_label(no_ask)} — Buy No."
+        edge = feats.get("no_edge")
+        if edge is not None:
+            reason += f" Spot-fair edge {edge*100:+.0f}¢."
         return apply_strength(
             Signal("BUY_NO", f"BUY NO @ {cents_label(no_ask)}", reason, side="no", ask=no_ask, bid=no_bid),
             ind_1m, ind_5m, btc_price, strike,
@@ -1017,6 +1383,51 @@ def make_signal(
     return Signal("WAIT", "WAIT — No Trade", "Choppy / no clean edge: " + "; ".join(bits) + ".")
 
 
+def _momentum_stalled(side: str, ind: Optional[Indicators]) -> bool:
+    if not ind or not ind.ready:
+        return False
+    slope = getattr(ind, "ema_slope", None)
+    mom = getattr(ind, "momentum", None)
+    if side == "yes":
+        return (
+            (ind.ema9 or 0) <= (ind.ema21 or 0)
+            or (ind.macd_hist or 0) < 0
+            or (slope is not None and float(slope) < 0)
+            or (mom is not None and float(mom) < 0)
+        )
+    return (
+        (ind.ema9 or 0) >= (ind.ema21 or 0)
+        or (ind.macd_hist or 0) > 0
+        or (slope is not None and float(slope) > 0)
+        or (mom is not None and float(mom) > 0)
+    )
+
+
+def _reversal_confirmed(side: str, ind: Optional[Indicators], btc_price: float, strike: Optional[float], features: Optional[dict]) -> bool:
+    if strike is None:
+        return False
+    dist = float(btc_price) - float(strike)
+    chart_flip = False
+    if ind and ind.ready:
+        if side == "yes":
+            chart_flip = (ind.ema9 or 0) < (ind.ema21 or 0)
+        else:
+            chart_flip = (ind.ema9 or 0) > (ind.ema21 or 0)
+    if not chart_flip:
+        return False
+    if side == "yes" and dist >= 0:
+        return False
+    if side == "no" and dist <= 0:
+        return False
+    # Live order-flow, when present, can confirm but never veto a clear chart+strike flip.
+    flow = (features or {}).get("btc_flow_bias")
+    if side == "yes" and flow == "buy":
+        return True  # still flipped on chart+spot; flow just isn't confirming
+    if side == "no" and flow == "sell":
+        return True
+    return True
+
+
 def _exit_signal(
     position: dict,
     bid: Optional[float],
@@ -1024,48 +1435,75 @@ def _exit_signal(
     btc_price: float,
     strike: Optional[float],
     remaining_sec: Optional[int],
+    params: Optional[StrategyParams] = None,
+    features: Optional[dict] = None,
 ) -> Optional[Signal]:
+    p = params or StrategyParams()
+    if not p.enable_early_exits:
+        return None
     if remaining_sec is not None and remaining_sec < EARLY_EXIT_CUTOFF_SEC:
         return None  # hold to settlement
     side = position["side"]
     entry = float(position["entry_price"])
     if bid is None:
         return None
-    if bid >= max(TAKE_PROFIT_BID, entry + TAKE_PROFIT_GAIN) or bid >= entry + TAKE_PROFIT_GAIN:
+    feats = features or {}
+    tp_bid = float(p.tp_bid if p.tp_bid is not None else TAKE_PROFIT_BID)
+    tp_gain = float(p.tp_gain if p.tp_gain is not None else TAKE_PROFIT_GAIN)
+    sl_drop = float(p.sl_drop if p.sl_drop is not None else STOP_LOSS_DROP)
+    stalled = _momentum_stalled(side, ind)
+    fair_yes = feats.get("fair_yes")
+    fair_side = None
+    if fair_yes is not None:
+        fair_side = float(fair_yes) if side == "yes" else 1.0 - float(fair_yes)
+    rich_vs_fair = fair_side is not None and float(fair_side) + 0.03 < float(bid)
+
+    hit_tp = bid >= tp_bid or bid >= entry + tp_gain
+    if hit_tp:
+        if p.tp_require_stall and not stalled and not rich_vs_fair:
+            pass
+        else:
+            why = f"Take profit: {side.upper()} bid is {cents_label(bid)} vs a {cents_label(entry)} entry"
+            if stalled:
+                why += "; chart momentum has stalled"
+            if rich_vs_fair:
+                why += f"; spot fair is only {cents_label(fair_side)} so the bid looks rich"
+            why += ". Sell now rather than holding to settlement."
+            return Signal("TAKE_PROFIT", f"SELL NOW @ {cents_label(bid)}", why, side=side, bid=bid)
+
+    if p.fair_giveback and bid >= entry + 0.04 and rich_vs_fair and (stalled or (fair_side is not None and float(fair_side) + 0.08 < float(bid))):
         return Signal(
             "TAKE_PROFIT",
             f"SELL NOW @ {cents_label(bid)}",
-            f"Take profit: {side.upper()} bid is {cents_label(bid)} vs a {cents_label(entry)} entry. Sell now rather than holding to settlement.",
+            f"Early exit (TP): {side.upper()} is up from {cents_label(entry)} to {cents_label(bid)}, but spot fair value dropped to {cents_label(fair_side)}. Selling into the richness.",
             side=side,
             bid=bid,
         )
-    if bid <= entry - STOP_LOSS_DROP:
+
+    reversed_ = _reversal_confirmed(side, ind, btc_price, strike, feats)
+    if bid <= entry - sl_drop:
+        if p.sl_require_reversal and not reversed_:
+            pass
+        else:
+            return Signal(
+                "CUT_LOSS",
+                f"CUT LOSS @ {cents_label(bid)}",
+                f"Cut loss: {side.upper()} bid fell to {cents_label(bid)} from a {cents_label(entry)} entry (−{(entry-bid)*100:.0f}¢)"
+                + ("; BTC and the chart have flipped against the position" if reversed_ else "")
+                + ". Sell now rather than hoping settlement saves it.",
+                side=side,
+                bid=bid,
+            )
+
+    # Momentum + strike flip against the position, and the bid has stopped being a great hold.
+    if reversed_ and bid < entry:
         return Signal(
             "CUT_LOSS",
             f"CUT LOSS @ {cents_label(bid)}",
-            f"Cut loss: {side.upper()} bid fell to {cents_label(bid)} from a {cents_label(entry)} entry (−{(entry-bid)*100:.0f}¢). Sell now rather than hoping settlement saves it.",
+            f"Momentum flipped: the chart turned against {side.upper()} and BTC is now on the other side of the strike. Sell at {cents_label(bid)} (entry {cents_label(entry)}).",
             side=side,
             bid=bid,
         )
-    # Momentum flip against the position, and the bid has at least stopped being a great hold.
-    if ind and ind.ready and strike is not None:
-        dist = btc_price - float(strike)
-        if side == "yes" and ind.ema9 < ind.ema21 and dist < 0 and bid < entry:
-            return Signal(
-                "CUT_LOSS",
-                f"CUT LOSS @ {cents_label(bid)}",
-                f"Momentum flipped: EMA 9 crossed back below EMA 21 and BTC is now below the strike. Sell Yes at {cents_label(bid)} (entry {cents_label(entry)}).",
-                side=side,
-                bid=bid,
-            )
-        if side == "no" and ind.ema9 > ind.ema21 and dist > 0 and bid < entry:
-            return Signal(
-                "CUT_LOSS",
-                f"CUT LOSS @ {cents_label(bid)}",
-                f"Momentum flipped: EMA 9 crossed back above EMA 21 and BTC is now above the strike. Sell No at {cents_label(bid)} (entry {cents_label(entry)}).",
-                side=side,
-                bid=bid,
-            )
     return None
 
 
@@ -1445,6 +1883,7 @@ def close_trade(
     reason: str,
     now: datetime,
     expiration_value: Optional[float] = None,
+    exit_kind: Optional[str] = None,
 ) -> tuple[float, dict]:
     contracts = int(position["contracts"])
     if outcome == "settlement":
@@ -1485,7 +1924,13 @@ def close_trade(
         "stake": inferred_stake(position),
         "pressed": bool(position.get("pressed")),
         "strength": position.get("strength"),
-        "pnl_kind": "settled",
+        "pnl_kind": (
+            "settled" if outcome == "settlement"
+            else "tp" if (exit_kind or "").upper() in ("TAKE_PROFIT", "TP")
+            else "sl" if (exit_kind or "").upper() in ("CUT_LOSS", "SL")
+            else "early_exit"
+        ),
+        "exit_kind": exit_kind,
     }
     return cash_after, trade
 
@@ -1527,6 +1972,10 @@ def run_backtest(
     candles_5m: list[dict],
     series_5m: list[Indicators],
     params: Optional[StrategyParams] = None,
+    candles_15m: Optional[list[dict]] = None,
+    series_15m: Optional[list[Indicators]] = None,
+    candles_1h: Optional[list[dict]] = None,
+    series_1h: Optional[list[Indicators]] = None,
 ) -> dict:
     params = params or StrategyParams()
     # Oldest first, only markets with a real yes/no result and a strike.
@@ -1561,6 +2010,22 @@ def run_backtest(
         btc_px = snap_1[0]["close"]
         strike = dollars(m["floor_strike"])
         vol, chop = window_chop_features(candles_1m, decision_ts - 1)
+        remaining = to_ts(m["close_time"]) - decision_ts
+        sigma = market_reader.realized_vol_per_sqrt_min(candles_1m, decision_ts - 1)
+        fair_yes = market_reader.fair_yes_probability(btc_px, strike, sigma, remaining / 60.0)
+        snap_15 = indicators_at(candles_15m, series_15m, decision_ts - 1) if candles_15m and series_15m else None
+        snap_1h = indicators_at(candles_1h, series_1h, decision_ts - 1) if candles_1h and series_1h else None
+        feats = {
+            "volatility_usd": vol,
+            "chop_ratio": chop,
+            "ind_15m": snap_15[1] if snap_15 else None,
+            "ind_1h": snap_1h[1] if snap_1h else None,
+            "fair_yes": fair_yes,
+            "sigma_usd": sigma,
+            "yes_edge": market_reader.side_edge(fair_yes, q["yes_ask"]),
+            "no_edge": market_reader.side_edge(None if fair_yes is None else 1.0 - float(fair_yes), q["no_ask"]),
+            "spread_cents": None if q.get("yes_ask") is None or q.get("yes_bid") is None else (float(q["yes_ask"]) - float(q["yes_bid"])) * 100.0,
+        }
         sig = make_signal(
             ind_1m=snap_1[1],
             ind_5m=snap_5[1] if snap_5 else None,
@@ -1570,10 +2035,10 @@ def run_backtest(
             yes_bid=q["yes_bid"],
             no_ask=q["no_ask"],
             no_bid=q["no_bid"],
-            remaining_sec=to_ts(m["close_time"]) - decision_ts,
+            remaining_sec=remaining,
             position=None,
             params=params,
-            features={"volatility_usd": vol, "chop_ratio": chop},
+            features=feats,
         )
         if sig.action not in ("BUY_YES", "BUY_NO"):
             skipped += 1
@@ -1593,17 +2058,71 @@ def run_backtest(
             continue
         cash, position, _log = opened
         close_dt = parse_iso(m.get("settlement_ts") or m["close_time"])
-        cash, trade = close_trade(
-            cash,
-            position,
-            exit_price=None,
-            exit_fee=0.0,
-            result=m["result"],
-            outcome="settlement",
-            reason=f"Held to settlement: official result was {m['result'].upper()} (BTC {dollars(m.get('expiration_value')) or 'n/a'} vs strike {strike}).",
-            now=close_dt,
-            expiration_value=dollars(m.get("expiration_value")),
-        )
+        exited = False
+        if params.enable_early_exits:
+            path = build_exit_path(
+                sticks.get(m["ticker"]) or [],
+                candles_1m,
+                series_1m,
+                to_ts(m["open_time"]),
+                to_ts(m["close_time"]),
+            )
+            entry_ts = decision_ts
+            close_ts = to_ts(close_dt)
+            sigma = market_reader.realized_vol_per_sqrt_min(candles_1m, decision_ts - 1)
+            for raw in path:
+                row = parse_exit_row(raw)
+                if not row or int(row["t"]) <= entry_ts:
+                    continue
+                remaining = close_ts - int(row["t"])
+                side = position["side"]
+                bid = row["yes_bid"] if side == "yes" else row.get("no_bid")
+                btc = float(row.get("btc") or btc_px)
+                ind = Indicators(
+                    ema9=row.get("ema9"),
+                    ema21=row.get("ema21"),
+                    ema50=row.get("ema9"),
+                    rsi14=50.0,
+                    macd_hist=row.get("macd_hist"),
+                    close=btc,
+                    ready=row.get("ema9") is not None and row.get("ema21") is not None,
+                )
+                step_feats = {
+                    "fair_yes": market_reader.fair_yes_probability(btc, strike, sigma, remaining / 60.0),
+                    "sigma_usd": sigma,
+                }
+                exit_sig = _exit_signal(
+                    position, bid, ind, btc, strike, remaining,
+                    params=params, features=step_feats,
+                )
+                if exit_sig and exit_sig.bid is not None:
+                    fee = kalshi_taker_fee(int(position["contracts"]), float(exit_sig.bid))
+                    cash, trade = close_trade(
+                        cash,
+                        position,
+                        exit_price=float(exit_sig.bid),
+                        exit_fee=fee,
+                        result=None,
+                        outcome="early_exit",
+                        reason=exit_sig.reason,
+                        now=parse_iso(int(row["t"])),
+                        expiration_value=dollars(m.get("expiration_value")),
+                        exit_kind=exit_sig.action,
+                    )
+                    exited = True
+                    break
+        if not exited:
+            cash, trade = close_trade(
+                cash,
+                position,
+                exit_price=None,
+                exit_fee=0.0,
+                result=m["result"],
+                outcome="settlement",
+                reason=f"Held to settlement: official result was {m['result'].upper()} (BTC {dollars(m.get('expiration_value')) or 'n/a'} vs strike {strike}).",
+                now=close_dt,
+                expiration_value=dollars(m.get("expiration_value")),
+            )
         trades.append(trade)
         press_next, last_win_stake = apply_press_from_trade(press_next, last_win_stake, trade)
         equity.append({"t": to_ts(close_dt), "t_pt": fmt_pt(close_dt), "equity": cash})
@@ -1644,11 +2163,13 @@ def run_backtest(
         "trades": list(reversed(trades[-80:])),
         "assumption_note": (
             "Each window is evaluated once, 1 minute after it opens, using the real Kalshi Yes/No "
-            "quotes at that minute and Coinbase 1-minute / 5-minute BTC candles. Trades use a $4–$8 "
-            "flat $4–$8 stake by signal strength (no 2× press), "
-            "the official quadratic taker fee, and are held to Kalshi’s official Yes/No settlement. "
-            "The live bot can also enter later in a window (on a 5-minute scan) or exit early if momentum flips; "
-            "those live extras are not in this backtest."
+            "quotes at that minute and Coinbase 1-minute / 5-minute / 15-minute / 1-hour BTC candles, "
+            "plus a spot-derived fair probability from realized 1-minute volatility. Trades use a $4–$8 "
+            "flat stake by signal strength (no 2× press) and the official quadratic taker fee. "
+            "When a full 15-minute Kalshi bid path is available, early take-profit and cut-loss rules "
+            "are applied on that path; otherwise the ticket is held to official Yes/No settlement. "
+            "The live bot can also enter later in a window (on a 5-minute scan) and uses live order-book "
+            "and taker-flow data as a market reader; those live-only prints are not in this backtest."
         ),
         "fee_note": "Paper PnL includes Kalshi’s taker fee: ceil(0.07 × contracts × price × (1 − price)), rounded up to the next cent.",
     }
@@ -1669,6 +2190,7 @@ def simulate_prepared_windows(
     for w in windows:
         ind1 = indicators_from_payload(w.get("ind_1m"))
         ind5 = indicators_from_payload(w.get("ind_5m"))
+        feats = features_from_window(w)
         sig = make_signal(
             ind_1m=ind1,
             ind_5m=ind5,
@@ -1681,7 +2203,7 @@ def simulate_prepared_windows(
             remaining_sec=w.get("remaining_sec"),
             position=None,
             params=params,
-            features={"volatility_usd": w.get("volatility_usd"), "chop_ratio": w.get("chop_ratio")},
+            features=feats,
         )
         if sig.action not in ("BUY_YES", "BUY_NO") or sig.ask is None:
             continue
@@ -1703,17 +2225,64 @@ def simulate_prepared_windows(
         cash, position, _log = opened
         result = (w.get("result") or "").lower()
         close_when = parse_iso(w.get("close_time") or w.get("decision_ts") or when)
-        cash, trade = close_trade(
-            cash,
-            position,
-            exit_price=None,
-            exit_fee=0.0,
-            result=result,
-            outcome="settlement",
-            reason=f"Settled {result.upper()} at BTC {w.get('expiration_value') or 'n/a'} vs strike {w.get('strike')}.",
-            now=close_when,
-            expiration_value=w.get("expiration_value"),
-        )
+        exited = False
+        if params.enable_early_exits:
+            entry_ts = to_ts(when)
+            close_ts = to_ts(close_when)
+            for raw in (w.get("exit_path") or []):
+                row = parse_exit_row(raw)
+                if not row or int(row["t"]) <= entry_ts:
+                    continue
+                remaining = close_ts - int(row["t"])
+                side = position["side"]
+                bid = row["yes_bid"] if side == "yes" else row.get("no_bid")
+                btc = float(row.get("btc") or w["btc_price"])
+                ind = Indicators(
+                    ema9=row.get("ema9"),
+                    ema21=row.get("ema21"),
+                    ema50=row.get("ema9"),
+                    rsi14=50.0,
+                    macd_hist=row.get("macd_hist"),
+                    close=btc,
+                    ready=row.get("ema9") is not None and row.get("ema21") is not None,
+                )
+                step_feats = dict(feats)
+                if feats.get("sigma_usd") is not None:
+                    step_feats["fair_yes"] = market_reader.fair_yes_probability(
+                        btc, w.get("strike"), feats.get("sigma_usd"), remaining / 60.0
+                    )
+                exit_sig = _exit_signal(
+                    position, bid, ind, btc, w.get("strike"), remaining,
+                    params=params, features=step_feats,
+                )
+                if exit_sig and exit_sig.bid is not None:
+                    fee = kalshi_taker_fee(int(position["contracts"]), float(exit_sig.bid))
+                    cash, trade = close_trade(
+                        cash,
+                        position,
+                        exit_price=float(exit_sig.bid),
+                        exit_fee=fee,
+                        result=None,
+                        outcome="early_exit",
+                        reason=exit_sig.reason,
+                        now=parse_iso(int(row["t"])),
+                        expiration_value=w.get("expiration_value"),
+                        exit_kind=exit_sig.action,
+                    )
+                    exited = True
+                    break
+        if not exited:
+            cash, trade = close_trade(
+                cash,
+                position,
+                exit_price=None,
+                exit_fee=0.0,
+                result=result,
+                outcome="settlement",
+                reason=f"Settled {result.upper()} at BTC {w.get('expiration_value') or 'n/a'} vs strike {w.get('strike')}.",
+                now=close_when,
+                expiration_value=w.get("expiration_value"),
+            )
         press_next, last_win_stake = apply_press_from_trade(press_next, last_win_stake, trade)
         trades.append(trade)
         peak = max(peak, cash)
@@ -1897,6 +2466,7 @@ def step_paper_book(
                 outcome="early_exit",
                 reason=sig.reason,
                 now=now,
+                exit_kind=sig.action,
             )
             upsert_closed_trade(trades, trade)
             press_next, last_win_stake = apply_press_from_trade(press_next, last_win_stake, trade)
@@ -2809,8 +3379,10 @@ def step_v1_book(
     ind_5m: Optional[Indicators],
     btc_price: float,
     now: datetime,
+    params: Optional[StrategyParams] = None,
+    features: Optional[dict] = None,
 ) -> tuple[dict, Signal]:
-    """Version 1: hold all tickets to settlement; at most one new entry per 5-minute check."""
+    """Version 1: up to 3 tickets per window; early exits use the same learned TP/SL rules."""
     ensure_press_fields(book)
     events: list[str] = list(book.get("events") or [])
     cash = float(book.get("cash") or RACE_STARTING)
@@ -2833,6 +3405,42 @@ def step_v1_book(
     strike = mp["strike"] if mp else None
     remaining = mp["remaining_sec"] if mp else None
     ticker = mp["ticker"] if mp else None
+    params = params or StrategyParams()
+    features = features or {}
+
+    # Evaluate early exits on open tickets in the current window before considering a new entry.
+    still = []
+    for position in positions:
+        if not market or market.get("ticker") != position.get("ticker"):
+            still.append(position)
+            continue
+        bid = yes_bid if position.get("side") == "yes" else no_bid
+        exit_sig = _exit_signal(
+            position, bid, ind_1m, btc_price, strike, remaining,
+            params=params, features=features,
+        )
+        if exit_sig and exit_sig.bid is not None:
+            fee = kalshi_taker_fee(int(position["contracts"]), float(exit_sig.bid))
+            cash, trade = close_trade(
+                cash,
+                position,
+                exit_price=float(exit_sig.bid),
+                exit_fee=fee,
+                result=None,
+                outcome="early_exit",
+                reason=exit_sig.reason,
+                now=now,
+                exit_kind=exit_sig.action,
+            )
+            upsert_closed_trade(trades, trade)
+            press_next, last_win_stake = apply_press_from_trade(press_next, last_win_stake, trade)
+            events.append(
+                f"{exit_sig.action} {position['side'].upper()} on {position['ticker']} @ {cents_label(exit_sig.bid)} PnL {trade['pnl']:+.2f}"
+            )
+        else:
+            still.append(position)
+    positions = still
+
     count = window_trade_count(trades, ticker, positions)
     last = last_entry_for(trades, ticker, positions)
 
@@ -2988,7 +3596,10 @@ def run_race(
     strategy_version: Optional[int] = None,
 ) -> tuple[dict, Signal, Signal]:
     race = ensure_race(state, now, strategy_version)
-    v1, sig1 = step_v1_book(dict(race["v1"]), market, settled, ind_1m, ind_5m, btc_price, now)
+    v1, sig1 = step_v1_book(
+        dict(race["v1"]), market, settled, ind_1m, ind_5m, btc_price, now,
+        params=params, features=features,
+    )
     v2, sig2 = step_v2_book(
         dict(race["v2"]), market, settled, ind_1m, ind_5m, btc_price, now,
         params=params, features=features, strategy_version=strategy_version,
@@ -3049,10 +3660,7 @@ def rules_summary_from_params(p: StrategyParams) -> dict:
     return {
         "buy_yes": yes,
         "buy_no": no,
-        "exits": (
-            "Sell early if the bid reaches 80¢ or +15¢ from entry (take profit), drops 12¢ from entry, "
-            "or momentum and BTC-vs-strike both flip against the position. Otherwise hold to official settlement."
-        ),
+        "exits": exit_rules_text(p),
         "sizing": (
             "Normal qualifying signal $4, strong $6, top-conviction $8 — flat $4–$8 per trade (no press). "
             "Every ticket’s total cost, including the Kalshi taker fee, stays between $4 and $8. "
@@ -3114,11 +3722,16 @@ def main() -> int:
 
     candles_1m, src_1m = fetch_btc_candles(candle_start, candle_end, 60)
     candles_5m, src_5m = fetch_btc_candles(candle_start, candle_end, 300)
-    series_1m = compute_indicators(candles_1m)
-    series_5m = compute_indicators(candles_5m)
+    candles_15m, src_15m = fetch_btc_candles(candle_start, candle_end, 900)
+    candles_1h, src_1h = fetch_btc_candles(candle_start, candle_end, 3600)
+    series_1m = compute_indicators(candles_1m, vwap_lookback=30)
+    series_5m = compute_indicators(candles_5m, vwap_lookback=24)
+    series_15m = compute_indicators(candles_15m, vwap_lookback=20)
+    series_1h = compute_indicators(candles_1h, vwap_lookback=24)
     btc_price, price_src = fetch_live_price()
     print(
-        f"  1m candles: {len(candles_1m)} ({src_1m}); 5m candles: {len(candles_5m)} ({src_5m}); "
+        f"  1m candles: {len(candles_1m)} ({src_1m}); 5m: {len(candles_5m)} ({src_5m}); "
+        f"15m: {len(candles_15m)} ({src_15m}); 1h: {len(candles_1h)} ({src_1h}); "
         f"live BTC ${btc_price:,.2f} ({price_src})",
         flush=True,
     )
@@ -3127,15 +3740,25 @@ def main() -> int:
     # Limit to the most recent BACKTEST_DAYS of settled windows to stay inside rate limits.
     cutoff = int((now - timedelta(days=BACKTEST_DAYS)).timestamp())
     settled_window = [m for m in settled if m.get("open_time") and to_ts(m["open_time"]) >= cutoff]
-    print(f"  Backtest windows in last {BACKTEST_DAYS} days: {len(settled_window)}. Fetching 1-minute Kalshi quotes…", flush=True)
-    sticks = fetch_candlesticks_for_markets(settled_window, first_minutes=3)
+    first_minutes = 15 if params.enable_early_exits else 3
+    print(
+        f"  Backtest windows in last {BACKTEST_DAYS} days: {len(settled_window)}. "
+        f"Fetching {first_minutes}-minute Kalshi quotes…",
+        flush=True,
+    )
+    sticks = fetch_candlesticks_for_markets(settled_window, first_minutes=first_minutes)
     print(f"  Candlesticks for {sum(1 for v in sticks.values() if v)} / {len(settled_window)} markets", flush=True)
 
-    backtest = run_backtest(settled_window, sticks, candles_1m, series_1m, candles_5m, series_5m, params=params)
+    backtest = run_backtest(
+        settled_window, sticks, candles_1m, series_1m, candles_5m, series_5m, params=params,
+        candles_15m=candles_15m, series_15m=series_15m, candles_1h=candles_1h, series_1h=series_1h,
+    )
     backtest["generated_at"] = iso_utc(now)
     backtest["generated_at_pt"] = fmt_pt(now)
     backtest["candle_source_1m"] = src_1m
     backtest["candle_source_5m"] = src_5m
+    backtest["candle_source_15m"] = src_15m
+    backtest["candle_source_1h"] = src_1h
     save_json(BACKTEST_PATH, backtest)
     wr = backtest.get("win_rate")
     print(
@@ -3154,8 +3777,12 @@ def main() -> int:
     # Use last fully closed 1-min / 5-min bars (not the in-progress one).
     snap1 = indicators_at(candles_1m, series_1m, now_ts - 60)
     snap5 = indicators_at(candles_5m, series_5m, now_ts - 300)
+    snap15 = indicators_at(candles_15m, series_15m, now_ts - 900)
+    snap1h = indicators_at(candles_1h, series_1h, now_ts - 3600)
     ind_1m = snap1[1] if snap1 else None
     ind_5m = snap5[1] if snap5 else None
+    ind_15m = snap15[1] if snap15 else None
+    ind_1h = snap1h[1] if snap1h else None
     if snap1:
         last_closed_1 = snap1[0]
     if snap5:
@@ -3169,8 +3796,29 @@ def main() -> int:
     else:
         ensure_press_fields(state)
 
-    vol, chop = window_chop_features(candles_1m, now_ts - 60)
-    features = {"volatility_usd": vol, "chop_ratio": chop}
+    mp_pre = market_payload(market, now) if market else None
+    scorecard = (strategy_cfg.get("chart_scorecard") or {})
+    features = build_live_features(
+        candles_1m=candles_1m,
+        series_1m=series_1m,
+        ind_1m=ind_1m,
+        ind_5m=ind_5m,
+        ind_15m=ind_15m,
+        ind_1h=ind_1h,
+        btc_price=btc_price,
+        strike=(mp_pre or {}).get("strike"),
+        remaining_sec=(mp_pre or {}).get("remaining_sec"),
+        yes_ask=(mp_pre or {}).get("yes_ask"),
+        yes_bid=(mp_pre or {}).get("yes_bid"),
+        no_ask=(mp_pre or {}).get("no_ask"),
+        no_bid=(mp_pre or {}).get("no_bid"),
+        ticker=(mp_pre or {}).get("ticker"),
+        ts=now_ts - 60,
+        include_live_books=True,
+        scorecard=scorecard,
+        best_chart=(scorecard.get("best_chart") if isinstance(scorecard, dict) else None),
+        params=params,
+    )
     new_state, sig, events = run_live(state, market, settled, ind_1m, ind_5m, btc_price, now, params=params, features=features)
     session = run_session(state, market, settled, ind_1m, ind_5m, btc_price, now, params=params, features=features)
     race, sig_v1, sig_v2 = run_race(
@@ -3207,6 +3855,9 @@ def main() -> int:
         "price_source": price_src,
         "candle_source_1m": src_1m,
         "candle_source_5m": src_5m,
+        "candle_source_15m": src_15m,
+        "candle_source_1h": src_1h,
+        "market_reader": features.get("reader"),
         "polling": {
             "coinbase_cors": True,
             "kalshi_cors": False,
@@ -3229,6 +3880,8 @@ def main() -> int:
             "market": mp,
             "indicators_1m": ind_payload(ind_1m),
             "indicators_5m": ind_payload(ind_5m),
+            "indicators_15m": ind_payload(ind_15m),
+            "indicators_1h": ind_payload(ind_1h),
             "last_1m_close": last_closed_1["close"] if last_closed_1 else None,
             "last_1m_time_pt": fmt_pt(last_closed_1["time"]) if last_closed_1 else None,
             "cash": new_state["cash"],
@@ -3259,6 +3912,7 @@ def main() -> int:
             "params": params.as_dict(),
             "plain_english": strategy_cfg.get("plain_english") or plain_english_params(params),
             "metrics": strategy_cfg.get("metrics") or {},
+            "chart_scorecard": strategy_cfg.get("chart_scorecard") or {},
         },
         "learning": load_existing_dashboard().get("learning"),
         "fee_note": "Every paper trade uses Kalshi’s taker fee, ceil(0.07 × contracts × price × (1 − price)), rounded up to the next cent. The Head-to-Head $100 Race starts two books at $100 together (Version 1 Active Multi-Trade vs Version 2 Strict Rules). Existing $40 race books are lifted to $100 by adding the cash delta, so prior trades and P&L stay accurate. The completed 1-hour $40 run and the ongoing $100 book stay in the Trades tab. All books use flat $4–$8 sizing by signal strength (no 2× press). Every ticket costs $4–$8 including fees.",

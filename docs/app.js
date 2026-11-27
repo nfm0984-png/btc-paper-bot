@@ -626,10 +626,17 @@
     const action = String((item && (item.action || item.label)) || "").toUpperCase();
     const pnl = item && item.pnl;
     const settled = item && (item.status === "closed" || item.outcome === "settlement" || item.kind === "trade");
+    const kind = String((item && (item.pnl_kind || item.exit_kind || item.outcome)) || "").toLowerCase();
+    const early = kind === "tp" || kind === "sl" || kind === "early_exit" || kind === "take_profit" || kind === "cut_loss" || /TAKE_PROFIT|CUT_LOSS|SELL NOW/.test(action);
     if (settled && pnl != null) {
+      if (kind === "tp" || /TAKE_PROFIT/.test(action)) return { cls: "TP", text: "TP " + money(pnl, true) };
+      if (kind === "sl" || /CUT_LOSS/.test(action)) return { cls: "SL", text: "SL " + money(pnl, true) };
+      if (early) return { cls: pnl >= 0 ? "TP" : "SL", text: "EARLY EXIT " + money(pnl, true) };
       if (pnl >= 0) return { cls: "WIN", text: "WIN " + money(pnl, true) };
       return { cls: "LOSS", text: "LOSS " + money(pnl, true) };
     }
+    if (/TAKE_PROFIT|SELL NOW/.test(action)) return { cls: "TP", text: "TP / EARLY EXIT" };
+    if (/CUT_LOSS/.test(action)) return { cls: "SL", text: "SL / EARLY EXIT" };
     if (/WIN/.test(action) && pnl != null) return { cls: "WIN", text: "WIN " + money(pnl, true) };
     if (/LOSS/.test(action) && pnl != null) return { cls: "LOSS", text: "LOSS " + money(pnl, true) };
     if (/BUY_NO|BOUGHT NO|BUY NO/.test(action) && !/HOLD/.test(action)) return { cls: "BOUGHT", text: "BOUGHT NO" };
@@ -852,6 +859,109 @@
       return windowLabelFromClose(new Date(Date.parse(m.close_time))).replace(/ window$/i, " PT");
     }
     return prettyWindow(m) ? prettyWindow(m).replace(/ window$/i, " PT") : "Waiting for the next window";
+  }
+
+
+  function centsEdge(n) {
+    if (n == null || Number.isNaN(Number(n))) return "—";
+    const c = Math.round(Number(n) * 100);
+    return (c > 0 ? "+" : "") + c + "¢";
+  }
+
+  function biasClass(bias) {
+    const b = String(bias || "").toLowerCase();
+    if (b === "up" || b === "buy" || b === "yes" || b === "bullish") return "UP";
+    if (b === "down" || b === "sell" || b === "no" || b === "bearish") return "DOWN";
+    return "MIXED";
+  }
+
+  function renderMarketReader(data, live) {
+    const reader = (data && data.market_reader) || (live && live.market_reader) || {};
+    const charts = reader.charts || {};
+    const cons = reader.consensus || {};
+    const score = reader.scorecard || (data.strategy && data.strategy.chart_scorecard) || (data.learning && data.learning.chart_scorecard) || {};
+    const best = reader.best_chart || score.best_chart || "5m";
+    if ($("reader-best")) $("reader-best").textContent = "Best chart: " + best;
+    const bias = cons.bias || reader.btc_bias || "mixed";
+    const biasEl = $("reader-bias");
+    if (biasEl) {
+      biasEl.textContent = cons.label || (bias === "up" ? "Bullish alignment" : bias === "down" ? "Bearish alignment" : "Mixed / choppy");
+      biasEl.className = "pill " + biasClass(bias);
+    }
+    if ($("reader-title")) {
+      $("reader-title").textContent = cons.label ? (cons.label + (best ? " · watching the " + best + " chart" : "")) : "Reading Bitcoin…";
+    }
+    const grid = $("reader-charts");
+    if (grid) {
+      grid.innerHTML = ["1m", "5m", "15m", "1h"].map((tf) => {
+        const c = charts[tf] || {};
+        const b = c.bias || (c.ready ? "flat" : "—");
+        const rsi = c.rsi14 != null ? ("RSI " + Math.round(c.rsi14)) : "warming up";
+        const macd = c.macd_hist != null ? ("MACD " + (c.macd_hist >= 0 ? "+" : "") + Number(c.macd_hist).toFixed(1)) : "";
+        const mark = (String(best).toLowerCase() === tf || String(best).toLowerCase() === "multi-tf" && tf === "15m") ? " · best" : "";
+        return `<div class="tf-cell ${esc(c.bias || "flat")}"><div class="tf-name">${tf} chart${mark}</div><div class="tf-bias">${esc(String(b))}</div><div class="tf-meta">${esc([rsi, macd].filter(Boolean).join(" · "))}</div></div>`;
+      }).join("");
+    }
+    const implied = reader.implied_yes;
+    const fair = reader.fair_yes;
+    const yesEdge = reader.yes_edge;
+    const noEdge = reader.no_edge;
+    const flow = reader.btc_bias || ((reader.btc_flow || {}).bias);
+    const bookBias = (reader.kalshi_book || {}).bias;
+    const spread = (reader.kalshi_book || {}).spread_cents;
+    const mets = [
+      ["Spot fair Yes", fair == null ? "—" : Math.round(fair * 100) + "¢"],
+      ["Kalshi Yes ask", implied == null ? "—" : Math.round(implied * 100) + "¢"],
+      ["Yes edge", centsEdge(yesEdge)],
+      ["No edge", centsEdge(noEdge)],
+      ["BTC book / flow", flow ? String(flow) : "—"],
+      ["Kalshi book", bookBias ? (bookBias + (spread != null ? " · " + spread + "¢ spread" : "")) : "—"],
+    ];
+    if ($("reader-metrics")) {
+      $("reader-metrics").innerHTML = mets.map(([k, v]) => {
+        const cls = (k.indexOf("edge") >= 0 && typeof v === "string" && v.startsWith("+")) ? "up" : (k.indexOf("edge") >= 0 && typeof v === "string" && v.startsWith("-") ? "down" : "");
+        return `<div class="metric"><div class="k">${esc(k)}</div><div class="v ${cls}">${esc(String(v))}</div></div>`;
+      }).join("");
+    }
+    const buy = reader.buy_rules || "";
+    const sell = reader.sell_rules || "";
+    if ($("reader-rules")) {
+      $("reader-rules").textContent = [sell, buy].filter(Boolean).join(" ");
+    }
+    if ($("reader-sub")) {
+      const ready = (cons.ready || []).join(", ") || "waiting on candles";
+      $("reader-sub").textContent = "Charts ready: " + ready + ". Coinbase / Kraken book & flow, Kalshi KXBTC15M book, and a spot-fair probability from realized 1-minute volatility.";
+    }
+  }
+
+  function renderScorecard(data) {
+    const score = (data.learning && data.learning.chart_scorecard) || (data.strategy && data.strategy.chart_scorecard) || {};
+    if ($("scorecard-title")) {
+      const bits = [score.best_chart ? ("Best chart: " + score.best_chart) : null, score.best_exit ? ("Best exit: " + score.best_exit) : null].filter(Boolean);
+      $("scorecard-title").textContent = bits.length ? bits.join(" · ") : "Which charts are winning";
+    }
+    if ($("scorecard-sub") && score.windows_with_exit_path != null) {
+      $("scorecard-sub").textContent = (score.windows || "") && (Number(score.windows).toLocaleString("en-US") + " windows scored") + (score.windows_with_exit_path != null ? (" · " + score.windows_with_exit_path + " with a full bid path for exits") : "");
+    }
+    if ($("scorecard-takeaway")) $("scorecard-takeaway").textContent = score.takeaway || "The hourly learner will fill this in after it scores the charts.";
+    const el = $("scorecard-rows");
+    if (!el) return;
+    const rows = score.rows || [];
+    if (!rows.length) { el.innerHTML = ""; return; }
+    const bests = new Set([score.best_chart, score.best_exit, score.best_reader].filter(Boolean));
+    el.innerHTML = `<div class="scorecard-table">${rows.map((r) => {
+      const v = r.val || {};
+      const o = r.overall || {};
+      const cls = bests.has(r.name) ? "scorecard-row best" : "scorecard-row";
+      const valPnl = v.net_pnl;
+      const wr = v.win_rate != null && v.trade_count ? (v.win_rate.toFixed(1) + "% · " + v.trade_count + " trades") : "no trades";
+      return `<div class="${cls}">
+        <div><div class="name">${esc(r.name || "")}</div><div class="kind">${esc(r.kind || "")}</div></div>
+        <div><div class="k" style="font-size:11px;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted)">Unseen P&amp;L</div><div class="v ${valPnl > 0 ? "up" : valPnl < 0 ? "down" : ""}">${money(valPnl, true)}</div></div>
+        <div><div class="k" style="font-size:11px;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted)">Unseen record</div><div class="v">${esc(wr)}</div></div>
+        <div><div class="k" style="font-size:11px;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted)">Overall / DD</div><div class="v">${money(o.net_pnl, true)} · ${o.max_drawdown_pct != null ? Number(o.max_drawdown_pct).toFixed(1) + "% DD" : "—"}</div></div>
+      </div>`;
+    }).join("")}</div>`;
   }
 
   function renderRaceBar(data, live) {
@@ -1122,10 +1232,12 @@
     const sess = data.session || {};
     const bt = data.backtest || {};
     renderHero(data, live, sess);
+    renderMarketReader(data, live);
     renderRace(data, live);
     renderSession(sess);
     renderTrades(live, sess, data.race || {});
     renderLearning(data);
+    renderScorecard(data);
     renderBacktest(bt);
   }
 

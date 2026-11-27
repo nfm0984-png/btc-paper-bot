@@ -19,6 +19,7 @@ from datetime import datetime, timedelta
 from typing import Optional
 
 import bot
+import market_reader
 
 LOG_MAX_ENTRIES = 200
 VAL_MARGIN_USD = 1.50
@@ -79,6 +80,7 @@ def strategy_snapshot(cfg: dict) -> dict:
         "params": params.as_dict(),
         "plain_english": cfg.get("plain_english") or bot.plain_english_params(params),
         "metrics": cfg.get("metrics") or {},
+        "chart_scorecard": cfg.get("chart_scorecard") or {},
         "last_promoted_at": cfg.get("last_promoted_at"),
         "last_promoted_at_pt": cfg.get("last_promoted_at_pt"),
     }
@@ -127,6 +129,18 @@ PARAM_LABELS = {
     "min_volatility_usd": ("min 15m range", lambda v: f"${float(v):.0f}"),
     "max_chop_ratio": ("max chop", lambda v: f"{float(v):.2f}"),
     "ema_flat_dollars": ("flat-EMA band", lambda v: f"${float(v):.0f}"),
+    "chart_mode": ("chart mode", lambda v: str(v)),
+    "require_15m_align": ("15-minute filter", lambda v: "on" if v else "off"),
+    "require_1h_align": ("1-hour filter", lambda v: "on" if v else "off"),
+    "min_fair_edge": ("min fair edge", lambda v: f"{float(v)*100:.0f}¢"),
+    "max_spread_cents": ("max spread", lambda v: f"{float(v):.0f}¢"),
+    "enable_early_exits": ("early exits", lambda v: "on" if v else "off"),
+    "tp_bid": ("take-profit bid", lambda v: f"{int(round(float(v)*100))}¢"),
+    "tp_gain": ("take-profit gain", lambda v: f"+{int(round(float(v)*100))}¢"),
+    "sl_drop": ("stop-loss drop", lambda v: f"{int(round(float(v)*100))}¢"),
+    "tp_require_stall": ("TP needs stall", lambda v: "on" if v else "off"),
+    "sl_require_reversal": ("SL needs reversal", lambda v: "on" if v else "off"),
+    "fair_giveback": ("fair-value giveback", lambda v: "on" if v else "off"),
 }
 
 
@@ -200,6 +214,43 @@ def candidate_grid(current: bot.StrategyParams) -> list[tuple[str, bot.StrategyP
         max_chop_ratio=0.70,
         min_volatility_usd=20,
     )
+    add("chart_1m", chart_mode="1m", require_5m_align=False, require_15m_align=False, require_1h_align=False)
+    add("chart_1m_5m", chart_mode="1m_5m", require_5m_align=True, require_15m_align=False, require_1h_align=False)
+    add("chart_1m_15m", chart_mode="1m_15m", require_5m_align=False, require_15m_align=True, require_1h_align=False)
+    add("chart_1m_1h", chart_mode="1m_1h", require_5m_align=False, require_15m_align=False, require_1h_align=True)
+    add("chart_mtf", chart_mode="mtf", require_5m_align=False, require_15m_align=False, require_1h_align=False)
+    for edge in (0.03, 0.05, 0.08):
+        add(f"fair_edge_{int(edge*100)}", min_fair_edge=edge)
+    for sp in (3, 4, 6):
+        add(f"spread_{sp}", max_spread_cents=sp)
+    add("hold_to_expiry", enable_early_exits=False)
+    add("tp85_gain25", tp_bid=0.85, tp_gain=0.25, enable_early_exits=True)
+    add("tp85_stall", tp_bid=0.85, tp_gain=0.25, tp_require_stall=True, enable_early_exits=True)
+    add("tp90_gain35", tp_bid=0.90, tp_gain=0.35, enable_early_exits=True)
+    add("sl_reversal", sl_require_reversal=True, enable_early_exits=True)
+    add("fair_giveback", fair_giveback=True, enable_early_exits=True)
+    add(
+        "protective_exits",
+        enable_early_exits=True,
+        tp_bid=0.85,
+        tp_gain=0.25,
+        tp_require_stall=True,
+        sl_require_reversal=True,
+        sl_drop=0.12,
+        fair_giveback=True,
+    )
+    add(
+        "reader_quality",
+        chart_mode="mtf",
+        min_fair_edge=0.03,
+        max_spread_cents=6,
+        enable_early_exits=True,
+        tp_bid=0.85,
+        tp_gain=0.25,
+        tp_require_stall=True,
+        sl_require_reversal=True,
+        fair_giveback=True,
+    )
     return cands
 
 
@@ -230,6 +281,11 @@ def prepare_window(
     series_1m: list,
     candles_5m: list[dict],
     series_5m: list,
+    candles_15m: Optional[list[dict]] = None,
+    series_15m: Optional[list] = None,
+    candles_1h: Optional[list[dict]] = None,
+    series_1h: Optional[list] = None,
+    include_exit_path: bool = True,
 ) -> Optional[dict]:
     if market.get("result") not in ("yes", "no"):
         return None
@@ -244,7 +300,8 @@ def prepare_window(
         return None
     vol, chop = bot.window_chop_features(candles_1m, decision_ts - 1)
     close_ts = market["close_time"]
-    return {
+    remaining = bot.to_ts(close_ts) - decision_ts
+    w = {
         "ticker": market["ticker"],
         "open_time": bot.iso_utc(market["open_time"]),
         "close_time": bot.iso_utc(close_ts),
@@ -260,11 +317,163 @@ def prepare_window(
         "yes_bid": q.get("yes_bid"),
         "no_ask": q.get("no_ask"),
         "no_bid": q.get("no_bid"),
-        "remaining_sec": bot.to_ts(close_ts) - decision_ts,
+        "remaining_sec": remaining,
         "ind_1m": bot.ind_payload(snap1[1]),
         "ind_5m": bot.ind_payload(snap5[1]) if snap5 else bot.ind_payload(None),
         "volatility_usd": vol,
         "chop_ratio": chop,
+    }
+    return enrich_window_features(
+        w,
+        candles_1m,
+        series_1m,
+        candles_15m,
+        series_15m,
+        candles_1h,
+        series_1h,
+        sticks=sticks.get(market["ticker"]) if include_exit_path else None,
+    )
+
+
+def window_incomplete(w: dict) -> bool:
+    if not isinstance(w, dict):
+        return True
+    if not (w.get("ind_15m") or {}).get("ready"):
+        return True
+    if not (w.get("ind_1h") or {}).get("ready"):
+        return True
+    if w.get("fair_yes") is None:
+        return True
+    return False
+
+
+def enrich_window_features(
+    w: dict,
+    candles_1m,
+    series_1m,
+    candles_15m,
+    series_15m,
+    candles_1h,
+    series_1h,
+    sticks: Optional[list] = None,
+) -> dict:
+    ts = int(w.get("decision_ts") or 0) - 1
+    if candles_15m and series_15m:
+        snap15 = bot.indicators_at(candles_15m, series_15m, ts)
+        w["ind_15m"] = bot.ind_payload(snap15[1] if snap15 else None)
+    if candles_1h and series_1h:
+        snap1h = bot.indicators_at(candles_1h, series_1h, ts)
+        w["ind_1h"] = bot.ind_payload(snap1h[1] if snap1h else None)
+    sigma = market_reader.realized_vol_per_sqrt_min(candles_1m, ts) if candles_1m else w.get("sigma_usd")
+    minutes = (w.get("remaining_sec") or 840) / 60.0
+    fair = market_reader.fair_yes_probability(w.get("btc_price"), w.get("strike"), sigma, minutes)
+    w["sigma_usd"] = None if sigma is None else round(float(sigma), 3)
+    w["fair_yes"] = None if fair is None else round(float(fair), 4)
+    w["yes_edge"] = market_reader.side_edge(fair, w.get("yes_ask"))
+    w["no_edge"] = market_reader.side_edge(None if fair is None else 1.0 - float(fair), w.get("no_ask"))
+    if w.get("yes_ask") is not None and w.get("yes_bid") is not None:
+        w["spread_cents"] = round((float(w["yes_ask"]) - float(w["yes_bid"])) * 100.0, 1)
+    if sticks is not None and candles_1m and series_1m:
+        path = bot.build_exit_path(
+            sticks,
+            candles_1m,
+            series_1m,
+            bot.to_ts(w["open_time"]),
+            bot.to_ts(w["close_time"]),
+        )
+        if path:
+            w["exit_path"] = path
+    return w
+
+
+EXIT_PATH_BACKFILL = 500
+
+
+def scorecard_rows(windows: list[dict], current: bot.StrategyParams) -> dict:
+    """Walk-forward comparison of chart timeframes, market-reader gates, and exit rules."""
+    studies: list[tuple[str, str, dict]] = [
+        ("1m", "chart", {"chart_mode": "1m", "require_5m_align": False, "require_15m_align": False, "require_1h_align": False}),
+        ("5m", "chart", {"chart_mode": "1m_5m", "require_5m_align": True, "require_15m_align": False, "require_1h_align": False}),
+        ("15m", "chart", {"chart_mode": "1m_15m", "require_5m_align": False, "require_15m_align": True, "require_1h_align": False}),
+        ("1h", "chart", {"chart_mode": "1m_1h", "require_5m_align": False, "require_15m_align": False, "require_1h_align": True}),
+        ("multi-TF", "chart", {"chart_mode": "mtf", "require_5m_align": False, "require_15m_align": False, "require_1h_align": False}),
+        ("no fair-edge gate", "reader", {"min_fair_edge": 0.0}),
+        ("fair edge 3¢", "reader", {"min_fair_edge": 0.03}),
+        ("fair edge 5¢", "reader", {"min_fair_edge": 0.05}),
+        ("fair edge 8¢", "reader", {"min_fair_edge": 0.08}),
+        ("spread ≤4¢", "reader", {"max_spread_cents": 4}),
+        ("spread ≤6¢", "reader", {"max_spread_cents": 6}),
+        ("hold to expiry", "exit", {"enable_early_exits": False}),
+        ("current TP/SL", "exit", {"enable_early_exits": True, "tp_bid": 0.80, "tp_gain": 0.15, "sl_drop": 0.12, "tp_require_stall": False, "sl_require_reversal": False, "fair_giveback": False}),
+        ("TP 85¢ / +25¢ + stall", "exit", {"enable_early_exits": True, "tp_bid": 0.85, "tp_gain": 0.25, "tp_require_stall": True}),
+        ("TP 90¢ / +35¢", "exit", {"enable_early_exits": True, "tp_bid": 0.90, "tp_gain": 0.35}),
+        ("SL only on reversal", "exit", {"enable_early_exits": True, "sl_require_reversal": True}),
+        ("fair giveback", "exit", {"enable_early_exits": True, "fair_giveback": True}),
+        ("protective exits", "exit", {"enable_early_exits": True, "tp_bid": 0.85, "tp_gain": 0.25, "tp_require_stall": True, "sl_require_reversal": True, "fair_giveback": True}),
+    ]
+    rows = []
+    path_n = sum(1 for w in windows if w.get("exit_path"))
+    for name, kind, overrides in studies:
+        d = current.as_dict()
+        d.update(overrides)
+        ev = evaluate(windows, bot.params_from_dict(d))
+        val = ev["val"]
+        rows.append({
+            "name": name,
+            "kind": kind,
+            "train": ev["train"],
+            "val": val,
+            "overall": ev["overall"],
+        })
+    def val_key(row):
+        v = row["val"]
+        return (
+            float(v.get("net_pnl") or -9999),
+            -float(row["overall"].get("max_drawdown_pct") or 99),
+            float(v.get("win_rate") or 0),
+        )
+
+    def quality_ok(row):
+        o = row["overall"]
+        v = row["val"]
+        if (o.get("trade_count") or 0) < 8:
+            return False
+        if (v.get("trade_count") or 0) < 6 and row["kind"] != "reader":
+            return False
+        if float(o.get("net_pnl") or 0) <= 0:
+            return False
+        if float(o.get("max_drawdown_pct") or 0) > 40:
+            return False
+        return True
+
+    def pick(kind):
+        group = [r for r in rows if r["kind"] == kind]
+        qualified = [r for r in group if quality_ok(r)]
+        pool = qualified or group
+        return max(pool, key=val_key) if pool else None
+
+    charts = [r for r in rows if r["kind"] == "chart"]
+    exits = [r for r in rows if r["kind"] == "exit"]
+    readers = [r for r in rows if r["kind"] == "reader"]
+    best_chart = pick("chart")
+    best_exit = pick("exit")
+    best_reader = pick("reader")
+    return {
+        "windows": len(windows),
+        "windows_with_exit_path": path_n,
+        "rows": rows,
+        "best_chart": None if not best_chart else best_chart["name"],
+        "best_exit": None if not best_exit else best_exit["name"],
+        "best_reader": None if not best_reader else best_reader["name"],
+        "takeaway": (
+            f"Best unseen chart is {best_chart['name']} "
+            f"({signed_money(best_chart['val'].get('net_pnl'))}, {wr_label(best_chart['val'])}). "
+            f"Best market-reader gate is {best_reader['name']} "
+            f"({signed_money(best_reader['val'].get('net_pnl'))}). "
+            f"Best exit rule is {best_exit['name']} "
+            f"({signed_money(best_exit['val'].get('net_pnl'))}, {wr_label(best_exit['val'])})"
+            + (f" on {path_n} windows with a full bid path." if path_n else ".")
+        ) if best_chart and best_exit and best_reader else "Not enough windows to score charts yet.",
     }
 
 
@@ -293,31 +502,70 @@ def update_history(now: datetime) -> tuple[list[dict], dict]:
     missing = [m for m in markets if m["ticker"] not in by_ticker]
     print(f"  Already stored: {len(by_ticker)}; new to feature: {len(missing)}", flush=True)
 
-    if missing or not by_ticker:
+    incomplete = [
+        m for m in markets
+        if m["ticker"] in by_ticker and window_incomplete(by_ticker[m["ticker"]])
+    ]
+    missing_paths = [
+        m for m in markets
+        if m["ticker"] in by_ticker and len(by_ticker[m["ticker"]].get("exit_path") or []) < 5
+    ]
+    need_candles = bool(missing or incomplete or missing_paths or not by_ticker)
+    src_1m = src_5m = src_15m = src_1h = "cached"
+    if need_candles:
         oldest = min(bot.to_ts(m["open_time"]) for m in markets) if markets else int((now - timedelta(days=bot.HISTORY_DAYS)).timestamp())
         candle_start = oldest - bot.BACKTEST_CANDLE_PAD_HOURS * 3600
         candle_end = int(now.timestamp()) + 60
-        print("  Downloading Coinbase/Kraken 1m and 5m candles…", flush=True)
+        print("  Downloading Coinbase/Kraken 1m, 5m, 15m, and 1h candles…", flush=True)
         candles_1m, src_1m = bot.fetch_btc_candles(candle_start, candle_end, 60)
         candles_5m, src_5m = bot.fetch_btc_candles(candle_start, candle_end, 300)
-        series_1m = bot.compute_indicators(candles_1m)
-        series_5m = bot.compute_indicators(candles_5m)
+        candles_15m, src_15m = bot.fetch_btc_candles(candle_start, candle_end, 900)
+        candles_1h, src_1h = bot.fetch_btc_candles(candle_start, candle_end, 3600)
+        series_1m = bot.compute_indicators(candles_1m, vwap_lookback=30)
+        series_5m = bot.compute_indicators(candles_5m, vwap_lookback=24)
+        series_15m = bot.compute_indicators(candles_15m, vwap_lookback=20)
+        series_1h = bot.compute_indicators(candles_1h, vwap_lookback=24)
         print(
-            f"  1m candles: {len(candles_1m)} ({src_1m}); 5m candles: {len(candles_5m)} ({src_5m})",
+            f"  1m: {len(candles_1m)} ({src_1m}); 5m: {len(candles_5m)} ({src_5m}); "
+            f"15m: {len(candles_15m)} ({src_15m}); 1h: {len(candles_1h)} ({src_1h})",
             flush=True,
         )
         fetch_list = missing if by_ticker else markets
-        print(f"  Fetching Kalshi 1-minute quotes for {len(fetch_list)} windows…", flush=True)
-        sticks = bot.fetch_candlesticks_for_markets(fetch_list, first_minutes=3)
+        path_targets = []
+        if fetch_list:
+            path_targets.extend(fetch_list)
+        # Backfill exit paths for older windows, newest first, capped so the hourly job stays inside its timeout.
+        extra_paths = [m for m in reversed(missing_paths) if m["ticker"] not in {x["ticker"] for x in path_targets}]
+        path_targets.extend(extra_paths[:EXIT_PATH_BACKFILL])
+        print(
+            f"  Fetching Kalshi 15-minute quote paths for {len(path_targets)} windows "
+            f"({len(fetch_list)} new, {len(path_targets) - len(fetch_list)} backfill)…",
+            flush=True,
+        )
+        sticks = bot.fetch_candlesticks_for_markets(path_targets, first_minutes=15) if path_targets else {}
         built = 0
         for m in fetch_list:
-            w = prepare_window(m, sticks, candles_1m, series_1m, candles_5m, series_5m)
+            w = prepare_window(
+                m, sticks, candles_1m, series_1m, candles_5m, series_5m,
+                candles_15m, series_15m, candles_1h, series_1h, include_exit_path=True,
+            )
             if w:
                 by_ticker[w["ticker"]] = w
                 built += 1
         print(f"  Featured {built} / {len(fetch_list)} new windows", flush=True)
-    else:
-        src_1m = src_5m = "cached"
+        refreshed = 0
+        for m in markets:
+            w = by_ticker.get(m["ticker"])
+            if not w:
+                continue
+            path_sticks = sticks.get(m["ticker"]) if m["ticker"] in {x["ticker"] for x in path_targets} else None
+            if window_incomplete(w) or path_sticks:
+                by_ticker[m["ticker"]] = enrich_window_features(
+                    w, candles_1m, series_1m, candles_15m, series_15m, candles_1h, series_1h,
+                    sticks=path_sticks,
+                )
+                refreshed += 1
+        print(f"  Refreshed chart/fair/exit features on {refreshed} stored windows", flush=True)
 
     windows = [w for w in by_ticker.values() if bot.to_ts(w.get("close_time") or w.get("open_time")) >= cutoff_ts]
     windows.sort(key=lambda w: bot.to_ts(w.get("open_time")))
@@ -332,6 +580,8 @@ def update_history(now: datetime) -> tuple[list[dict], dict]:
         "window_count": len(windows),
         "candle_source_1m": src_1m,
         "candle_source_5m": src_5m,
+        "candle_source_15m": src_15m,
+        "candle_source_1h": src_1h,
         "windows": windows,
     }
     bot.save_json(bot.HISTORY_WINDOWS_PATH, payload)
@@ -455,6 +705,10 @@ def run_learn() -> int:
         flush=True,
     )
 
+    print("  Scoring chart timeframes, market-reader gates, and exit rules…", flush=True)
+    chart_scorecard = scorecard_rows(windows, current)
+    print(f"  {chart_scorecard.get('takeaway')}", flush=True)
+
     grid = candidate_grid(current)
     print(f"  Testing {len(grid)} parameter sets (fees + flat $4–$8, no press)…", flush=True)
 
@@ -524,6 +778,7 @@ def run_learn() -> int:
                 "candidate": pick_name,
             },
             "plain_english": bot.plain_english_params(pick_params),
+            "chart_scorecard": chart_scorecard,
             "last_promoted_at": bot.iso_utc(now),
             "last_promoted_at_pt": bot.fmt_pt(now),
         }
@@ -554,6 +809,7 @@ def run_learn() -> int:
             "metrics_updated_at": bot.iso_utc(now),
             "metrics_updated_at_pt": bot.fmt_pt(now),
         }
+        cfg["chart_scorecard"] = chart_scorecard
         bot.save_json(bot.STRATEGY_CONFIG_PATH, cfg)
         print(f"  {decision}: {reason}", flush=True)
 
@@ -606,6 +862,13 @@ def run_learn() -> int:
         "decision": decision,
         "takeaway": note,
         "reason": reason,
+        "chart_scorecard": {
+            "best_chart": chart_scorecard.get("best_chart"),
+            "best_exit": chart_scorecard.get("best_exit"),
+            "best_reader": chart_scorecard.get("best_reader"),
+            "takeaway": chart_scorecard.get("takeaway"),
+            "windows_with_exit_path": chart_scorecard.get("windows_with_exit_path"),
+        },
     }
 
     log = load_json(bot.LEARNING_LOG_PATH, {"runs": []})
@@ -630,6 +893,7 @@ def run_learn() -> int:
         "live_version": live_cfg.get("version", new_version if promoted else version),
         "decision": decision,
         "takeaway": note,
+        "chart_scorecard": chart_scorecard,
         "last_run": entry,
         "runs": list(reversed(runs[-48:])),  # newest first for the dashboard
     }
