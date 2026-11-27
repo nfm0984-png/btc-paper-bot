@@ -499,11 +499,16 @@
       "t": 1795801141,
       "t_pt": "Nov 27, 2026, 9:39 AM PT",
       "equity": 78.09
+    },
+    {
+      "t": 1795801442,
+      "t_pt": "Nov 27, 2026, 9:44 AM PT",
+      "equity": 78.09
     }
   ],
   "created_at": "2026-11-26T18:33:31Z",
-  "updated_at": "2026-11-27T17:39:01Z",
-  "updated_at_pt": "Nov 27, 2026, 9:39 AM PT",
+  "updated_at": "2026-11-27T17:44:02Z",
+  "updated_at_pt": "Nov 27, 2026, 9:44 AM PT",
   "session": {
     "starting_balance": 40.0,
     "stake": 5.0,
@@ -674,8 +679,8 @@
         "reason": "Picked NO @ 70\u00a2 \u2014 BTC is \u2212$136 below strike with 1m trending down & RSI cooled to 39.",
         "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov271245-45",
         "window_entry": 1,
-        "mark": 7.59,
-        "pnl": -0.28,
+        "mark": 10.98,
+        "pnl": 3.11,
         "pnl_kind": "unrealized",
         "book_id": "v1",
         "book_label": "Version 1"
@@ -703,8 +708,8 @@
           "reason": "Picked NO @ 70\u00a2 \u2014 BTC is \u2212$136 below strike with 1m trending down & RSI cooled to 39.",
           "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov271245-45",
           "window_entry": 1,
-          "mark": 7.59,
-          "pnl": -0.28,
+          "mark": 10.98,
+          "pnl": 3.11,
           "pnl_kind": "unrealized",
           "book_id": "v1",
           "book_label": "Version 1"
@@ -3028,11 +3033,35 @@
           "book_id": "v1",
           "book_label": "Version 1",
           "open_count": 1
+        },
+        {
+          "t": "2026-11-27T17:44:02Z",
+          "t_pt": "Nov 27, 2026, 9:44 AM PT",
+          "ticker": "KXBTC15M-26NOV271245-45",
+          "close_time": "2026-11-27T17:45:00Z",
+          "close_time_pt": "Nov 27, 2026, 9:45 AM PT",
+          "window_label": "9:30 AM \u2013 9:45 AM PT",
+          "action": "HOLD",
+          "label": "HOLD open trades \u2014 Too close to expiry",
+          "reason": "Only 0:58 left in this window, so Version 1 won\u2019t open another ticket.",
+          "reason_full": "Only 0:58 left in this window, so Version 1 won\u2019t open another ticket.",
+          "btc_price": 59494.49,
+          "strike": 59655.7,
+          "yes_ask": 0.002,
+          "no_ask": 0.999,
+          "side": "no",
+          "ask": null,
+          "contracts": 11,
+          "entry_price": 0.7,
+          "cash": 61.15,
+          "book_id": "v1",
+          "book_label": "Version 1",
+          "open_count": 1
         }
       ],
-      "equity": 68.74,
-      "pnl": -31.26,
-      "pnl_pct": -31.26,
+      "equity": 72.13,
+      "pnl": -27.87,
+      "pnl_pct": -27.87,
       "amount_bought": 197.85,
       "contracts_total": 319,
       "wins": 14,
@@ -3063,9 +3092,9 @@
         "Settled NO on KXBTC15M-26NOV271230-30: Settled NO at BTC 59655.7 vs strike 59932.33. PnL +4.12",
         "Opened NO 11x KXBTC15M-26NOV271245-45 @ 70\u00a2 (bought $7.87, $8 ticket, entry #1 in window)"
       ],
-      "net_pnl": -31.26,
-      "updated_at": "2026-11-27T17:39:01Z",
-      "updated_at_pt": "Nov 27, 2026, 9:39 AM PT"
+      "net_pnl": -27.87,
+      "updated_at": "2026-11-27T17:44:02Z",
+      "updated_at_pt": "Nov 27, 2026, 9:44 AM PT"
     },
     "v2": {
       "id": "v2",
@@ -4807,6 +4836,30 @@
           "book_id": "v2",
           "book_label": "Version 2",
           "open_count": 0
+        },
+        {
+          "t": "2026-11-27T17:44:02Z",
+          "t_pt": "Nov 27, 2026, 9:44 AM PT",
+          "ticker": "KXBTC15M-26NOV271245-45",
+          "close_time": "2026-11-27T17:45:00Z",
+          "close_time_pt": "Nov 27, 2026, 9:45 AM PT",
+          "window_label": "9:30 AM \u2013 9:45 AM PT",
+          "action": "WAIT",
+          "label": "WAIT \u2014 Too close to expiry",
+          "reason": "Only 0:58 left in this window. The bot stands aside under 2 minutes.",
+          "reason_full": "Only 0:58 left in this window. The bot stands aside under 2 minutes.",
+          "btc_price": 59494.49,
+          "strike": 59655.7,
+          "yes_ask": 0.002,
+          "no_ask": 0.999,
+          "side": null,
+          "ask": null,
+          "contracts": null,
+          "entry_price": null,
+          "cash": 82.79,
+          "book_id": "v2",
+          "book_label": "Version 2",
+          "open_count": 0
         }
       ],
       "equity": 82.79,
@@ -4822,34 +4875,34 @@
       "created_at": "2026-11-26T20:22:54Z",
       "events": [],
       "net_pnl": -17.21,
-      "updated_at": "2026-11-27T17:39:01Z",
-      "updated_at_pt": "Nov 27, 2026, 9:39 AM PT"
+      "updated_at": "2026-11-27T17:44:02Z",
+      "updated_at_pt": "Nov 27, 2026, 9:44 AM PT"
     },
     "leader": "v2",
     "leader_label": "Version 2 ahead",
-    "leader_margin": 14.05,
-    "leader_text": "Version 2 ahead by +$14.05",
+    "leader_margin": 10.66,
+    "leader_text": "Version 2 ahead by +$10.66",
     "choice": {
       "v1": {
         "action": "HOLD",
-        "label": "BOUGHT NO @ 70\u00a2",
-        "reason": "Picked NO @ 70\u00a2 \u2014 BTC is \u2212$136 below strike with 1m trending down & RSI cooled to 39.",
+        "label": "HOLD open trades \u2014 Too close to expiry",
+        "reason": "Only 0:58 left in this window, so Version 1 won\u2019t open another ticket.",
         "side": "no",
-        "ask": 0.7,
-        "strength": "top",
-        "base_stake": 8.0
+        "ask": null,
+        "strength": null,
+        "base_stake": null
       },
       "v2": {
         "action": "WAIT",
-        "label": "WAIT \u2014 No Trade",
-        "reason": "Choppy / no clean edge: price is below the strike, but the 1-minute trend/momentum is not cleanly bearish (MACD histogram is still positive); Yes ask 31\u00a2.",
+        "label": "WAIT \u2014 Too close to expiry",
+        "reason": "Only 0:58 left in this window. The bot stands aside under 2 minutes.",
         "side": null,
         "ask": null,
         "strength": null,
         "base_stake": null
       }
     },
-    "updated_at": "2026-11-27T17:39:01Z",
-    "updated_at_pt": "Nov 27, 2026, 9:39 AM PT"
+    "updated_at": "2026-11-27T17:44:02Z",
+    "updated_at_pt": "Nov 27, 2026, 9:44 AM PT"
   }
 }
