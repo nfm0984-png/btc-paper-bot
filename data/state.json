@@ -354,11 +354,16 @@
       "t": 1795786470,
       "t_pt": "Nov 27, 2026, 5:34 AM PT",
       "equity": 85.85
+    },
+    {
+      "t": 1795786769,
+      "t_pt": "Nov 27, 2026, 5:39 AM PT",
+      "equity": 85.85
     }
   ],
   "created_at": "2026-11-26T18:33:31Z",
-  "updated_at": "2026-11-27T13:34:30Z",
-  "updated_at_pt": "Nov 27, 2026, 5:34 AM PT",
+  "updated_at": "2026-11-27T13:39:29Z",
+  "updated_at_pt": "Nov 27, 2026, 5:39 AM PT",
   "session": {
     "starting_balance": 40.0,
     "stake": 5.0,
@@ -529,8 +534,8 @@
         "reason": "Picked NO @ 59\u00a2 \u2014 BTC is \u2212$58 below strike with 1m trending down & RSI cooled to 42.",
         "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov270845-45",
         "window_entry": 1,
-        "mark": 7.54,
-        "pnl": -0.36,
+        "mark": 3.9,
+        "pnl": -4.0,
         "pnl_kind": "unrealized",
         "book_id": "v1",
         "book_label": "Version 1"
@@ -558,8 +563,8 @@
           "reason": "Picked NO @ 59\u00a2 \u2014 BTC is \u2212$58 below strike with 1m trending down & RSI cooled to 42.",
           "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov270845-45",
           "window_entry": 1,
-          "mark": 7.54,
-          "pnl": -0.36,
+          "mark": 3.9,
+          "pnl": -4.0,
           "pnl_kind": "unrealized",
           "book_id": "v1",
           "book_label": "Version 1"
@@ -2139,11 +2144,35 @@
           "book_id": "v1",
           "book_label": "Version 1",
           "open_count": 1
+        },
+        {
+          "t": "2026-11-27T13:39:29Z",
+          "t_pt": "Nov 27, 2026, 5:39 AM PT",
+          "ticker": "KXBTC15M-26NOV270845-45",
+          "close_time": "2026-11-27T13:45:00Z",
+          "close_time_pt": "Nov 27, 2026, 5:45 AM PT",
+          "window_label": "5:30 AM \u2013 5:45 AM PT",
+          "action": "HOLD",
+          "label": "HOLD open trades \u2014 WAIT \u2014 Too close to strike",
+          "reason": "BTC is +$5 above strike. That\u2019s inside a $20 band, so settlement could still flip either way.",
+          "reason_full": "BTC is +$5 above strike. That\u2019s inside a $20 band, so settlement could still flip either way.",
+          "btc_price": 61370.52,
+          "strike": 61365.61,
+          "yes_ask": 0.7,
+          "no_ask": 0.31,
+          "side": "no",
+          "ask": null,
+          "contracts": 13,
+          "entry_price": 0.59,
+          "cash": 61.73,
+          "book_id": "v1",
+          "book_label": "Version 1",
+          "open_count": 1
         }
       ],
-      "equity": 69.27,
-      "pnl": -30.73,
-      "pnl_pct": -30.73,
+      "equity": 65.63,
+      "pnl": -34.37,
+      "pnl_pct": -34.37,
       "amount_bought": 156.27,
       "contracts_total": 257,
       "wins": 10,
@@ -2174,9 +2203,9 @@
         "Settled NO on KXBTC15M-26NOV270830-30: Settled NO at BTC 61365.61 vs strike 61426.74. PnL +4.36",
         "Opened NO 13x KXBTC15M-26NOV270845-45 @ 59\u00a2 (bought $7.90, $8 ticket, entry #1 in window)"
       ],
-      "net_pnl": -30.73,
-      "updated_at": "2026-11-27T13:34:30Z",
-      "updated_at_pt": "Nov 27, 2026, 5:34 AM PT"
+      "net_pnl": -34.37,
+      "updated_at": "2026-11-27T13:39:29Z",
+      "updated_at_pt": "Nov 27, 2026, 5:39 AM PT"
     },
     "v2": {
       "id": "v2",
@@ -3334,6 +3363,30 @@
           "book_id": "v2",
           "book_label": "Version 2",
           "open_count": 0
+        },
+        {
+          "t": "2026-11-27T13:39:29Z",
+          "t_pt": "Nov 27, 2026, 5:39 AM PT",
+          "ticker": "KXBTC15M-26NOV270845-45",
+          "close_time": "2026-11-27T13:45:00Z",
+          "close_time_pt": "Nov 27, 2026, 5:45 AM PT",
+          "window_label": "5:30 AM \u2013 5:45 AM PT",
+          "action": "WAIT",
+          "label": "WAIT \u2014 Too choppy",
+          "reason": "The last 15 minutes were choppy (chop 0.89 vs a 0.80 cap) \u2014 the bot stands aside.",
+          "reason_full": "The last 15 minutes were choppy (chop 0.89 vs a 0.80 cap) \u2014 the bot stands aside.",
+          "btc_price": 61370.52,
+          "strike": 61365.61,
+          "yes_ask": 0.7,
+          "no_ask": 0.31,
+          "side": null,
+          "ask": null,
+          "contracts": null,
+          "entry_price": null,
+          "cash": 90.55,
+          "book_id": "v2",
+          "book_label": "Version 2",
+          "open_count": 0
         }
       ],
       "equity": 90.55,
@@ -3349,22 +3402,22 @@
       "created_at": "2026-11-26T20:22:54Z",
       "events": [],
       "net_pnl": -9.45,
-      "updated_at": "2026-11-27T13:34:30Z",
-      "updated_at_pt": "Nov 27, 2026, 5:34 AM PT"
+      "updated_at": "2026-11-27T13:39:29Z",
+      "updated_at_pt": "Nov 27, 2026, 5:39 AM PT"
     },
     "leader": "v2",
     "leader_label": "Version 2 ahead",
-    "leader_margin": 21.28,
-    "leader_text": "Version 2 ahead by +$21.28",
+    "leader_margin": 24.92,
+    "leader_text": "Version 2 ahead by +$24.92",
     "choice": {
       "v1": {
         "action": "HOLD",
-        "label": "BOUGHT NO @ 59\u00a2",
-        "reason": "Picked NO @ 59\u00a2 \u2014 BTC is \u2212$58 below strike with 1m trending down & RSI cooled to 42.",
+        "label": "HOLD open trades \u2014 WAIT \u2014 Too close to strike",
+        "reason": "BTC is +$5 above strike. That\u2019s inside a $20 band, so settlement could still flip either way.",
         "side": "no",
-        "ask": 0.59,
-        "strength": "top",
-        "base_stake": 8.0
+        "ask": null,
+        "strength": null,
+        "base_stake": null
       },
       "v2": {
         "action": "WAIT",
@@ -3376,7 +3429,7 @@
         "base_stake": null
       }
     },
-    "updated_at": "2026-11-27T13:34:30Z",
-    "updated_at_pt": "Nov 27, 2026, 5:34 AM PT"
+    "updated_at": "2026-11-27T13:39:29Z",
+    "updated_at_pt": "Nov 27, 2026, 5:39 AM PT"
   }
 }
