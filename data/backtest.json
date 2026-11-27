@@ -1,15 +1,15 @@
 {
-  "start": "2026-11-22T05:45:00Z",
-  "end": "2026-11-27T05:30:00Z",
-  "start_pt": "Nov 21, 2026, 9:45 PM PT",
-  "end_pt": "Nov 26, 2026, 9:30 PM PT",
+  "start": "2026-11-22T06:45:00Z",
+  "end": "2026-11-27T06:30:00Z",
+  "start_pt": "Nov 21, 2026, 10:45 PM PT",
+  "end_pt": "Nov 26, 2026, 10:30 PM PT",
   "days": 5.0,
   "windows_scanned": 471,
   "windows_traded": 48,
   "windows_skipped": 423,
   "skip_reasons": {
-    "WAIT \u2014 Too close to strike": 144,
-    "WAIT \u2014 No Trade": 278,
+    "WAIT \u2014 No Trade": 280,
+    "WAIT \u2014 Too close to strike": 142,
     "WAIT \u2014 No Edge": 1
   },
   "starting_balance": 100.0,
@@ -27,26 +27,6 @@
   "gross_loss": 180.76,
   "net_pnl": 118.89,
   "equity_history": [
-    {
-      "t": 1795326360,
-      "t_pt": "Nov 21, 2026, 9:46 PM PT",
-      "equity": 100.0
-    },
-    {
-      "t": 1795327260,
-      "t_pt": "Nov 21, 2026, 10:01 PM PT",
-      "equity": 100.0
-    },
-    {
-      "t": 1795328160,
-      "t_pt": "Nov 21, 2026, 10:16 PM PT",
-      "equity": 100.0
-    },
-    {
-      "t": 1795329060,
-      "t_pt": "Nov 21, 2026, 10:31 PM PT",
-      "equity": 100.0
-    },
     {
       "t": 1795329960,
       "t_pt": "Nov 21, 2026, 10:46 PM PT",
@@ -2381,6 +2361,26 @@
       "t": 1795756560,
       "t_pt": "Nov 26, 2026, 9:16 PM PT",
       "equity": 218.89
+    },
+    {
+      "t": 1795757460,
+      "t_pt": "Nov 26, 2026, 9:31 PM PT",
+      "equity": 218.89
+    },
+    {
+      "t": 1795758360,
+      "t_pt": "Nov 26, 2026, 9:46 PM PT",
+      "equity": 218.89
+    },
+    {
+      "t": 1795759260,
+      "t_pt": "Nov 26, 2026, 10:01 PM PT",
+      "equity": 218.89
+    },
+    {
+      "t": 1795760160,
+      "t_pt": "Nov 26, 2026, 10:16 PM PT",
+      "equity": 218.89
     }
   ],
   "trades": [
@@ -2402,7 +2402,7 @@
       "expiration_value": 61384.49,
       "strike": 61409.31,
       "pnl": -7.52,
-      "reason_entry": "EMA 9 > 21 ($61,387 > $61,375); price above the 50-period EMA; MACD histogram is positive; RSI 60; 5-minute trend agrees. BTC +$28.69 vs the $61,409.31 strike, Yes ask 61\u00a2 \u2014 Buy Yes. Top signal ($8 ticket): MACD hist 17.1; RSI 60 in the heart of the bullish band; 5-minute trend is clearly aligned ($40 EMA spread).",
+      "reason_entry": "EMA 9 > 21 ($61,388 > $61,375); price above the 50-period EMA; MACD histogram is positive; RSI 60; 5-minute trend agrees. BTC +$29.16 vs the $61,409.31 strike, Yes ask 61\u00a2 \u2014 Buy Yes. Top signal ($8 ticket): MACD hist 17.2; RSI 60 in the heart of the bullish band; 5-minute trend is clearly aligned ($40 EMA spread).",
       "reason_exit": "Held to settlement: official result was NO (BTC 61384.49 vs strike 61409.31).",
       "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov262330-30",
       "running_balance": 218.89,
@@ -2605,7 +2605,7 @@
       "expiration_value": 60265.6,
       "strike": 60163.95,
       "pnl": -15.55,
-      "reason_entry": "EMA 9 < 21 ($60,169 < $60,299); price below the 50-period EMA; MACD histogram is negative; RSI 32; 5-minute trend agrees. BTC $-97.38 vs the $60,163.95 strike, No ask 66\u00a2 \u2014 Buy No. Top signal ($8 ticket): EMA 9/21 spread $130; RSI 32 in the heart of the bearish band; BTC $97 from the strike; 5-minute trend is clearly aligned ($164 EMA spread).",
+      "reason_entry": "EMA 9 < 21 ($60,169 < $60,300); price below the 50-period EMA; MACD histogram is negative; RSI 32; 5-minute trend agrees. BTC $-97.38 vs the $60,163.95 strike, No ask 66\u00a2 \u2014 Buy No. Top signal ($8 ticket): EMA 9/21 spread $130; RSI 32 in the heart of the bearish band; BTC $97 from the strike; 5-minute trend is clearly aligned ($164 EMA spread).",
       "reason_exit": "Held to settlement: official result was YES (BTC 60265.6 vs strike 60163.95).",
       "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov261030-30",
       "running_balance": 243.09,
@@ -2750,7 +2750,7 @@
       "expiration_value": 60841.05,
       "strike": 60384.87,
       "pnl": 4.24,
-      "reason_entry": "EMA 9 > 21 ($60,395 > $60,344); price above the 50-period EMA; MACD histogram is positive; RSI 68; 5-minute trend agrees. BTC +$45.45 vs the $60,384.87 strike, Yes ask 63\u00a2 \u2014 Buy Yes. Top signal ($8 ticket): EMA 9/21 spread $50; RSI 68 in the heart of the bullish band; 5-minute trend is clearly aligned ($77 EMA spread).",
+      "reason_entry": "EMA 9 > 21 ($60,395 > $60,344); price above the 50-period EMA; MACD histogram is positive; RSI 68; 5-minute trend agrees. BTC +$45.53 vs the $60,384.87 strike, Yes ask 63\u00a2 \u2014 Buy Yes. Top signal ($8 ticket): EMA 9/21 spread $51; RSI 68 in the heart of the bullish band; 5-minute trend is clearly aligned ($77 EMA spread).",
       "reason_exit": "Held to settlement: official result was YES (BTC 60841.05 vs strike 60384.87).",
       "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov251915-15",
       "running_balance": 256.14,
@@ -2779,7 +2779,7 @@
       "expiration_value": 60110.17,
       "strike": 60123.27,
       "pnl": -7.76,
-      "reason_entry": "EMA 9 > 21 ($60,105 > $60,064); price above the 50-period EMA; MACD histogram is positive; RSI 66; 5-minute trend agrees. BTC +$68.80 vs the $60,123.27 strike, Yes ask 69\u00a2 \u2014 Buy Yes. Top signal ($8 ticket): EMA 9/21 spread $41; MACD hist 28.0; RSI 66 in the heart of the bullish band; BTC $69 from the strike.",
+      "reason_entry": "EMA 9 > 21 ($60,106 > $60,064); price above the 50-period EMA; MACD histogram is positive; RSI 66; 5-minute trend agrees. BTC +$68.80 vs the $60,123.27 strike, Yes ask 69\u00a2 \u2014 Buy Yes. Top signal ($8 ticket): EMA 9/21 spread $41; MACD hist 28.0; RSI 66 in the heart of the bullish band; BTC $69 from the strike.",
       "reason_exit": "Held to settlement: official result was NO (BTC 60110.17 vs strike 60123.27).",
       "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov251830-30",
       "running_balance": 251.9,
@@ -2837,7 +2837,7 @@
       "expiration_value": 59875.01,
       "strike": 59971.17,
       "pnl": -19.63,
-      "reason_entry": "EMA 9 > 21 ($59,933 > $59,915); price above the 50-period EMA; MACD histogram is positive; RSI 57; 5-minute trend agrees. BTC +$22.36 vs the $59,971.17 strike, Yes ask 56\u00a2 \u2014 Buy Yes. Top signal ($8 ticket): MACD hist 16.8; RSI 57 in the heart of the bullish band; ask 56\u00a2 leaves upside; 5-minute trend is clearly aligned ($86 EMA spread).",
+      "reason_entry": "EMA 9 > 21 ($59,934 > $59,915); price above the 50-period EMA; MACD histogram is positive; RSI 57; 5-minute trend agrees. BTC +$22.36 vs the $59,971.17 strike, Yes ask 56\u00a2 \u2014 Buy Yes. Top signal ($8 ticket): MACD hist 16.8; RSI 57 in the heart of the bullish band; ask 56\u00a2 leaves upside; 5-minute trend is clearly aligned ($86 EMA spread).",
       "reason_exit": "Held to settlement: official result was NO (BTC 59875.01 vs strike 59971.17).",
       "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov251530-30",
       "running_balance": 264.26,
@@ -2866,7 +2866,7 @@
       "expiration_value": 60134.42,
       "strike": 59829.48,
       "pnl": 7.17,
-      "reason_entry": "EMA 9 > 21 ($59,879 > $59,824); price above the 50-period EMA; MACD histogram is positive; RSI 62; 5-minute trend agrees. BTC +$123.75 vs the $59,829.48 strike, Yes ask 72\u00a2 \u2014 Buy Yes. Top signal ($8 ticket): EMA 9/21 spread $54; RSI 62 in the heart of the bullish band; BTC $124 from the strike; 5-minute trend is clearly aligned ($206 EMA spread).",
+      "reason_entry": "EMA 9 > 21 ($59,878 > $59,824); price above the 50-period EMA; MACD histogram is positive; RSI 62; 5-minute trend agrees. BTC +$121.32 vs the $59,829.48 strike, Yes ask 72\u00a2 \u2014 Buy Yes. Top signal ($8 ticket): EMA 9/21 spread $54; RSI 62 in the heart of the bullish band; BTC $121 from the strike; 5-minute trend is clearly aligned ($205 EMA spread).",
       "reason_exit": "Held to settlement: official result was YES (BTC 60134.42 vs strike 59829.48).",
       "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov251430-30",
       "running_balance": 283.89,
@@ -2982,7 +2982,7 @@
       "expiration_value": 58812.01,
       "strike": 58873.28,
       "pnl": 15.14,
-      "reason_entry": "EMA 9 < 21 ($58,937 < $59,001); price below the 50-period EMA; MACD histogram is negative; RSI 32; 5-minute trend agrees. BTC $-26.97 vs the $58,873.28 strike, No ask 55\u00a2 \u2014 Buy No. Top signal ($8 ticket): EMA 9/21 spread $64; MACD hist 11.9; RSI 32 in the heart of the bearish band; ask 55\u00a2 leaves upside; 5-minute trend is clearly aligned ($25 EMA spread).",
+      "reason_entry": "EMA 9 < 21 ($58,937 < $59,001); price below the 50-period EMA; MACD histogram is negative; RSI 32; 5-minute trend agrees. BTC $-26.97 vs the $58,873.28 strike, No ask 55\u00a2 \u2014 Buy No. Top signal ($8 ticket): EMA 9/21 spread $64; MACD hist 11.9; RSI 32 in the heart of the bearish band; ask 55\u00a2 leaves upside; 5-minute trend is clearly aligned ($24 EMA spread).",
       "reason_exit": "Held to settlement: official result was NO (BTC 58812.01 vs strike 58873.28).",
       "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov250445-45",
       "running_balance": 247.27,
@@ -3127,7 +3127,7 @@
       "expiration_value": 59251.27,
       "strike": 59384.84,
       "pnl": 3.45,
-      "reason_entry": "EMA 9 < 21 ($59,369 < $59,403); price below the 50-period EMA; MACD histogram is negative; RSI 39; 5-minute trend agrees. BTC $-81.70 vs the $59,384.84 strike, No ask 67\u00a2 \u2014 Buy No. Top signal ($8 ticket): EMA 9/21 spread $34; RSI 39 in the heart of the bearish band; BTC $82 from the strike; 5-minute trend is clearly aligned ($101 EMA spread).",
+      "reason_entry": "EMA 9 < 21 ($59,369 < $59,403); price below the 50-period EMA; MACD histogram is negative; RSI 39; 5-minute trend agrees. BTC $-82.68 vs the $59,384.84 strike, No ask 67\u00a2 \u2014 Buy No. Top signal ($8 ticket): EMA 9/21 spread $34; RSI 39 in the heart of the bearish band; BTC $83 from the strike; 5-minute trend is clearly aligned ($101 EMA spread).",
       "reason_exit": "Held to settlement: official result was NO (BTC 59251.27 vs strike 59384.84).",
       "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov242045-45",
       "running_balance": 194.4,
@@ -3185,7 +3185,7 @@
       "expiration_value": 59679.53,
       "strike": 59818.8,
       "pnl": 13.29,
-      "reason_entry": "EMA 9 < 21 ($59,820 < $59,837); price below the 50-period EMA; MACD histogram is negative; RSI 42; 5-minute trend agrees. BTC $-26.98 vs the $59,818.80 strike, No ask 58\u00a2 \u2014 Buy No. Strong signal ($6 ticket): RSI 42 in the heart of the bearish band; 5-minute trend is clearly aligned ($25 EMA spread).",
+      "reason_entry": "EMA 9 < 21 ($59,820 < $59,837); price below the 50-period EMA; MACD histogram is negative; RSI 42; 5-minute trend agrees. BTC $-26.98 vs the $59,818.80 strike, No ask 58\u00a2 \u2014 Buy No. Strong signal ($6 ticket): RSI 42 in the heart of the bearish band; 5-minute trend is clearly aligned ($24 EMA spread).",
       "reason_exit": "Held to settlement: official result was NO (BTC 59679.53 vs strike 59818.8).",
       "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov241445-45",
       "running_balance": 210.69,
@@ -3243,7 +3243,7 @@
       "expiration_value": 59746.31,
       "strike": 59916.04,
       "pnl": 6.47,
-      "reason_entry": "EMA 9 < 21 ($59,955 < $60,064); price below the 50-period EMA; MACD histogram is negative; RSI 38; 5-minute trend agrees. BTC $-32.36 vs the $59,916.04 strike, No ask 52\u00a2 \u2014 Buy No. Top signal ($8 ticket): EMA 9/21 spread $109; MACD hist 18.9; RSI 38 in the heart of the bearish band; ask 52\u00a2 leaves upside; 5-minute trend is clearly aligned ($78 EMA spread).",
+      "reason_entry": "EMA 9 < 21 ($59,954 < $60,063); price below the 50-period EMA; MACD histogram is negative; RSI 37; 5-minute trend agrees. BTC $-40.39 vs the $59,916.04 strike, No ask 52\u00a2 \u2014 Buy No. Top signal ($8 ticket): EMA 9/21 spread $110; MACD hist 19.3; RSI 37 in the heart of the bearish band; ask 52\u00a2 leaves upside; 5-minute trend is clearly aligned ($78 EMA spread).",
       "reason_exit": "Held to settlement: official result was NO (BTC 59746.31 vs strike 59916.04).",
       "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov241030-30",
       "running_balance": 186.26,
@@ -3272,7 +3272,7 @@
       "expiration_value": 60344.89,
       "strike": 60362.26,
       "pnl": -7.76,
-      "reason_entry": "EMA 9 > 21 ($60,375 > $60,320); price above the 50-period EMA; MACD histogram is positive; RSI 58; 5-minute trend agrees. BTC +$114.08 vs the $60,362.26 strike, Yes ask 63\u00a2 \u2014 Buy Yes. Top signal ($8 ticket): EMA 9/21 spread $55; MACD hist 23.7; RSI 58 in the heart of the bullish band; BTC $114 from the strike; 5-minute trend is clearly aligned ($65 EMA spread).",
+      "reason_entry": "EMA 9 > 21 ($60,375 > $60,320); price above the 50-period EMA; MACD histogram is positive; RSI 58; 5-minute trend agrees. BTC +$114.08 vs the $60,362.26 strike, Yes ask 63\u00a2 \u2014 Buy Yes. Top signal ($8 ticket): EMA 9/21 spread $54; MACD hist 23.6; RSI 58 in the heart of the bullish band; BTC $114 from the strike; 5-minute trend is clearly aligned ($65 EMA spread).",
       "reason_exit": "Held to settlement: official result was NO (BTC 60344.89 vs strike 60362.26).",
       "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov241000-00",
       "running_balance": 179.79,
@@ -3301,7 +3301,7 @@
       "expiration_value": 59770.14,
       "strike": 59586.39,
       "pnl": -19.56,
-      "reason_entry": "EMA 9 < 21 ($59,607 < $59,636); price below the 50-period EMA; MACD histogram is negative; RSI 36; 5-minute trend agrees. BTC $-100.30 vs the $59,586.39 strike, No ask 71\u00a2 \u2014 Buy No. Top signal ($8 ticket): EMA 9/21 spread $29; MACD hist 19.6; RSI 36 in the heart of the bearish band; BTC $100 from the strike; 5-minute trend is clearly aligned ($100 EMA spread).",
+      "reason_entry": "EMA 9 < 21 ($59,606 < $59,635); price below the 50-period EMA; MACD histogram is negative; RSI 36; 5-minute trend agrees. BTC $-100.30 vs the $59,586.39 strike, No ask 71\u00a2 \u2014 Buy No. Top signal ($8 ticket): EMA 9/21 spread $30; MACD hist 19.7; RSI 36 in the heart of the bearish band; BTC $100 from the strike; 5-minute trend is clearly aligned ($100 EMA spread).",
       "reason_exit": "Held to settlement: official result was YES (BTC 59770.14 vs strike 59586.39).",
       "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov240630-30",
       "running_balance": 187.55,
@@ -3765,7 +3765,7 @@
       "expiration_value": 60644.61,
       "strike": 60685.73,
       "pnl": 2.46,
-      "reason_entry": "EMA 9 < 21 ($60,684 < $60,701); price below the 50-period EMA; MACD histogram is negative; RSI 35; 5-minute trend agrees. BTC $-129.65 vs the $60,685.73 strike, No ask 74\u00a2 \u2014 Buy No. Top signal ($8 ticket): MACD hist 20.7; RSI 35 in the heart of the bearish band; BTC $130 from the strike; 5-minute trend is clearly aligned ($41 EMA spread).",
+      "reason_entry": "EMA 9 < 21 ($60,684 < $60,701); price below the 50-period EMA; MACD histogram is negative; RSI 35; 5-minute trend agrees. BTC $-129.65 vs the $60,685.73 strike, No ask 74\u00a2 \u2014 Buy No. Top signal ($8 ticket): MACD hist 20.6; RSI 35 in the heart of the bearish band; BTC $130 from the strike; 5-minute trend is clearly aligned ($41 EMA spread).",
       "reason_exit": "Held to settlement: official result was NO (BTC 60644.61 vs strike 60685.73).",
       "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov220900-00",
       "running_balance": 102.46,
@@ -3779,8 +3779,8 @@
   ],
   "assumption_note": "Each window is evaluated once, 1 minute after it opens, using the real Kalshi Yes/No quotes at that minute and Coinbase 1-minute / 5-minute BTC candles. Trades use a $4\u2013$8 base stake by signal strength, then 2\u00d7 after a win (capped at $20), the official quadratic taker fee, and are held to Kalshi\u2019s official Yes/No settlement. The live bot can also enter later in a window (on a 5-minute scan) or exit early if momentum flips; those live extras are not in this backtest.",
   "fee_note": "Paper PnL includes Kalshi\u2019s taker fee: ceil(0.07 \u00d7 contracts \u00d7 price \u00d7 (1 \u2212 price)), rounded up to the next cent.",
-  "generated_at": "2026-11-27T05:37:31Z",
-  "generated_at_pt": "Nov 26, 2026, 9:37 PM PT",
+  "generated_at": "2026-11-27T06:34:50Z",
+  "generated_at_pt": "Nov 26, 2026, 10:34 PM PT",
   "candle_source_1m": "coinbase",
   "candle_source_5m": "coinbase"
 }
