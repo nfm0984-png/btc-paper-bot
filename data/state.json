@@ -414,11 +414,16 @@
       "t": 1795798106,
       "t_pt": "Nov 27, 2026, 8:48 AM PT",
       "equity": 85.85
+    },
+    {
+      "t": 1795798406,
+      "t_pt": "Nov 27, 2026, 8:53 AM PT",
+      "equity": 85.85
     }
   ],
   "created_at": "2026-11-26T18:33:31Z",
-  "updated_at": "2026-11-27T16:48:26Z",
-  "updated_at_pt": "Nov 27, 2026, 8:48 AM PT",
+  "updated_at": "2026-11-27T16:53:26Z",
+  "updated_at_pt": "Nov 27, 2026, 8:53 AM PT",
   "session": {
     "starting_balance": 40.0,
     "stake": 5.0,
@@ -589,8 +594,8 @@
         "reason": "Picked NO @ 72\u00a2 (choppy lean) \u2014 BTC is \u2212$91 below strike with RSI cooled to 47.",
         "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov271200-00",
         "window_entry": 1,
-        "mark": 4.26,
-        "pnl": -0.15,
+        "mark": 4.86,
+        "pnl": 0.45,
         "pnl_kind": "unrealized",
         "book_id": "v1",
         "book_label": "Version 1"
@@ -618,8 +623,8 @@
           "reason": "Picked NO @ 72\u00a2 (choppy lean) \u2014 BTC is \u2212$91 below strike with RSI cooled to 47.",
           "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov271200-00",
           "window_entry": 1,
-          "mark": 4.26,
-          "pnl": -0.15,
+          "mark": 4.86,
+          "pnl": 0.45,
           "pnl_kind": "unrealized",
           "book_id": "v1",
           "book_label": "Version 1"
@@ -2551,11 +2556,35 @@
           "book_id": "v1",
           "book_label": "Version 1",
           "open_count": 1
+        },
+        {
+          "t": "2026-11-27T16:53:26Z",
+          "t_pt": "Nov 27, 2026, 8:53 AM PT",
+          "ticker": "KXBTC15M-26NOV271200-00",
+          "close_time": "2026-11-27T17:00:00Z",
+          "close_time_pt": "Nov 27, 2026, 9:00 AM PT",
+          "window_label": "8:45 AM \u2013 9:00 AM PT",
+          "action": "HOLD",
+          "label": "WAIT \u2014 No tradable ask",
+          "reason": "Neither Yes nor No is between 35\u00a2 and 75\u00a2, so Version 1 stands aside.",
+          "reason_full": "Neither Yes nor No is between 35\u00a2 and 75\u00a2, so Version 1 stands aside.",
+          "btc_price": 60125.37,
+          "strike": 60208.12,
+          "yes_ask": 0.19,
+          "no_ask": 0.82,
+          "side": "no",
+          "ask": null,
+          "contracts": 6,
+          "entry_price": 0.72,
+          "cash": 74.54,
+          "book_id": "v1",
+          "book_label": "Version 1",
+          "open_count": 1
         }
       ],
-      "equity": 78.8,
-      "pnl": -21.2,
-      "pnl_pct": -21.2,
+      "equity": 79.4,
+      "pnl": -20.6,
+      "pnl_pct": -20.6,
       "amount_bought": 166.46,
       "contracts_total": 273,
       "wins": 12,
@@ -2586,9 +2615,9 @@
         "Settled NO on KXBTC15M-26NOV271100-00: Settled NO at BTC 60110.79 vs strike 60113.12. PnL +4.22",
         "Opened NO 6x KXBTC15M-26NOV271200-00 @ 72\u00a2 (bought $4.41, $4 ticket, entry #1 in window)"
       ],
-      "net_pnl": -21.2,
-      "updated_at": "2026-11-27T16:48:26Z",
-      "updated_at_pt": "Nov 27, 2026, 8:48 AM PT"
+      "net_pnl": -20.6,
+      "updated_at": "2026-11-27T16:53:26Z",
+      "updated_at_pt": "Nov 27, 2026, 8:53 AM PT"
     },
     "v2": {
       "id": "v2",
@@ -4034,6 +4063,30 @@
           "book_id": "v2",
           "book_label": "Version 2",
           "open_count": 0
+        },
+        {
+          "t": "2026-11-27T16:53:26Z",
+          "t_pt": "Nov 27, 2026, 8:53 AM PT",
+          "ticker": "KXBTC15M-26NOV271200-00",
+          "close_time": "2026-11-27T17:00:00Z",
+          "close_time_pt": "Nov 27, 2026, 9:00 AM PT",
+          "window_label": "8:45 AM \u2013 9:00 AM PT",
+          "action": "WAIT",
+          "label": "WAIT \u2014 No Trade",
+          "reason": "Choppy / no clean edge: price is below the strike, but the 1-minute trend/momentum is not cleanly bearish (EMAs are flat \u2014 looks choppy; price is still above the 50-period EMA; RSI 48 is not in the\u2026.",
+          "reason_full": "Choppy / no clean edge: price is below the strike, but the 1-minute trend/momentum is not cleanly bearish (EMAs are flat \u2014 looks choppy; price is still above the 50-period EMA; RSI 48 is not in the\u2026",
+          "btc_price": 60125.37,
+          "strike": 60208.12,
+          "yes_ask": 0.19,
+          "no_ask": 0.82,
+          "side": null,
+          "ask": null,
+          "contracts": null,
+          "entry_price": null,
+          "cash": 90.55,
+          "book_id": "v2",
+          "book_label": "Version 2",
+          "open_count": 0
         }
       ],
       "equity": 90.55,
@@ -4049,34 +4102,34 @@
       "created_at": "2026-11-26T20:22:54Z",
       "events": [],
       "net_pnl": -9.45,
-      "updated_at": "2026-11-27T16:48:26Z",
-      "updated_at_pt": "Nov 27, 2026, 8:48 AM PT"
+      "updated_at": "2026-11-27T16:53:26Z",
+      "updated_at_pt": "Nov 27, 2026, 8:53 AM PT"
     },
     "leader": "v2",
     "leader_label": "Version 2 ahead",
-    "leader_margin": 11.75,
-    "leader_text": "Version 2 ahead by +$11.75",
+    "leader_margin": 11.15,
+    "leader_text": "Version 2 ahead by +$11.15",
     "choice": {
       "v1": {
         "action": "HOLD",
-        "label": "BOUGHT NO @ 72\u00a2",
-        "reason": "Picked NO @ 72\u00a2 (choppy lean) \u2014 BTC is \u2212$91 below strike with RSI cooled to 47.",
+        "label": "WAIT \u2014 No tradable ask",
+        "reason": "Neither Yes nor No is between 35\u00a2 and 75\u00a2, so Version 1 stands aside.",
         "side": "no",
-        "ask": 0.72,
-        "strength": "normal",
-        "base_stake": 4.0
+        "ask": null,
+        "strength": null,
+        "base_stake": null
       },
       "v2": {
         "action": "WAIT",
-        "label": "WAIT \u2014 Too choppy",
-        "reason": "The last 15 minutes were choppy (chop 0.85 vs a 0.80 cap) \u2014 the bot stands aside.",
+        "label": "WAIT \u2014 No Trade",
+        "reason": "Choppy / no clean edge: price is below the strike, but the 1-minute trend/momentum is not cleanly bearish (EMAs are flat \u2014 looks choppy; price is still above the 50-period EMA; RSI 48 is not in the\u2026",
         "side": null,
         "ask": null,
         "strength": null,
         "base_stake": null
       }
     },
-    "updated_at": "2026-11-27T16:48:26Z",
-    "updated_at_pt": "Nov 27, 2026, 8:48 AM PT"
+    "updated_at": "2026-11-27T16:53:26Z",
+    "updated_at_pt": "Nov 27, 2026, 8:53 AM PT"
   }
 }
