@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-11-27T21:54:55Z",
-  "updated_at_pt": "Nov 27, 2026, 1:54 PM PT",
+  "updated_at": "2026-11-27T22:55:54Z",
+  "updated_at_pt": "Nov 27, 2026, 2:55 PM PT",
   "runs": [
     {
       "t": "2026-11-26T20:02:10Z",
@@ -2716,6 +2716,147 @@
         "best_exit": "hold to expiry",
         "best_reader": "no fair-edge gate",
         "takeaway": "Best unseen chart is 5m (+$37.81, 76.5% WR on 34 trades). Best market-reader gate is no fair-edge gate (+$37.81). Best exit rule is hold to expiry (+$37.81, 76.5% WR on 34 trades) on 1328 windows with a full bid path.",
+        "windows_with_exit_path": 1328
+      }
+    },
+    {
+      "t": "2026-11-27T22:55:54Z",
+      "t_pt": "Nov 27, 2026, 2:55 PM PT",
+      "windows": 1328,
+      "train_windows": 929,
+      "val_windows": 399,
+      "candidates_tested": 56,
+      "live_version": 7,
+      "live": {
+        "train": {
+          "trade_count": 64,
+          "wins": 49,
+          "losses": 15,
+          "win_rate": 76.6,
+          "net_pnl": 69.23,
+          "profit_factor": 1.633,
+          "max_drawdown_pct": 17.82,
+          "ending_equity": 169.23
+        },
+        "val": {
+          "trade_count": 35,
+          "wins": 27,
+          "losses": 8,
+          "win_rate": 77.1,
+          "net_pnl": 40.32,
+          "profit_factor": 1.694,
+          "max_drawdown_pct": 10.71,
+          "ending_equity": 140.32
+        },
+        "overall": {
+          "trade_count": 99,
+          "wins": 76,
+          "losses": 23,
+          "win_rate": 76.8,
+          "net_pnl": 109.55,
+          "profit_factor": 1.654,
+          "max_drawdown_pct": 17.82,
+          "ending_equity": 209.55
+        }
+      },
+      "best_candidate": {
+        "name": "chart_1m",
+        "params": {
+          "min_entry_cents": 35,
+          "max_entry_cents": 75,
+          "min_strike_gap_usd": 40.0,
+          "min_mins_left": 2,
+          "max_mins_left": 15,
+          "rsi_bull_min": 54.0,
+          "rsi_bull_max": 72.0,
+          "rsi_bear_min": 30.0,
+          "rsi_bear_max": 45.0,
+          "require_ema50_align": true,
+          "require_5m_align": false,
+          "min_volatility_usd": 0.0,
+          "max_chop_ratio": 0.8,
+          "ema_flat_dollars": 8.0,
+          "chart_mode": "1m",
+          "require_15m_align": false,
+          "require_1h_align": false,
+          "min_fair_edge": 0.0,
+          "max_spread_cents": 20.0,
+          "enable_early_exits": false,
+          "tp_bid": 0.8,
+          "tp_gain": 0.15,
+          "sl_drop": 0.12,
+          "tp_require_stall": false,
+          "sl_require_reversal": false,
+          "fair_giveback": false
+        },
+        "train": {
+          "trade_count": 104,
+          "wins": 65,
+          "losses": 39,
+          "win_rate": 62.5,
+          "net_pnl": -46.99,
+          "profit_factor": 0.831,
+          "max_drawdown_pct": 71.42,
+          "ending_equity": 53.01
+        },
+        "val": {
+          "trade_count": 54,
+          "wins": 40,
+          "losses": 14,
+          "win_rate": 74.1,
+          "net_pnl": 46.49,
+          "profit_factor": 1.476,
+          "max_drawdown_pct": 11.09,
+          "ending_equity": 146.49
+        },
+        "overall": {
+          "trade_count": 158,
+          "wins": 105,
+          "losses": 53,
+          "win_rate": 66.5,
+          "net_pnl": -0.5,
+          "profit_factor": 0.999,
+          "max_drawdown_pct": 71.42,
+          "ending_equity": 99.5
+        }
+      },
+      "promoted_to": 8,
+      "promoted_params": {
+        "min_entry_cents": 35,
+        "max_entry_cents": 75,
+        "min_strike_gap_usd": 40.0,
+        "min_mins_left": 2,
+        "max_mins_left": 15,
+        "rsi_bull_min": 54.0,
+        "rsi_bull_max": 72.0,
+        "rsi_bear_min": 25.0,
+        "rsi_bear_max": 48.0,
+        "require_ema50_align": true,
+        "require_5m_align": true,
+        "min_volatility_usd": 0.0,
+        "max_chop_ratio": 0.8,
+        "ema_flat_dollars": 8.0,
+        "chart_mode": "1m_5m",
+        "require_15m_align": false,
+        "require_1h_align": false,
+        "min_fair_edge": 0.0,
+        "max_spread_cents": 20.0,
+        "enable_early_exits": false,
+        "tp_bid": 0.8,
+        "tp_gain": 0.15,
+        "sl_drop": 0.12,
+        "tp_require_stall": false,
+        "sl_require_reversal": false,
+        "fair_giveback": false
+      },
+      "decision": "PROMOTED v7 \u2192 v8",
+      "takeaway": "Changing bear RSI floor from 30 to 25 and bear RSI cap from 45 to 48 improved unseen P&L by +$5.08 after fees (76.9% WR on 39 trades). Promoted v7 \u2192 v8.",
+      "reason": "unseen P&L +$45.40 vs live +$40.32",
+      "chart_scorecard": {
+        "best_chart": "5m",
+        "best_exit": "hold to expiry",
+        "best_reader": "no fair-edge gate",
+        "takeaway": "Best unseen chart is 5m (+$40.32, 77.1% WR on 35 trades). Best market-reader gate is no fair-edge gate (+$40.32). Best exit rule is hold to expiry (+$40.32, 77.1% WR on 35 trades) on 1328 windows with a full bid path.",
         "windows_with_exit_path": 1328
       }
     }
