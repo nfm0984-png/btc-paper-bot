@@ -369,11 +369,16 @@
       "t": 1795787370,
       "t_pt": "Nov 27, 2026, 5:49 AM PT",
       "equity": 85.85
+    },
+    {
+      "t": 1795790049,
+      "t_pt": "Nov 27, 2026, 6:34 AM PT",
+      "equity": 85.85
     }
   ],
   "created_at": "2026-11-26T18:33:31Z",
-  "updated_at": "2026-11-27T13:49:30Z",
-  "updated_at_pt": "Nov 27, 2026, 5:49 AM PT",
+  "updated_at": "2026-11-27T14:34:09Z",
+  "updated_at_pt": "Nov 27, 2026, 6:34 AM PT",
   "session": {
     "starting_balance": 40.0,
     "stake": 5.0,
@@ -2179,6 +2184,30 @@
           "book_id": "v1",
           "book_label": "Version 1",
           "open_count": 0
+        },
+        {
+          "t": "2026-11-27T14:34:09Z",
+          "t_pt": "Nov 27, 2026, 6:34 AM PT",
+          "ticker": "KXBTC15M-26NOV270945-45",
+          "close_time": "2026-11-27T14:45:00Z",
+          "close_time_pt": "Nov 27, 2026, 6:45 AM PT",
+          "window_label": "6:30 AM \u2013 6:45 AM PT",
+          "action": "WAIT",
+          "label": "WAIT \u2014 No tradable ask",
+          "reason": "Neither Yes nor No is between 35\u00a2 and 75\u00a2, so Version 1 stands aside.",
+          "reason_full": "Neither Yes nor No is between 35\u00a2 and 75\u00a2, so Version 1 stands aside.",
+          "btc_price": 60632.21,
+          "strike": 61349.19,
+          "yes_ask": 0.099,
+          "no_ask": 0.902,
+          "side": null,
+          "ask": null,
+          "contracts": null,
+          "entry_price": null,
+          "cash": 74.73,
+          "book_id": "v1",
+          "book_label": "Version 1",
+          "open_count": 0
         }
       ],
       "equity": 74.73,
@@ -2215,8 +2244,8 @@
         "Settled NO on KXBTC15M-26NOV270845-45: Settled NO at BTC 61364.94 vs strike 61365.61. PnL +5.10"
       ],
       "net_pnl": -25.27,
-      "updated_at": "2026-11-27T13:49:30Z",
-      "updated_at_pt": "Nov 27, 2026, 5:49 AM PT"
+      "updated_at": "2026-11-27T14:34:09Z",
+      "updated_at_pt": "Nov 27, 2026, 6:34 AM PT"
     },
     "v2": {
       "id": "v2",
@@ -3446,6 +3475,30 @@
           "book_id": "v2",
           "book_label": "Version 2",
           "open_count": 0
+        },
+        {
+          "t": "2026-11-27T14:34:09Z",
+          "t_pt": "Nov 27, 2026, 6:34 AM PT",
+          "ticker": "KXBTC15M-26NOV270945-45",
+          "close_time": "2026-11-27T14:45:00Z",
+          "close_time_pt": "Nov 27, 2026, 6:45 AM PT",
+          "window_label": "6:30 AM \u2013 6:45 AM PT",
+          "action": "WAIT",
+          "label": "WAIT \u2014 No Trade",
+          "reason": "Choppy / no clean edge: price is below the strike, but the 1-minute trend/momentum is not cleanly bearish (RSI 25 is oversold / stretched); Yes ask 10\u00a2.",
+          "reason_full": "Choppy / no clean edge: price is below the strike, but the 1-minute trend/momentum is not cleanly bearish (RSI 25 is oversold / stretched); Yes ask 10\u00a2.",
+          "btc_price": 60632.21,
+          "strike": 61349.19,
+          "yes_ask": 0.099,
+          "no_ask": 0.902,
+          "side": null,
+          "ask": null,
+          "contracts": null,
+          "entry_price": null,
+          "cash": 90.55,
+          "book_id": "v2",
+          "book_label": "Version 2",
+          "open_count": 0
         }
       ],
       "equity": 90.55,
@@ -3461,8 +3514,8 @@
       "created_at": "2026-11-26T20:22:54Z",
       "events": [],
       "net_pnl": -9.45,
-      "updated_at": "2026-11-27T13:49:30Z",
-      "updated_at_pt": "Nov 27, 2026, 5:49 AM PT"
+      "updated_at": "2026-11-27T14:34:09Z",
+      "updated_at_pt": "Nov 27, 2026, 6:34 AM PT"
     },
     "leader": "v2",
     "leader_label": "Version 2 ahead",
@@ -3481,14 +3534,14 @@
       "v2": {
         "action": "WAIT",
         "label": "WAIT \u2014 No Trade",
-        "reason": "Choppy / no clean edge: price is above the strike, but the 1-minute trend/momentum is not cleanly bullish (5-minute trend is still down); Yes ask 82\u00a2.",
+        "reason": "Choppy / no clean edge: price is below the strike, but the 1-minute trend/momentum is not cleanly bearish (RSI 25 is oversold / stretched); Yes ask 10\u00a2.",
         "side": null,
         "ask": null,
         "strength": null,
         "base_stake": null
       }
     },
-    "updated_at": "2026-11-27T13:49:30Z",
-    "updated_at_pt": "Nov 27, 2026, 5:49 AM PT"
+    "updated_at": "2026-11-27T14:34:09Z",
+    "updated_at_pt": "Nov 27, 2026, 6:34 AM PT"
   }
 }
