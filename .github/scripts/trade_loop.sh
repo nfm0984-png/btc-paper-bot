@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Hourly paper-trade loop: run bot.py every 5 minutes for ~45–50 minutes,
-# then exit before the next hourly cron (:02) starts. Used by trade.yml.
+# then exit (overlapping scheduled runs queue via the concurrency group). Used by trade.yml.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
@@ -25,23 +25,12 @@ git config user.name "github-actions[bot]"
 git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
 START_EPOCH="$(date +%s)"
-# Hard stop ~50 minutes after start, and at least 8 minutes before the next :02 cron.
-# Next cron is the next UTC hour at minute 02.
-NOW_UTC_MIN=$((10#$(date -u +%M)))
-NOW_UTC_SEC=$((10#$(date -u +%S)))
-# Seconds until the next HH:02:00 UTC (if we are at or past :02 this hour, that's next hour).
-if (( NOW_UTC_MIN < 2 )); then
-  SECS_TO_NEXT_CRON=$(( (2 - NOW_UTC_MIN) * 60 - NOW_UTC_SEC ))
-else
-  SECS_TO_NEXT_CRON=$(( (60 - NOW_UTC_MIN + 2) * 60 - NOW_UTC_SEC ))
-fi
-DEADLINE_FROM_CRON=$(( START_EPOCH + SECS_TO_NEXT_CRON - 8 * 60 ))
-DEADLINE_FROM_START=$(( START_EPOCH + 50 * 60 ))
-if (( DEADLINE_FROM_CRON < DEADLINE_FROM_START )); then
-  DEADLINE="${DEADLINE_FROM_CRON}"
-else
-  DEADLINE="${DEADLINE_FROM_START}"
-fi
+# Hard stop ~50 minutes after start (job timeout is 56 min).
+# GitHub often starts scheduled runs 20-50 min late (e.g. :52/:56 UTC on Nov 27),
+# so cutting the loop off 8 min before the next :02 left late runs doing a single
+# tick and idled the book for ~an hour. The paper-trade concurrency group queues
+# any overlapping run, so we no longer stop early for the next cron.
+DEADLINE=$(( START_EPOCH + 50 * 60 ))
 # Always allow at least the first tick even if we started late.
 if (( DEADLINE <= START_EPOCH )); then
   DEADLINE=$(( START_EPOCH + 60 ))
