@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-11-27T05:05:49Z",
-  "updated_at_pt": "Nov 26, 2026, 9:05 PM PT",
+  "updated_at": "2026-11-27T06:06:15Z",
+  "updated_at_pt": "Nov 26, 2026, 10:06 PM PT",
   "runs": [
     {
       "t": "2026-11-26T20:02:10Z",
@@ -894,6 +894,101 @@
           "profit_factor": 1.138,
           "max_drawdown_pct": 70.79,
           "ending_equity": 195.25
+        }
+      },
+      "promoted_to": null,
+      "promoted_params": null,
+      "decision": "KEPT v4",
+      "takeaway": "Current v4 still leads on unseen windows \u2014 kept.",
+      "reason": "promotion cooldown still active"
+    },
+    {
+      "t": "2026-11-27T06:06:15Z",
+      "t_pt": "Nov 26, 2026, 10:06 PM PT",
+      "windows": 1328,
+      "train_windows": 929,
+      "val_windows": 399,
+      "candidates_tested": 40,
+      "live_version": 4,
+      "live": {
+        "train": {
+          "trade_count": 101,
+          "wins": 66,
+          "losses": 35,
+          "win_rate": 65.3,
+          "net_pnl": -20.06,
+          "profit_factor": 0.96,
+          "max_drawdown_pct": 72.22,
+          "ending_equity": 79.94
+        },
+        "val": {
+          "trade_count": 46,
+          "wins": 34,
+          "losses": 12,
+          "win_rate": 73.9,
+          "net_pnl": 105.0,
+          "profit_factor": 1.581,
+          "max_drawdown_pct": 24.07,
+          "ending_equity": 205.0
+        },
+        "overall": {
+          "trade_count": 147,
+          "wins": 100,
+          "losses": 47,
+          "win_rate": 68.0,
+          "net_pnl": 91.64,
+          "profit_factor": 1.134,
+          "max_drawdown_pct": 72.22,
+          "ending_equity": 191.64
+        }
+      },
+      "best_candidate": {
+        "name": "current",
+        "params": {
+          "min_entry_cents": 35,
+          "max_entry_cents": 75,
+          "min_strike_gap_usd": 20.0,
+          "min_mins_left": 2,
+          "max_mins_left": 15,
+          "rsi_bull_min": 55.0,
+          "rsi_bull_max": 70.0,
+          "rsi_bear_min": 30.0,
+          "rsi_bear_max": 45.0,
+          "require_ema50_align": true,
+          "require_5m_align": true,
+          "min_volatility_usd": 0.0,
+          "max_chop_ratio": 1.0,
+          "ema_flat_dollars": 8.0
+        },
+        "train": {
+          "trade_count": 101,
+          "wins": 66,
+          "losses": 35,
+          "win_rate": 65.3,
+          "net_pnl": -20.06,
+          "profit_factor": 0.96,
+          "max_drawdown_pct": 72.22,
+          "ending_equity": 79.94
+        },
+        "val": {
+          "trade_count": 46,
+          "wins": 34,
+          "losses": 12,
+          "win_rate": 73.9,
+          "net_pnl": 105.0,
+          "profit_factor": 1.581,
+          "max_drawdown_pct": 24.07,
+          "ending_equity": 205.0
+        },
+        "overall": {
+          "trade_count": 147,
+          "wins": 100,
+          "losses": 47,
+          "win_rate": 68.0,
+          "net_pnl": 91.64,
+          "profit_factor": 1.134,
+          "max_drawdown_pct": 72.22,
+          "ending_equity": 191.64
         }
       },
       "promoted_to": null,
