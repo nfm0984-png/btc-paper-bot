@@ -8406,7 +8406,9 @@
       "best_exit": "hold to expiry",
       "best_reader": "no fair-edge gate",
       "takeaway": "Best unseen chart is 5m (+$41.23, 78.1% WR on 32 trades). Best market-reader gate is no fair-edge gate (+$41.23). Best exit rule is hold to expiry (+$41.23, 78.1% WR on 32 trades) on 1328 windows with a full bid path."
-    }
+    },
+    "last_promoted_at": "2026-11-27T10:57:58Z",
+    "last_promoted_at_pt": "Nov 27, 2026, 2:57 AM PT"
   },
   "learning": {
     "generated_at": "2026-11-27T13:13:03Z",
