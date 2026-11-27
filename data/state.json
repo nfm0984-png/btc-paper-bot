@@ -25,8 +25,8 @@
     "strike": 59914.26,
     "reason": "EMA 9 < 21 ($59,925 < $60,011); price below the 50-period EMA; MACD histogram is negative; RSI 34; 5-minute trend agrees. BTC $-82.04 vs the $59,914.26 strike, No ask 69\u00a2 \u2014 Buy No. Spot-fair edge -1\u00a2. Top signal ($8 ticket): EMA 9/21 spread $86; MACD hist 30.7; RSI 34 in the heart of the bearish band; BTC $82 from the strike.",
     "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov271215-15",
-    "mark": 6.93,
-    "pnl": -0.83,
+    "mark": 5.17,
+    "pnl": -2.59,
     "pnl_kind": "unrealized"
   },
   "trades": [
@@ -476,11 +476,16 @@
       "t": 1795799306,
       "t_pt": "Nov 27, 2026, 9:08 AM PT",
       "equity": 85.02
+    },
+    {
+      "t": 1795799607,
+      "t_pt": "Nov 27, 2026, 9:13 AM PT",
+      "equity": 83.26
     }
   ],
   "created_at": "2026-11-26T18:33:31Z",
-  "updated_at": "2026-11-27T17:08:26Z",
-  "updated_at_pt": "Nov 27, 2026, 9:08 AM PT",
+  "updated_at": "2026-11-27T17:13:27Z",
+  "updated_at_pt": "Nov 27, 2026, 9:13 AM PT",
   "session": {
     "starting_balance": 40.0,
     "stake": 5.0,
@@ -651,8 +656,8 @@
         "reason": "Entry #2 in window: BTC broke \u2212$54 below strike, adding NO @ 64\u00a2.",
         "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov271215-15",
         "window_entry": 2,
-        "mark": 7.56,
-        "pnl": -0.32,
+        "mark": 5.64,
+        "pnl": -2.24,
         "pnl_kind": "unrealized",
         "book_id": "v1",
         "book_label": "Version 1"
@@ -680,8 +685,8 @@
           "reason": "Picked NO @ 69\u00a2 \u2014 BTC is \u2212$82 below strike with 1m trending down & RSI cooled to 34.",
           "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov271215-15",
           "window_entry": 1,
-          "mark": 6.93,
-          "pnl": -0.83,
+          "mark": 5.17,
+          "pnl": -2.59,
           "pnl_kind": "unrealized",
           "book_id": "v1",
           "book_label": "Version 1"
@@ -708,8 +713,8 @@
           "reason": "Entry #2 in window: BTC broke \u2212$54 below strike, adding NO @ 64\u00a2.",
           "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov271215-15",
           "window_entry": 2,
-          "mark": 7.56,
-          "pnl": -0.32,
+          "mark": 5.64,
+          "pnl": -2.24,
           "pnl_kind": "unrealized",
           "book_id": "v1",
           "book_label": "Version 1"
@@ -2792,11 +2797,35 @@
           "book_id": "v1",
           "book_label": "Version 1",
           "open_count": 2
+        },
+        {
+          "t": "2026-11-27T17:13:27Z",
+          "t_pt": "Nov 27, 2026, 9:13 AM PT",
+          "ticker": "KXBTC15M-26NOV271215-15",
+          "close_time": "2026-11-27T17:15:00Z",
+          "close_time_pt": "Nov 27, 2026, 9:15 AM PT",
+          "window_label": "9:00 AM \u2013 9:15 AM PT",
+          "action": "HOLD",
+          "label": "HOLD open trades \u2014 Too close to expiry",
+          "reason": "Only 1:33 left in this window, so Version 1 won\u2019t open another ticket.",
+          "reason_full": "Only 1:33 left in this window, so Version 1 won\u2019t open another ticket.",
+          "btc_price": 59929.12,
+          "strike": 59914.26,
+          "yes_ask": 0.53,
+          "no_ask": 0.48,
+          "side": "no",
+          "ask": null,
+          "contracts": 12,
+          "entry_price": 0.64,
+          "cash": 64.9,
+          "book_id": "v1",
+          "book_label": "Version 1",
+          "open_count": 2
         }
       ],
-      "equity": 79.39,
-      "pnl": -20.61,
-      "pnl_pct": -20.61,
+      "equity": 75.71,
+      "pnl": -24.29,
+      "pnl_pct": -24.29,
       "amount_bought": 182.1,
       "contracts_total": 296,
       "wins": 13,
@@ -2827,9 +2856,9 @@
         "Opened NO 11x KXBTC15M-26NOV271215-15 @ 69\u00a2 (bought $7.76, $8 ticket, entry #1 in window)",
         "Opened NO 12x KXBTC15M-26NOV271215-15 @ 64\u00a2 (bought $7.88, $8 ticket, entry #2 in window)"
       ],
-      "net_pnl": -20.61,
-      "updated_at": "2026-11-27T17:08:26Z",
-      "updated_at_pt": "Nov 27, 2026, 9:08 AM PT"
+      "net_pnl": -24.29,
+      "updated_at": "2026-11-27T17:13:27Z",
+      "updated_at_pt": "Nov 27, 2026, 9:13 AM PT"
     },
     "v2": {
       "id": "v2",
@@ -2862,8 +2891,8 @@
         "strike": 59914.26,
         "reason": "EMA 9 < 21 ($59,925 < $60,011); price below the 50-period EMA; MACD histogram is negative; RSI 34; 5-minute trend agrees. BTC $-82.04 vs the $59,914.26 strike, No ask 69\u00a2 \u2014 Buy No. Spot-fair edge -1\u00a2. Top signal ($8 ticket): EMA 9/21 spread $86; MACD hist 30.7; RSI 34 in the heart of the bearish band; BTC $82 from the strike.",
         "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov271215-15",
-        "mark": 6.93,
-        "pnl": -0.83,
+        "mark": 5.17,
+        "pnl": -2.59,
         "pnl_kind": "unrealized",
         "book_id": "v2",
         "book_label": "Version 2"
@@ -2890,8 +2919,8 @@
           "strike": 59914.26,
           "reason": "EMA 9 < 21 ($59,925 < $60,011); price below the 50-period EMA; MACD histogram is negative; RSI 34; 5-minute trend agrees. BTC $-82.04 vs the $59,914.26 strike, No ask 69\u00a2 \u2014 Buy No. Spot-fair edge -1\u00a2. Top signal ($8 ticket): EMA 9/21 spread $86; MACD hist 30.7; RSI 34 in the heart of the bearish band; BTC $82 from the strike.",
           "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov271215-15",
-          "mark": 6.93,
-          "pnl": -0.83,
+          "mark": 5.17,
+          "pnl": -2.59,
           "pnl_kind": "unrealized",
           "book_id": "v2",
           "book_label": "Version 2"
@@ -4447,11 +4476,35 @@
           "book_id": "v2",
           "book_label": "Version 2",
           "open_count": 1
+        },
+        {
+          "t": "2026-11-27T17:13:27Z",
+          "t_pt": "Nov 27, 2026, 9:13 AM PT",
+          "ticker": "KXBTC15M-26NOV271215-15",
+          "close_time": "2026-11-27T17:15:00Z",
+          "close_time_pt": "Nov 27, 2026, 9:15 AM PT",
+          "window_label": "9:00 AM \u2013 9:15 AM PT",
+          "action": "HOLD",
+          "label": "HOLD NO",
+          "reason": "Holding NO from 69\u00a2; live bid 47\u00a2. No exit trigger yet \u2014 still watching until settlement or a flip.",
+          "reason_full": "Holding NO from 69\u00a2; live bid 47\u00a2. No exit trigger yet \u2014 still watching until settlement or a flip.",
+          "btc_price": 59929.12,
+          "strike": 59914.26,
+          "yes_ask": 0.53,
+          "no_ask": 0.48,
+          "side": "no",
+          "ask": null,
+          "contracts": 11,
+          "entry_price": 0.69,
+          "cash": 82.79,
+          "book_id": "v2",
+          "book_label": "Version 2",
+          "open_count": 1
         }
       ],
-      "equity": 89.72,
-      "pnl": -10.28,
-      "pnl_pct": -10.28,
+      "equity": 87.96,
+      "pnl": -12.04,
+      "pnl_pct": -12.04,
       "amount_bought": 31.21,
       "contracts_total": 50,
       "wins": 1,
@@ -4461,35 +4514,35 @@
       "next_stake_label": "Next stake: $4\u2013$8 flat (no press)",
       "created_at": "2026-11-26T20:22:54Z",
       "events": [],
-      "net_pnl": -10.28,
-      "updated_at": "2026-11-27T17:08:26Z",
-      "updated_at_pt": "Nov 27, 2026, 9:08 AM PT"
+      "net_pnl": -12.04,
+      "updated_at": "2026-11-27T17:13:27Z",
+      "updated_at_pt": "Nov 27, 2026, 9:13 AM PT"
     },
     "leader": "v2",
     "leader_label": "Version 2 ahead",
-    "leader_margin": 10.33,
-    "leader_text": "Version 2 ahead by +$10.33",
+    "leader_margin": 12.25,
+    "leader_text": "Version 2 ahead by +$12.25",
     "choice": {
       "v1": {
         "action": "HOLD",
-        "label": "BOUGHT NO @ 64\u00a2",
-        "reason": "Entry #2 in window: BTC broke \u2212$54 below strike, adding NO @ 64\u00a2.",
+        "label": "HOLD open trades \u2014 Too close to expiry",
+        "reason": "Only 1:33 left in this window, so Version 1 won\u2019t open another ticket.",
         "side": "no",
-        "ask": 0.64,
-        "strength": "top",
-        "base_stake": 8.0
+        "ask": null,
+        "strength": null,
+        "base_stake": null
       },
       "v2": {
         "action": "HOLD",
         "label": "HOLD NO",
-        "reason": "Holding NO from 69\u00a2; live bid 63\u00a2. No exit trigger yet \u2014 still watching until settlement or a flip.",
+        "reason": "Holding NO from 69\u00a2; live bid 47\u00a2. No exit trigger yet \u2014 still watching until settlement or a flip.",
         "side": "no",
         "ask": null,
         "strength": null,
         "base_stake": null
       }
     },
-    "updated_at": "2026-11-27T17:08:26Z",
-    "updated_at_pt": "Nov 27, 2026, 9:08 AM PT"
+    "updated_at": "2026-11-27T17:13:27Z",
+    "updated_at_pt": "Nov 27, 2026, 9:13 AM PT"
   }
 }
