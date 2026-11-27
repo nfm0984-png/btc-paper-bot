@@ -2518,7 +2518,7 @@
       "expiration_value": 60265.6,
       "strike": 60163.95,
       "pnl": -7.44,
-      "reason_entry": "EMA 9 < 21 ($60,169 < $60,299); price below the 50-period EMA; MACD histogram is negative; RSI 32; 5-minute trend agrees. BTC $-97.38 vs the $60,163.95 strike, No ask 66\u00a2 \u2014 Buy No. Top signal ($8 ticket): EMA 9/21 spread $130; RSI 32 in the heart of the bearish band; BTC $97 from the strike; 5-minute trend is clearly aligned ($164 EMA spread).",
+      "reason_entry": "EMA 9 < 21 ($60,169 < $60,300); price below the 50-period EMA; MACD histogram is negative; RSI 32; 5-minute trend agrees. BTC $-97.38 vs the $60,163.95 strike, No ask 66\u00a2 \u2014 Buy No. Top signal ($8 ticket): EMA 9/21 spread $130; RSI 32 in the heart of the bearish band; BTC $97 from the strike; 5-minute trend is clearly aligned ($164 EMA spread).",
       "reason_exit": "Held to settlement: official result was YES (BTC 60265.6 vs strike 60163.95).",
       "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov261030-30",
       "running_balance": 147.62,
@@ -3402,8 +3402,8 @@
   ],
   "assumption_note": "Each window is evaluated once, 1 minute after it opens, using the real Kalshi Yes/No quotes at that minute and Coinbase 1-minute / 5-minute BTC candles. Trades use a $4\u2013$8 flat $4\u2013$8 stake by signal strength (no 2\u00d7 press), the official quadratic taker fee, and are held to Kalshi\u2019s official Yes/No settlement. The live bot can also enter later in a window (on a 5-minute scan) or exit early if momentum flips; those live extras are not in this backtest.",
   "fee_note": "Paper PnL includes Kalshi\u2019s taker fee: ceil(0.07 \u00d7 contracts \u00d7 price \u00d7 (1 \u2212 price)), rounded up to the next cent.",
-  "generated_at": "2026-11-27T08:08:18Z",
-  "generated_at_pt": "Nov 27, 2026, 12:08 AM PT",
+  "generated_at": "2026-11-27T08:10:57Z",
+  "generated_at_pt": "Nov 27, 2026, 12:10 AM PT",
   "candle_source_1m": "coinbase",
   "candle_source_5m": "coinbase"
 }
