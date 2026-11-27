@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-11-27T09:02:30Z",
-  "updated_at_pt": "Nov 27, 2026, 1:02 AM PT",
+  "updated_at": "2026-11-27T10:06:27Z",
+  "updated_at_pt": "Nov 27, 2026, 2:06 AM PT",
   "runs": [
     {
       "t": "2026-11-26T20:02:10Z",
@@ -1296,6 +1296,120 @@
       "decision": "KEPT v5",
       "takeaway": "A candidate that changed 5-minute filter from on to off looked better on unseen windows (+$48.13 vs live +$42.00), but a promotion landed too recently \u2014 kept v5.",
       "reason": "promotion cooldown still active"
+    },
+    {
+      "t": "2026-11-27T10:06:27Z",
+      "t_pt": "Nov 27, 2026, 2:06 AM PT",
+      "windows": 1328,
+      "train_windows": 929,
+      "val_windows": 399,
+      "candidates_tested": 57,
+      "live_version": 5,
+      "live": {
+        "train": {
+          "trade_count": 68,
+          "wins": 49,
+          "losses": 19,
+          "win_rate": 72.1,
+          "net_pnl": 41.3,
+          "profit_factor": 1.298,
+          "max_drawdown_pct": 23.46,
+          "ending_equity": 141.3
+        },
+        "val": {
+          "trade_count": 32,
+          "wins": 25,
+          "losses": 7,
+          "win_rate": 78.1,
+          "net_pnl": 42.0,
+          "profit_factor": 1.832,
+          "max_drawdown_pct": 12.3,
+          "ending_equity": 142.0
+        },
+        "overall": {
+          "trade_count": 100,
+          "wins": 74,
+          "losses": 26,
+          "win_rate": 74.0,
+          "net_pnl": 83.3,
+          "profit_factor": 1.441,
+          "max_drawdown_pct": 23.46,
+          "ending_equity": 183.3
+        }
+      },
+      "best_candidate": {
+        "name": "chart_1m",
+        "params": {
+          "min_entry_cents": 35,
+          "max_entry_cents": 75,
+          "min_strike_gap_usd": 40.0,
+          "min_mins_left": 2,
+          "max_mins_left": 15,
+          "rsi_bull_min": 55.0,
+          "rsi_bull_max": 70.0,
+          "rsi_bear_min": 30.0,
+          "rsi_bear_max": 45.0,
+          "require_ema50_align": true,
+          "require_5m_align": false,
+          "min_volatility_usd": 0.0,
+          "max_chop_ratio": 1.0,
+          "ema_flat_dollars": 8.0,
+          "chart_mode": "1m",
+          "require_15m_align": false,
+          "require_1h_align": false,
+          "min_fair_edge": 0.0,
+          "max_spread_cents": 20.0,
+          "enable_early_exits": false,
+          "tp_bid": 0.8,
+          "tp_gain": 0.15,
+          "sl_drop": 0.12,
+          "tp_require_stall": false,
+          "sl_require_reversal": false,
+          "fair_giveback": false
+        },
+        "train": {
+          "trade_count": 105,
+          "wins": 60,
+          "losses": 45,
+          "win_rate": 57.1,
+          "net_pnl": -99.97,
+          "profit_factor": 0.685,
+          "max_drawdown_pct": 99.97,
+          "ending_equity": 0.03
+        },
+        "val": {
+          "trade_count": 51,
+          "wins": 39,
+          "losses": 12,
+          "win_rate": 76.5,
+          "net_pnl": 52.65,
+          "profit_factor": 1.613,
+          "max_drawdown_pct": 11.98,
+          "ending_equity": 152.65
+        },
+        "overall": {
+          "trade_count": 105,
+          "wins": 60,
+          "losses": 45,
+          "win_rate": 57.1,
+          "net_pnl": -99.97,
+          "profit_factor": 0.685,
+          "max_drawdown_pct": 99.97,
+          "ending_equity": 0.03
+        }
+      },
+      "promoted_to": null,
+      "promoted_params": null,
+      "decision": "KEPT v5",
+      "takeaway": "A candidate that changed 5-minute filter from on to off and chart mode from 1m_5m to 1m looked better on unseen windows (+$52.65 vs live +$42.00), but a promotion landed too recently \u2014 kept v5.",
+      "reason": "promotion cooldown still active",
+      "chart_scorecard": {
+        "best_chart": "5m",
+        "best_exit": "hold to expiry",
+        "best_reader": "no fair-edge gate",
+        "takeaway": "Best unseen chart is 5m (+$42.00, 78.1% WR on 32 trades). Best market-reader gate is no fair-edge gate (+$42.00). Best exit rule is hold to expiry (+$42.00, 78.1% WR on 32 trades) on 1204 windows with a full bid path.",
+        "windows_with_exit_path": 1204
+      }
     }
   ]
 }
