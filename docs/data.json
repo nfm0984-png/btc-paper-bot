@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-27T10:48:46Z",
-  "generated_at_pt": "Nov 27, 2026, 2:48 AM PT",
+  "generated_at": "2026-11-27T10:53:45Z",
+  "generated_at_pt": "Nov 27, 2026, 2:53 AM PT",
   "series_ticker": "KXBTC15M",
   "price_source": "coinbase",
   "candle_source_1m": "coinbase",
@@ -11,35 +11,35 @@
     "charts": {
       "1m": {
         "tf": "1m",
-        "bias": "down",
+        "bias": "up",
         "ready": true,
-        "ema9": 61542.99,
-        "ema21": 61555.93,
-        "ema50": 61576.51,
-        "rsi14": 45.64,
-        "macd_hist": -1.98,
-        "ema_slope": -10.79,
-        "vwap": 61563.15,
-        "vwap_dist": -23.51,
-        "atr": 33.47,
-        "momentum": -10.34,
-        "close": 61539.64
+        "ema9": 61567.97,
+        "ema21": 61564.81,
+        "ema50": 61576.94,
+        "rsi14": 53.6,
+        "macd_hist": 5.77,
+        "ema_slope": 13.41,
+        "vwap": 61562.36,
+        "vwap_dist": 19.75,
+        "atr": 31.32,
+        "momentum": -7.54,
+        "close": 61582.11
       },
       "5m": {
         "tf": "5m",
         "bias": "down",
         "ready": true,
-        "ema9": 61582.87,
-        "ema21": 61613.05,
-        "ema50": 61615.13,
-        "rsi14": 43.68,
-        "macd_hist": -5.64,
-        "ema_slope": -27.41,
-        "vwap": 61619.61,
-        "vwap_dist": -69.63,
-        "atr": 100.83,
-        "momentum": -74.08,
-        "close": 61549.98
+        "ema9": 61584.25,
+        "ema21": 61610.99,
+        "ema50": 61614.21,
+        "rsi14": 47.35,
+        "macd_hist": -2.94,
+        "ema_slope": -13.85,
+        "vwap": 61614.1,
+        "vwap_dist": -24.45,
+        "atr": 98.56,
+        "momentum": 40.5,
+        "close": 61589.65
       },
       "15m": {
         "tf": "15m",
@@ -75,7 +75,7 @@
       }
     },
     "consensus": {
-      "bias": "mixed",
+      "bias": "up",
       "ready": [
         "1m",
         "5m",
@@ -83,11 +83,11 @@
         "1h"
       ],
       "up": [
+        "1m",
         "15m",
         "1h"
       ],
       "down": [
-        "1m",
         "5m"
       ],
       "aligned": [
@@ -100,8 +100,8 @@
         "1h"
       ],
       "higher_agree": 2,
-      "score": 0,
-      "label": "Mixed / choppy"
+      "score": 2,
+      "label": "Bullish alignment"
     },
     "best_chart": "5m",
     "scorecard": {
@@ -726,25 +726,25 @@
       "best_reader": "no fair-edge gate",
       "takeaway": "Best unseen chart is 5m (+$42.00, 78.1% WR on 32 trades). Best market-reader gate is no fair-edge gate (+$42.00). Best exit rule is hold to expiry (+$42.00, 78.1% WR on 32 trades) on 1204 windows with a full bid path."
     },
-    "fair_yes": 0.4441,
-    "fair_no": 0.5559,
-    "implied_yes": 0.46,
-    "yes_edge": -0.0159,
-    "no_edge": 0.0059,
-    "yes_bid": 0.45,
-    "yes_ask": 0.46,
-    "no_bid": 0.54,
-    "no_ask": 0.55,
-    "sigma_usd_per_sqrt_min": 25.62,
-    "minutes_left": 11.23,
+    "fair_yes": 0.5054,
+    "fair_no": 0.4946,
+    "implied_yes": 0.71,
+    "yes_edge": -0.2046,
+    "no_edge": 0.1946,
+    "yes_bid": 0.7,
+    "yes_ask": 0.71,
+    "no_bid": 0.29,
+    "no_ask": 0.3,
+    "sigma_usd_per_sqrt_min": 24.64,
+    "minutes_left": 6.25,
     "btc_book": {
-      "best_bid": 61562.4,
-      "best_ask": 61562.5,
+      "best_bid": 61563.4,
+      "best_ask": 61563.5,
       "spread": 0.09999999999854481,
-      "mid": 61562.45,
-      "bid_depth": 5.56,
-      "ask_depth": 0.181,
-      "imbalance": 0.9369,
+      "mid": 61563.45,
+      "bid_depth": 3.599,
+      "ask_depth": 1.705,
+      "imbalance": 0.3571,
       "bias": "buy",
       "levels": 10,
       "source": "kraken"
@@ -752,20 +752,20 @@
     "btc_flow": {
       "source": "coinbase",
       "trades": 80,
-      "buy_volume": 0.390098,
-      "sell_volume": 0.432886,
-      "delta": -0.052,
-      "bias": "neutral"
+      "buy_volume": 0.007701,
+      "sell_volume": 0.011832,
+      "delta": -0.2115,
+      "bias": "sell"
     },
-    "btc_bias": "buy",
+    "btc_bias": "mixed",
     "btc_spread_usd": 0.1,
     "kalshi_book": {
-      "yes_depth": 64145.16,
-      "no_depth": 96430.07,
-      "imbalance": -0.2011,
+      "yes_depth": 43147.77,
+      "no_depth": 59444.47,
+      "imbalance": -0.1588,
       "bias": "no",
-      "yes_bid": 0.45,
-      "yes_ask": 0.46,
+      "yes_bid": 0.7,
+      "yes_ask": 0.71,
       "spread": 0.01,
       "spread_cents": 1.0,
       "yes_levels": 20,
@@ -781,12 +781,12 @@
     "note": "The dashboard polls Coinbase\u2019s public API every 20 seconds for a live BTC price and 1-minute indicators (CORS is open). Kalshi\u2019s public API blocks browser CORS, so contract quotes, the official Buy/Sell/Wait call, and paper-trade grading refresh with each GitHub Actions run (every 5 minutes)."
   },
   "live": {
-    "btc_price": 61549.44,
+    "btc_price": 61562.35,
     "strike": 61561.52,
-    "distance": -12.08,
+    "distance": 0.83,
     "call": "WAIT",
     "call_label": "WAIT \u2014 Too close to strike",
-    "reason": "BTC $-12.08 vs the $61,561.52 strike. That\u2019s inside a $40 band, so settlement could still flip either way.",
+    "reason": "BTC +$0.83 vs the $61,561.52 strike. That\u2019s inside a $40 band, so settlement could still flip either way.",
     "side": null,
     "ask": null,
     "bid": null,
@@ -801,45 +801,45 @@
       "open_time_pt": "Nov 27, 2026, 2:45 AM PT",
       "close_time": "2026-11-27T11:00:00Z",
       "close_time_pt": "Nov 27, 2026, 3:00 AM PT",
-      "remaining_sec": 674,
-      "yes_bid": 0.45,
-      "yes_ask": 0.46,
-      "no_bid": 0.54,
-      "no_ask": 0.55,
-      "last": 0.45,
-      "volume": 473048.41,
+      "remaining_sec": 375,
+      "yes_bid": 0.7,
+      "yes_ask": 0.71,
+      "no_bid": 0.29,
+      "no_ask": 0.3,
+      "last": 0.7,
+      "volume": 1204110.75,
       "result": null,
       "expiration_value": null,
       "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov270600-00",
       "rules": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 6:00 AM EST on Nov 27, 2026 is at least the simple average of the sixty seconds of CF Benchmarks' BRTI before 5:45 AM EST on November 27, 2026, then the market resolves to Yes."
     },
     "indicators_1m": {
-      "ema9": 61542.99,
-      "ema21": 61555.93,
-      "ema50": 61576.51,
-      "rsi14": 45.64,
-      "macd_hist": -1.98,
-      "close": 61539.64,
+      "ema9": 61567.97,
+      "ema21": 61564.81,
+      "ema50": 61576.94,
+      "rsi14": 53.6,
+      "macd_hist": 5.77,
+      "close": 61582.11,
       "ready": true,
-      "ema_slope": -10.79,
-      "vwap": 61563.15,
-      "vwap_dist": -23.51,
-      "atr": 33.47,
-      "momentum": -10.34
+      "ema_slope": 13.41,
+      "vwap": 61562.36,
+      "vwap_dist": 19.75,
+      "atr": 31.32,
+      "momentum": -7.54
     },
     "indicators_5m": {
-      "ema9": 61582.87,
-      "ema21": 61613.05,
-      "ema50": 61615.13,
-      "rsi14": 43.68,
-      "macd_hist": -5.64,
-      "close": 61549.98,
+      "ema9": 61584.25,
+      "ema21": 61610.99,
+      "ema50": 61614.21,
+      "rsi14": 47.35,
+      "macd_hist": -2.94,
+      "close": 61589.65,
       "ready": true,
-      "ema_slope": -27.41,
-      "vwap": 61619.61,
-      "vwap_dist": -69.63,
-      "atr": 100.83,
-      "momentum": -74.08
+      "ema_slope": -13.85,
+      "vwap": 61614.1,
+      "vwap_dist": -24.45,
+      "atr": 98.56,
+      "momentum": 40.5
     },
     "indicators_15m": {
       "ema9": 61605.65,
@@ -869,8 +869,8 @@
       "atr": 434.55,
       "momentum": -72.76
     },
-    "last_1m_close": 61539.64,
-    "last_1m_time_pt": "Nov 27, 2026, 2:47 AM PT",
+    "last_1m_close": 61582.11,
+    "last_1m_time_pt": "Nov 27, 2026, 2:52 AM PT",
     "cash": 85.85,
     "equity": 85.85,
     "pnl": -14.15,
@@ -1047,6 +1047,11 @@
       {
         "t": 1795776526,
         "t_pt": "Nov 27, 2026, 2:48 AM PT",
+        "equity": 85.85
+      },
+      {
+        "t": 1795776825,
+        "t_pt": "Nov 27, 2026, 2:53 AM PT",
         "equity": 85.85
       }
     ],
@@ -2331,6 +2336,30 @@
           "book_id": "v1",
           "book_label": "Version 1",
           "open_count": 0
+        },
+        {
+          "t": "2026-11-27T10:53:45Z",
+          "t_pt": "Nov 27, 2026, 2:53 AM PT",
+          "ticker": "KXBTC15M-26NOV270600-00",
+          "close_time": "2026-11-27T11:00:00Z",
+          "close_time_pt": "Nov 27, 2026, 3:00 AM PT",
+          "window_label": "2:45 AM \u2013 3:00 AM PT",
+          "action": "WAIT",
+          "label": "WAIT \u2014 Too close to strike",
+          "reason": "BTC is +$1 above strike. That\u2019s inside a $20 band, so settlement could still flip either way.",
+          "reason_full": "BTC is +$1 above strike. That\u2019s inside a $20 band, so settlement could still flip either way.",
+          "btc_price": 61562.35,
+          "strike": 61561.52,
+          "yes_ask": 0.71,
+          "no_ask": 0.3,
+          "side": null,
+          "ask": null,
+          "contracts": null,
+          "entry_price": null,
+          "cash": 70.83,
+          "book_id": "v1",
+          "book_label": "Version 1",
+          "open_count": 0
         }
       ],
       "equity": 70.83,
@@ -2367,8 +2396,8 @@
         "Settled NO on KXBTC15M-26NOV270545-45: Settled NO at BTC 61561.52 vs strike 61612.75. PnL +3.53"
       ],
       "net_pnl": -29.17,
-      "updated_at": "2026-11-27T10:48:46Z",
-      "updated_at_pt": "Nov 27, 2026, 2:48 AM PT"
+      "updated_at": "2026-11-27T10:53:45Z",
+      "updated_at_pt": "Nov 27, 2026, 2:53 AM PT"
     },
     "v2": {
       "id": "v2",
@@ -3070,6 +3099,30 @@
           "book_id": "v2",
           "book_label": "Version 2",
           "open_count": 0
+        },
+        {
+          "t": "2026-11-27T10:53:45Z",
+          "t_pt": "Nov 27, 2026, 2:53 AM PT",
+          "ticker": "KXBTC15M-26NOV270600-00",
+          "close_time": "2026-11-27T11:00:00Z",
+          "close_time_pt": "Nov 27, 2026, 3:00 AM PT",
+          "window_label": "2:45 AM \u2013 3:00 AM PT",
+          "action": "WAIT",
+          "label": "WAIT \u2014 Too close to strike",
+          "reason": "BTC +$0.83 vs the $61,561.52 strike. That\u2019s inside a $40 band, so settlement could still flip either way.",
+          "reason_full": "BTC +$0.83 vs the $61,561.52 strike. That\u2019s inside a $40 band, so settlement could still flip either way.",
+          "btc_price": 61562.35,
+          "strike": 61561.52,
+          "yes_ask": 0.71,
+          "no_ask": 0.3,
+          "side": null,
+          "ask": null,
+          "contracts": null,
+          "entry_price": null,
+          "cash": 90.55,
+          "book_id": "v2",
+          "book_label": "Version 2",
+          "open_count": 0
         }
       ],
       "equity": 90.55,
@@ -3085,8 +3138,8 @@
       "created_at": "2026-11-26T20:22:54Z",
       "events": [],
       "net_pnl": -9.45,
-      "updated_at": "2026-11-27T10:48:46Z",
-      "updated_at_pt": "Nov 27, 2026, 2:48 AM PT"
+      "updated_at": "2026-11-27T10:53:45Z",
+      "updated_at_pt": "Nov 27, 2026, 2:53 AM PT"
     },
     "leader": "v2",
     "leader_label": "Version 2 ahead",
@@ -3096,7 +3149,7 @@
       "v1": {
         "action": "WAIT",
         "label": "WAIT \u2014 Too close to strike",
-        "reason": "BTC is \u2212$12 below strike. That\u2019s inside a $20 band, so settlement could still flip either way.",
+        "reason": "BTC is +$1 above strike. That\u2019s inside a $20 band, so settlement could still flip either way.",
         "side": null,
         "ask": null,
         "strength": null,
@@ -3105,15 +3158,15 @@
       "v2": {
         "action": "WAIT",
         "label": "WAIT \u2014 Too close to strike",
-        "reason": "BTC $-12.08 vs the $61,561.52 strike. That\u2019s inside a $40 band, so settlement could still flip either way.",
+        "reason": "BTC +$0.83 vs the $61,561.52 strike. That\u2019s inside a $40 band, so settlement could still flip either way.",
         "side": null,
         "ask": null,
         "strength": null,
         "base_stake": null
       }
     },
-    "updated_at": "2026-11-27T10:48:46Z",
-    "updated_at_pt": "Nov 27, 2026, 2:48 AM PT"
+    "updated_at": "2026-11-27T10:53:45Z",
+    "updated_at_pt": "Nov 27, 2026, 2:53 AM PT"
   },
   "backtest": {
     "start": "2026-11-22T11:00:00Z",
@@ -5879,7 +5932,7 @@
         "expiration_value": 60134.42,
         "strike": 59829.48,
         "pnl": 2.65,
-        "reason_entry": "EMA 9 > 21 ($59,879 > $59,824); price above the 50-period EMA; MACD histogram is positive; RSI 62; 5-minute trend agrees. BTC +$123.75 vs the $59,829.48 strike, Yes ask 72\u00a2 \u2014 Buy Yes. Spot-fair edge +1\u00a2. Top signal ($8 ticket): EMA 9/21 spread $54; RSI 62 in the heart of the bullish band; BTC $124 from the strike; 5-minute trend is clearly aligned ($206 EMA spread).",
+        "reason_entry": "EMA 9 > 21 ($59,878 > $59,824); price above the 50-period EMA; MACD histogram is positive; RSI 62; 5-minute trend agrees. BTC +$121.32 vs the $59,829.48 strike, Yes ask 72\u00a2 \u2014 Buy Yes. Spot-fair edge +0\u00a2. Top signal ($8 ticket): EMA 9/21 spread $54; RSI 62 in the heart of the bullish band; BTC $121 from the strike; 5-minute trend is clearly aligned ($205 EMA spread).",
         "reason_exit": "Held to settlement: official result was YES (BTC 60134.42 vs strike 59829.48).",
         "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov251430-30",
         "running_balance": 157.17,
@@ -5909,7 +5962,7 @@
         "expiration_value": 58561.16,
         "strike": 58286.94,
         "pnl": 4.12,
-        "reason_entry": "EMA 9 > 21 ($58,324 > $58,255); price above the 50-period EMA; MACD histogram is positive; RSI 58; 5-minute trend agrees. BTC +$102.65 vs the $58,286.94 strike, Yes ask 64\u00a2 \u2014 Buy Yes. Spot-fair edge -4\u00a2. Top signal ($8 ticket): EMA 9/21 spread $69; RSI 58 in the heart of the bullish band; BTC $103 from the strike; 5-minute trend is clearly aligned ($52 EMA spread).",
+        "reason_entry": "EMA 9 > 21 ($58,323 > $58,254); price above the 50-period EMA; MACD histogram is positive; RSI 58; 5-minute trend agrees. BTC +$102.65 vs the $58,286.94 strike, Yes ask 64\u00a2 \u2014 Buy Yes. Spot-fair edge -4\u00a2. Top signal ($8 ticket): EMA 9/21 spread $69; RSI 58 in the heart of the bullish band; BTC $103 from the strike; 5-minute trend is clearly aligned ($52 EMA spread).",
         "reason_exit": "Held to settlement: official result was YES (BTC 58561.16 vs strike 58286.94).",
         "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov251115-15",
         "running_balance": 154.52,
@@ -5939,7 +5992,7 @@
         "expiration_value": 57869.19,
         "strike": 57921.77,
         "pnl": 3.35,
-        "reason_entry": "EMA 9 < 21 ($57,902 < $57,931); price below the 50-period EMA; MACD histogram is negative; RSI 45; 5-minute trend agrees. BTC $-149.95 vs the $57,921.77 strike, No ask 68\u00a2 \u2014 Buy No. Spot-fair edge -7\u00a2. Top signal ($8 ticket): EMA 9/21 spread $30; MACD hist 42.3; BTC $150 from the strike; 5-minute trend is clearly aligned ($131 EMA spread).",
+        "reason_entry": "EMA 9 < 21 ($57,899 < $57,930); price below the 50-period EMA; MACD histogram is negative; RSI 44; 5-minute trend agrees. BTC $-159.76 vs the $57,921.77 strike, No ask 68\u00a2 \u2014 Buy No. Spot-fair edge -7\u00a2. Top signal ($8 ticket): EMA 9/21 spread $31; MACD hist 42.9; BTC $160 from the strike; 5-minute trend is clearly aligned ($131 EMA spread).",
         "reason_exit": "Held to settlement: official result was NO (BTC 57869.19 vs strike 57921.77).",
         "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov251030-30",
         "running_balance": 150.4,
@@ -6479,7 +6532,7 @@
         "expiration_value": 61254.93,
         "strike": 61352.17,
         "pnl": 2.46,
-        "reason_entry": "EMA 9 < 21 ($61,340 < $61,360); price below the 50-period EMA; MACD histogram is negative; RSI 37; 5-minute trend agrees. BTC $-59.76 vs the $61,352.17 strike, No ask 74\u00a2 \u2014 Buy No. Spot-fair edge -0\u00a2. Top signal ($8 ticket): MACD hist 11.3; RSI 37 in the heart of the bearish band; BTC $60 from the strike.",
+        "reason_entry": "EMA 9 < 21 ($61,340 < $61,359); price below the 50-period EMA; MACD histogram is negative; RSI 37; 5-minute trend agrees. BTC $-61.05 vs the $61,352.17 strike, No ask 74\u00a2 \u2014 Buy No. Spot-fair edge +0\u00a2. Top signal ($8 ticket): MACD hist 11.4; RSI 37 in the heart of the bearish band; BTC $61 from the strike.",
         "reason_exit": "Held to settlement: official result was NO (BTC 61254.93 vs strike 61352.17).",
         "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov230715-15",
         "running_balance": 114.65,
@@ -6614,8 +6667,8 @@
     ],
     "assumption_note": "Each window is evaluated once, 1 minute after it opens, using the real Kalshi Yes/No quotes at that minute and Coinbase 1-minute / 5-minute / 15-minute / 1-hour BTC candles, plus a spot-derived fair probability from realized 1-minute volatility. Trades use a $4\u2013$8 flat stake by signal strength (no 2\u00d7 press) and the official quadratic taker fee. When a full 15-minute Kalshi bid path is available, early take-profit and cut-loss rules are applied on that path; otherwise the ticket is held to official Yes/No settlement. The live bot can also enter later in a window (on a 5-minute scan) and uses live order-book and taker-flow data as a market reader; those live-only prints are not in this backtest.",
     "fee_note": "Paper PnL includes Kalshi\u2019s taker fee: ceil(0.07 \u00d7 contracts \u00d7 price \u00d7 (1 \u2212 price)), rounded up to the next cent.",
-    "generated_at": "2026-11-27T10:48:46Z",
-    "generated_at_pt": "Nov 27, 2026, 2:48 AM PT",
+    "generated_at": "2026-11-27T10:53:45Z",
+    "generated_at_pt": "Nov 27, 2026, 2:53 AM PT",
     "candle_source_1m": "coinbase",
     "candle_source_5m": "coinbase",
     "candle_source_15m": "coinbase",
@@ -7315,9 +7368,7 @@
       "best_exit": "hold to expiry",
       "best_reader": "no fair-edge gate",
       "takeaway": "Best unseen chart is 5m (+$42.00, 78.1% WR on 32 trades). Best market-reader gate is no fair-edge gate (+$42.00). Best exit rule is hold to expiry (+$42.00, 78.1% WR on 32 trades) on 1204 windows with a full bid path."
-    },
-    "last_promoted_at": "2026-11-27T07:21:47Z",
-    "last_promoted_at_pt": "Nov 26, 2026, 11:21 PM PT"
+    }
   },
   "learning": {
     "generated_at": "2026-11-27T10:06:27Z",
