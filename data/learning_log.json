@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-11-27T19:57:50Z",
-  "updated_at_pt": "Nov 27, 2026, 11:57 AM PT",
+  "updated_at": "2026-11-27T20:55:22Z",
+  "updated_at_pt": "Nov 27, 2026, 12:55 PM PT",
   "runs": [
     {
       "t": "2026-11-26T20:02:10Z",
@@ -2483,6 +2483,120 @@
       "decision": "KEPT v7",
       "takeaway": "Current v7 still leads on unseen windows \u2014 kept. Best alternate (5-minute filter from on to off and chart mode from 1m_5m to 1m) overall P&L is \u2212$17.63, not positive.",
       "reason": "overall P&L is \u2212$17.63, not positive",
+      "chart_scorecard": {
+        "best_chart": "5m",
+        "best_exit": "hold to expiry",
+        "best_reader": "no fair-edge gate",
+        "takeaway": "Best unseen chart is 5m (+$37.81, 76.5% WR on 34 trades). Best market-reader gate is no fair-edge gate (+$37.81). Best exit rule is hold to expiry (+$37.81, 76.5% WR on 34 trades) on 1328 windows with a full bid path.",
+        "windows_with_exit_path": 1328
+      }
+    },
+    {
+      "t": "2026-11-27T20:55:22Z",
+      "t_pt": "Nov 27, 2026, 12:55 PM PT",
+      "windows": 1328,
+      "train_windows": 929,
+      "val_windows": 399,
+      "candidates_tested": 56,
+      "live_version": 7,
+      "live": {
+        "train": {
+          "trade_count": 65,
+          "wins": 50,
+          "losses": 15,
+          "win_rate": 76.9,
+          "net_pnl": 73.47,
+          "profit_factor": 1.672,
+          "max_drawdown_pct": 17.33,
+          "ending_equity": 173.47
+        },
+        "val": {
+          "trade_count": 34,
+          "wins": 26,
+          "losses": 8,
+          "win_rate": 76.5,
+          "net_pnl": 37.81,
+          "profit_factor": 1.65,
+          "max_drawdown_pct": 10.71,
+          "ending_equity": 137.81
+        },
+        "overall": {
+          "trade_count": 99,
+          "wins": 76,
+          "losses": 23,
+          "win_rate": 76.8,
+          "net_pnl": 111.28,
+          "profit_factor": 1.664,
+          "max_drawdown_pct": 17.33,
+          "ending_equity": 211.28
+        }
+      },
+      "best_candidate": {
+        "name": "chart_1m",
+        "params": {
+          "min_entry_cents": 35,
+          "max_entry_cents": 75,
+          "min_strike_gap_usd": 40.0,
+          "min_mins_left": 2,
+          "max_mins_left": 15,
+          "rsi_bull_min": 54.0,
+          "rsi_bull_max": 72.0,
+          "rsi_bear_min": 30.0,
+          "rsi_bear_max": 45.0,
+          "require_ema50_align": true,
+          "require_5m_align": false,
+          "min_volatility_usd": 0.0,
+          "max_chop_ratio": 0.8,
+          "ema_flat_dollars": 8.0,
+          "chart_mode": "1m",
+          "require_15m_align": false,
+          "require_1h_align": false,
+          "min_fair_edge": 0.0,
+          "max_spread_cents": 20.0,
+          "enable_early_exits": false,
+          "tp_bid": 0.8,
+          "tp_gain": 0.15,
+          "sl_drop": 0.12,
+          "tp_require_stall": false,
+          "sl_require_reversal": false,
+          "fair_giveback": false
+        },
+        "train": {
+          "trade_count": 106,
+          "wins": 66,
+          "losses": 40,
+          "win_rate": 62.3,
+          "net_pnl": -50.39,
+          "profit_factor": 0.824,
+          "max_drawdown_pct": 73.73,
+          "ending_equity": 49.61
+        },
+        "val": {
+          "trade_count": 53,
+          "wins": 39,
+          "losses": 14,
+          "win_rate": 73.6,
+          "net_pnl": 43.98,
+          "profit_factor": 1.45,
+          "max_drawdown_pct": 11.09,
+          "ending_equity": 143.98
+        },
+        "overall": {
+          "trade_count": 159,
+          "wins": 105,
+          "losses": 54,
+          "win_rate": 66.0,
+          "net_pnl": -6.41,
+          "profit_factor": 0.983,
+          "max_drawdown_pct": 73.73,
+          "ending_equity": 93.59
+        }
+      },
+      "promoted_to": null,
+      "promoted_params": null,
+      "decision": "KEPT v7",
+      "takeaway": "Current v7 still leads on unseen windows \u2014 kept. Best alternate (5-minute filter from on to off and chart mode from 1m_5m to 1m) overall P&L is \u2212$6.41, not positive.",
+      "reason": "overall P&L is \u2212$6.41, not positive",
       "chart_scorecard": {
         "best_chart": "5m",
         "best_exit": "hold to expiry",
