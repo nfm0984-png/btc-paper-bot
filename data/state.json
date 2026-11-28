@@ -1064,11 +1064,16 @@
       "t": 1795830223,
       "t_pt": "Nov 27, 2026, 5:43 PM PT",
       "equity": 82.59
+    },
+    {
+      "t": 1795830272,
+      "t_pt": "Nov 27, 2026, 5:44 PM PT",
+      "equity": 82.59
     }
   ],
   "created_at": "2026-11-26T18:33:31Z",
-  "updated_at": "2026-11-28T01:43:43Z",
-  "updated_at_pt": "Nov 27, 2026, 5:43 PM PT",
+  "updated_at": "2026-11-28T01:44:32Z",
+  "updated_at_pt": "Nov 27, 2026, 5:44 PM PT",
   "session": {
     "starting_balance": 40.0,
     "stake": 5.0,
@@ -1804,6 +1809,30 @@
           "book_id": "v1",
           "book_label": "Version 1.2",
           "open_count": 0
+        },
+        {
+          "t": "2026-11-28T01:44:32Z",
+          "t_pt": "Nov 27, 2026, 5:44 PM PT",
+          "ticker": "KXBTC15M-26NOV272045-45",
+          "close_time": "2026-11-28T01:45:00Z",
+          "close_time_pt": "Nov 27, 2026, 5:45 PM PT",
+          "window_label": "5:30 PM \u2013 5:45 PM PT",
+          "action": "WAIT",
+          "label": "Too close to expiry",
+          "reason": "Only 0:28 left in this window, so Version 1 won\u2019t open another ticket.",
+          "reason_full": "Only 0:28 left in this window, so Version 1 won\u2019t open another ticket.",
+          "btc_price": 60125.61,
+          "strike": 60057.74,
+          "yes_ask": 1.0,
+          "no_ask": 0.001,
+          "side": null,
+          "ask": null,
+          "contracts": null,
+          "entry_price": null,
+          "cash": 100.0,
+          "book_id": "v1",
+          "book_label": "Version 1.2",
+          "open_count": 0
         }
       ],
       "equity": 100.0,
@@ -1819,8 +1848,8 @@
       "created_at": "2026-11-28T00:04:13Z",
       "events": [],
       "net_pnl": 0.0,
-      "updated_at": "2026-11-28T01:43:43Z",
-      "updated_at_pt": "Nov 27, 2026, 5:43 PM PT"
+      "updated_at": "2026-11-28T01:44:32Z",
+      "updated_at_pt": "Nov 27, 2026, 5:44 PM PT"
     },
     "v2": {
       "id": "v2",
@@ -2372,6 +2401,30 @@
           "book_id": "v2",
           "book_label": "Version 2.2",
           "open_count": 0
+        },
+        {
+          "t": "2026-11-28T01:44:32Z",
+          "t_pt": "Nov 27, 2026, 5:44 PM PT",
+          "ticker": "KXBTC15M-26NOV272045-45",
+          "close_time": "2026-11-28T01:45:00Z",
+          "close_time_pt": "Nov 27, 2026, 5:45 PM PT",
+          "window_label": "5:30 PM \u2013 5:45 PM PT",
+          "action": "WAIT",
+          "label": "WAIT \u2014 Too close to expiry",
+          "reason": "Only 0:28 left in this window. The bot stands aside under 2 minutes.",
+          "reason_full": "Only 0:28 left in this window. The bot stands aside under 2 minutes.",
+          "btc_price": 60125.61,
+          "strike": 60057.74,
+          "yes_ask": 1.0,
+          "no_ask": 0.001,
+          "side": null,
+          "ask": null,
+          "contracts": null,
+          "entry_price": null,
+          "cash": 102.46,
+          "book_id": "v2",
+          "book_label": "Version 2.2",
+          "open_count": 0
         }
       ],
       "equity": 102.46,
@@ -2387,8 +2440,8 @@
       "created_at": "2026-11-28T00:04:13Z",
       "events": [],
       "net_pnl": 2.46,
-      "updated_at": "2026-11-28T01:43:43Z",
-      "updated_at_pt": "Nov 27, 2026, 5:43 PM PT"
+      "updated_at": "2026-11-28T01:44:32Z",
+      "updated_at_pt": "Nov 27, 2026, 5:44 PM PT"
     },
     "leader": "v2",
     "leader_label": "Version 2 ahead",
@@ -2398,7 +2451,7 @@
       "v1": {
         "action": "WAIT",
         "label": "Too close to expiry",
-        "reason": "Only 1:17 left in this window, so Version 1 won\u2019t open another ticket.",
+        "reason": "Only 0:28 left in this window, so Version 1 won\u2019t open another ticket.",
         "side": null,
         "ask": null,
         "strength": null,
@@ -2407,15 +2460,15 @@
       "v2": {
         "action": "WAIT",
         "label": "WAIT \u2014 Too close to expiry",
-        "reason": "Only 1:17 left in this window. The bot stands aside under 2 minutes.",
+        "reason": "Only 0:28 left in this window. The bot stands aside under 2 minutes.",
         "side": null,
         "ask": null,
         "strength": null,
         "base_stake": null
       }
     },
-    "updated_at": "2026-11-28T01:43:43Z",
-    "updated_at_pt": "Nov 27, 2026, 5:43 PM PT"
+    "updated_at": "2026-11-28T01:44:32Z",
+    "updated_at_pt": "Nov 27, 2026, 5:44 PM PT"
   },
   "race_archive": [
     {
