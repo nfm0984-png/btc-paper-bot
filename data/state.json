@@ -1329,11 +1329,16 @@
       "t": 1795843338,
       "t_pt": "Nov 27, 2026, 9:22 PM PT",
       "equity": 84.41
+    },
+    {
+      "t": 1795843637,
+      "t_pt": "Nov 27, 2026, 9:27 PM PT",
+      "equity": 84.41
     }
   ],
   "created_at": "2026-11-26T18:33:31Z",
-  "updated_at": "2026-11-28T05:22:18Z",
-  "updated_at_pt": "Nov 27, 2026, 9:22 PM PT",
+  "updated_at": "2026-11-28T05:27:17Z",
+  "updated_at_pt": "Nov 27, 2026, 9:27 PM PT",
   "session": {
     "starting_balance": 40.0,
     "stake": 5.0,
@@ -1584,8 +1589,8 @@
         "reason": "Picked NO @ 39\u00a2 \u2014 BTC is \u2212$38 below strike with 1m trending down & RSI cooled to 37.",
         "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov280030-30",
         "window_entry": 1,
-        "mark": 7.79,
-        "pnl": 0.06,
+        "mark": 3.04,
+        "pnl": -4.69,
         "pnl_kind": "unrealized",
         "book_id": "v1",
         "book_label": "Version 1.2"
@@ -1613,8 +1618,8 @@
           "reason": "Picked NO @ 39\u00a2 \u2014 BTC is \u2212$38 below strike with 1m trending down & RSI cooled to 37.",
           "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov280030-30",
           "window_entry": 1,
-          "mark": 7.79,
-          "pnl": 0.06,
+          "mark": 3.04,
+          "pnl": -4.69,
           "pnl_kind": "unrealized",
           "book_id": "v1",
           "book_label": "Version 1.2"
@@ -3277,11 +3282,35 @@
           "book_id": "v1",
           "book_label": "Version 1.2",
           "open_count": 1
+        },
+        {
+          "t": "2026-11-28T05:27:17Z",
+          "t_pt": "Nov 27, 2026, 9:27 PM PT",
+          "ticker": "KXBTC15M-26NOV280030-30",
+          "close_time": "2026-11-28T05:30:00Z",
+          "close_time_pt": "Nov 27, 2026, 9:30 PM PT",
+          "window_label": "9:15 PM \u2013 9:30 PM PT",
+          "action": "HOLD",
+          "label": "WAIT \u2014 No tradable ask",
+          "reason": "Neither Yes nor No is in Version 1\u2019s 35\u00a2\u201365\u00a2 buy band, so it stands aside.",
+          "reason_full": "Neither Yes nor No is in Version 1\u2019s 35\u00a2\u201365\u00a2 buy band, so it stands aside.",
+          "btc_price": 59772.35,
+          "strike": 59730.66,
+          "yes_ask": 0.84,
+          "no_ask": 0.17,
+          "side": "no",
+          "ask": null,
+          "contracts": 19,
+          "entry_price": 0.39,
+          "cash": 92.27,
+          "book_id": "v1",
+          "book_label": "Version 1.2",
+          "open_count": 1
         }
       ],
-      "equity": 100.06,
-      "pnl": 0.06,
-      "pnl_pct": 0.06,
+      "equity": 95.31,
+      "pnl": -4.69,
+      "pnl_pct": -4.69,
       "amount_bought": 7.73,
       "contracts_total": 19,
       "wins": 0,
@@ -3293,9 +3322,9 @@
       "events": [
         "Opened NO 19x KXBTC15M-26NOV280030-30 @ 39\u00a2 (bought $7.73, $8 ticket, entry #1 in window)"
       ],
-      "net_pnl": 0.06,
-      "updated_at": "2026-11-28T05:22:18Z",
-      "updated_at_pt": "Nov 27, 2026, 9:22 PM PT"
+      "net_pnl": -4.69,
+      "updated_at": "2026-11-28T05:27:17Z",
+      "updated_at_pt": "Nov 27, 2026, 9:27 PM PT"
     },
     "v2": {
       "id": "v2",
@@ -5007,6 +5036,30 @@
           "book_id": "v2",
           "book_label": "Version 2.2",
           "open_count": 0
+        },
+        {
+          "t": "2026-11-28T05:27:17Z",
+          "t_pt": "Nov 27, 2026, 9:27 PM PT",
+          "ticker": "KXBTC15M-26NOV280030-30",
+          "close_time": "2026-11-28T05:30:00Z",
+          "close_time_pt": "Nov 27, 2026, 9:30 PM PT",
+          "window_label": "9:15 PM \u2013 9:30 PM PT",
+          "action": "WAIT",
+          "label": "WAIT \u2014 No Trade",
+          "reason": "Choppy / no clean edge: price is above the strike, but the 1-minute trend/momentum is not cleanly bullish (EMA 9 is below EMA 21; price is below the 50-period EMA; RSI 48 is sho\u2026",
+          "reason_full": "Choppy / no clean edge: price is above the strike, but the 1-minute trend/momentum is not cleanly bullish (EMA 9 is below EMA 21; price is below the 50-period EMA; RSI 48 is sho\u2026",
+          "btc_price": 59772.35,
+          "strike": 59730.66,
+          "yes_ask": 0.84,
+          "no_ask": 0.17,
+          "side": null,
+          "ask": null,
+          "contracts": null,
+          "entry_price": null,
+          "cash": 104.28,
+          "book_id": "v2",
+          "book_label": "Version 2.2",
+          "open_count": 0
         }
       ],
       "equity": 104.28,
@@ -5022,18 +5075,18 @@
       "created_at": "2026-11-28T00:04:13Z",
       "events": [],
       "net_pnl": 4.28,
-      "updated_at": "2026-11-28T05:22:18Z",
-      "updated_at_pt": "Nov 27, 2026, 9:22 PM PT"
+      "updated_at": "2026-11-28T05:27:17Z",
+      "updated_at_pt": "Nov 27, 2026, 9:27 PM PT"
     },
     "leader": "v2",
     "leader_label": "Version 2 ahead",
-    "leader_margin": 4.22,
-    "leader_text": "Version 2 ahead by +$4.22",
+    "leader_margin": 8.97,
+    "leader_text": "Version 2 ahead by +$8.97",
     "choice": {
       "v1": {
         "action": "HOLD",
-        "label": "HOLD open trades \u2014 WAIT \u2014 Too close to strike",
-        "reason": "BTC is +$18 above strike. That\u2019s inside a $25 band, so settlement could still flip either way.",
+        "label": "WAIT \u2014 No tradable ask",
+        "reason": "Neither Yes nor No is in Version 1\u2019s 35\u00a2\u201365\u00a2 buy band, so it stands aside.",
         "side": "no",
         "ask": null,
         "strength": null,
@@ -5041,16 +5094,16 @@
       },
       "v2": {
         "action": "WAIT",
-        "label": "WAIT \u2014 Too close to strike",
-        "reason": "BTC +$17.82 vs the $59,730.66 strike. That\u2019s inside a $40 band, so settlement could still flip either way.",
+        "label": "WAIT \u2014 No Trade",
+        "reason": "Choppy / no clean edge: price is above the strike, but the 1-minute trend/momentum is not cleanly bullish (EMA 9 is below EMA 21; price is below the 50-period EMA; RSI 48 is sho\u2026",
         "side": null,
         "ask": null,
         "strength": null,
         "base_stake": null
       }
     },
-    "updated_at": "2026-11-28T05:22:18Z",
-    "updated_at_pt": "Nov 27, 2026, 9:22 PM PT"
+    "updated_at": "2026-11-28T05:27:17Z",
+    "updated_at_pt": "Nov 27, 2026, 9:27 PM PT"
   },
   "race_archive": [
     {
