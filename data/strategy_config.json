@@ -70,8 +70,8 @@
     "val_windows": 399,
     "promoted_from": 8,
     "candidate": "v2.2_fair_value_gate+reversal_exit",
-    "metrics_updated_at": "2026-11-28T18:48:29Z",
-    "metrics_updated_at_pt": "Nov 28, 2026, 10:48 AM PT"
+    "metrics_updated_at": "2026-11-28T19:52:16Z",
+    "metrics_updated_at_pt": "Nov 28, 2026, 11:52 AM PT"
   },
   "plain_english": "Buys Yes/No when the 1-minute trend is clean, BTC is at least $40 from the strike, the ask is 35\u201375\u00a2, and 2\u201315 minutes remain in the window. Requires the 50-period EMA to agree. Requires the 5-minute trend to agree. Only buys when the spot-derived fair probability is at least the ask (no overpaying vs fair value). No extra chop filter. Sells early at the live Kalshi bid only when BTC breaks back through the strike and the 1m EMA 9/21 plus MACD both flip against the ticket. Otherwise holds to official settlement.",
   "last_promoted_at": "2026-11-27T23:55:39Z",
@@ -84,24 +84,24 @@
         "name": "1m",
         "kind": "chart",
         "train": {
-          "trade_count": 69,
+          "trade_count": 70,
           "wins": 45,
-          "losses": 24,
-          "win_rate": 65.2,
-          "net_pnl": 26.03,
-          "profit_factor": 1.187,
+          "losses": 25,
+          "win_rate": 64.3,
+          "net_pnl": 18.26,
+          "profit_factor": 1.124,
           "max_drawdown_pct": 28.85,
-          "ending_equity": 126.03
+          "ending_equity": 118.26
         },
         "val": {
-          "trade_count": 30,
+          "trade_count": 29,
           "wins": 25,
-          "losses": 5,
-          "win_rate": 83.3,
-          "net_pnl": 57.61,
-          "profit_factor": 2.97,
-          "max_drawdown_pct": 7.77,
-          "ending_equity": 157.61
+          "losses": 4,
+          "win_rate": 86.2,
+          "net_pnl": 65.38,
+          "profit_factor": 4.045,
+          "max_drawdown_pct": 6.89,
+          "ending_equity": 165.38
         },
         "overall": {
           "trade_count": 99,
@@ -186,24 +186,24 @@
         "name": "1h",
         "kind": "chart",
         "train": {
-          "trade_count": 38,
+          "trade_count": 39,
           "wins": 24,
-          "losses": 14,
-          "win_rate": 63.2,
-          "net_pnl": 3.13,
-          "profit_factor": 1.036,
+          "losses": 15,
+          "win_rate": 61.5,
+          "net_pnl": -4.64,
+          "profit_factor": 0.951,
           "max_drawdown_pct": 20.86,
-          "ending_equity": 103.13
+          "ending_equity": 95.36
         },
         "val": {
-          "trade_count": 19,
+          "trade_count": 18,
           "wins": 15,
-          "losses": 4,
-          "win_rate": 78.9,
-          "net_pnl": 36.01,
-          "profit_factor": 2.695,
-          "max_drawdown_pct": 7.77,
-          "ending_equity": 136.01
+          "losses": 3,
+          "win_rate": 83.3,
+          "net_pnl": 43.78,
+          "profit_factor": 4.25,
+          "max_drawdown_pct": 6.63,
+          "ending_equity": 143.78
         },
         "overall": {
           "trade_count": 57,
@@ -696,7 +696,7 @@
     "best_chart": "1m",
     "best_exit": "hold to expiry",
     "best_reader": "spread \u22644\u00a2",
-    "takeaway": "Best unseen chart is 1m (+$57.61, 83.3% WR on 30 trades). Best market-reader gate is spread \u22644\u00a2 (+$55.59). Best exit rule is hold to expiry (+$55.59, 86.4% WR on 22 trades) on 1328 windows with a full bid path."
+    "takeaway": "Best unseen chart is 1m (+$65.38, 86.2% WR on 29 trades). Best market-reader gate is spread \u22644\u00a2 (+$55.59). Best exit rule is hold to expiry (+$55.59, 86.4% WR on 22 trades) on 1328 windows with a full bid path."
   },
   "method_label": "Version 2.2 \u00b7 Strict + Fair-Value Edge",
   "v1": {
@@ -758,7 +758,7 @@
     "rules": "Buys the side BTC is on (Yes above the strike, No below) when BTC is at least $25 from the strike, the ask is 35\u201360\u00a2, and 2+ minutes remain. Scores the 1m EMA 9/21/50, MACD, RSI and the 5-minute trend to pick its conviction. The 15-minute trend must not point against the side. Spot-derived fair value must be at least the ask (no overpaying). Price must be on the trade\u2019s side of 1m VWAP. At most 1 ticket per 15-minute window and never the opposite side of a held ticket. Takes profit at the live Kalshi bid once it reaches 90\u00a2+ and 1m momentum stalls. Otherwise holds to official settlement.",
     "last_promoted_at": "2026-11-28T18:48:29Z",
     "last_promoted_at_pt": "Nov 28, 2026, 10:48 AM PT",
-    "metrics_updated_at": "2026-11-28T18:48:29Z",
-    "metrics_updated_at_pt": "Nov 28, 2026, 10:48 AM PT"
+    "metrics_updated_at": "2026-11-28T19:52:16Z",
+    "metrics_updated_at_pt": "Nov 28, 2026, 11:52 AM PT"
   }
 }
