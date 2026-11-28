@@ -1,8 +1,8 @@
 {
-  "start": "2026-11-23T14:15:00Z",
-  "end": "2026-11-28T14:00:00Z",
-  "start_pt": "Nov 23, 2026, 6:15 AM PT",
-  "end_pt": "Nov 28, 2026, 6:00 AM PT",
+  "start": "2026-11-23T14:30:00Z",
+  "end": "2026-11-28T14:15:00Z",
+  "start_pt": "Nov 23, 2026, 6:30 AM PT",
+  "end_pt": "Nov 28, 2026, 6:15 AM PT",
   "days": 5.0,
   "windows_scanned": 471,
   "windows_traded": 29,
@@ -27,11 +27,6 @@
   "gross_loss": 20.98,
   "net_pnl": 71.81,
   "equity_history": [
-    {
-      "t": 1795443360,
-      "t_pt": "Nov 23, 2026, 6:16 AM PT",
-      "equity": 100.0
-    },
     {
       "t": 1795444260,
       "t_pt": "Nov 23, 2026, 6:31 AM PT",
@@ -2381,6 +2376,11 @@
       "t": 1795873560,
       "t_pt": "Nov 28, 2026, 5:46 AM PT",
       "equity": 171.81
+    },
+    {
+      "t": 1795874460,
+      "t_pt": "Nov 28, 2026, 6:01 AM PT",
+      "equity": 171.81
     }
   ],
   "trades": [
@@ -2552,7 +2552,7 @@
       "expiration_value": 60389.43,
       "strike": 60461.27,
       "pnl": 4.0,
-      "reason_entry": "EMA 9 < 21 ($60,457 < $60,490); price below the 50-period EMA; MACD histogram is negative; RSI 36; 5-minute trend agrees. BTC $-62.67 vs the $60,461.27 strike, No ask 65\u00a2 \u2014 Buy No. Spot-fair edge +5\u00a2. Top signal ($8 ticket): EMA 9/21 spread $34; MACD hist 13.7; RSI 36 in the heart of the bearish band; BTC $63 from the strike; 5-minute trend is clearly aligned ($63 EMA spread).",
+      "reason_entry": "EMA 9 < 21 ($60,457 < $60,490); price below the 50-period EMA; MACD histogram is negative; RSI 36; 5-minute trend agrees. BTC $-62.67 vs the $60,461.27 strike, No ask 65\u00a2 \u2014 Buy No. Spot-fair edge +4\u00a2. Top signal ($8 ticket): EMA 9/21 spread $34; MACD hist 13.7; RSI 36 in the heart of the bearish band; BTC $63 from the strike; 5-minute trend is clearly aligned ($63 EMA spread).",
       "reason_exit": "Held to settlement: official result was NO (BTC 60389.43 vs strike 60461.27).",
       "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov261815-15",
       "running_balance": 163.73,
@@ -3257,8 +3257,8 @@
   ],
   "assumption_note": "Each window is evaluated once, 1 minute after it opens, using the real Kalshi Yes/No quotes at that minute and Coinbase 1-minute / 5-minute / 15-minute / 1-hour BTC candles, plus a spot-derived fair probability from realized 1-minute volatility. Trades use a $4\u2013$8 flat stake by signal strength (no 2\u00d7 press) and the official quadratic taker fee. When a full 15-minute Kalshi bid path is available, early take-profit and cut-loss rules are applied on that path; otherwise the ticket is held to official Yes/No settlement. The live bot can also enter later in a window (on a 5-minute scan) and uses live order-book and taker-flow data as a market reader; those live-only prints are not in this backtest.",
   "fee_note": "Paper PnL includes Kalshi\u2019s taker fee: ceil(0.07 \u00d7 contracts \u00d7 price \u00d7 (1 \u2212 price)), rounded up to the next cent.",
-  "generated_at": "2026-11-28T14:11:39Z",
-  "generated_at_pt": "Nov 28, 2026, 6:11 AM PT",
+  "generated_at": "2026-11-28T14:16:40Z",
+  "generated_at_pt": "Nov 28, 2026, 6:16 AM PT",
   "candle_source_1m": "coinbase",
   "candle_source_5m": "coinbase",
   "candle_source_15m": "coinbase",
