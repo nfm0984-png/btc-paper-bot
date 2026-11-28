@@ -70,8 +70,8 @@
     "val_windows": 399,
     "promoted_from": 8,
     "candidate": "v2.2_fair_value_gate+reversal_exit",
-    "metrics_updated_at": "2026-11-28T09:52:36Z",
-    "metrics_updated_at_pt": "Nov 28, 2026, 1:52 AM PT"
+    "metrics_updated_at": "2026-11-28T10:52:01Z",
+    "metrics_updated_at_pt": "Nov 28, 2026, 2:52 AM PT"
   },
   "plain_english": "Buys Yes/No when the 1-minute trend is clean, BTC is at least $40 from the strike, the ask is 35\u201375\u00a2, and 2\u201315 minutes remain in the window. Requires the 50-period EMA to agree. Requires the 5-minute trend to agree. Only buys when the spot-derived fair probability is at least the ask (no overpaying vs fair value). No extra chop filter. Sells early at the live Kalshi bid only when BTC breaks back through the strike and the 1m EMA 9/21 plus MACD both flip against the ticket. Otherwise holds to official settlement.",
   "last_promoted_at": "2026-11-27T23:55:39Z",
@@ -758,7 +758,7 @@
     "rules": "Buys the side BTC is on (Yes above the strike, No below) when BTC is at least $25 from the strike, the ask is 35\u201365\u00a2, and 2+ minutes remain. Scores the 1m EMA 9/21/50, MACD, RSI and the 5-minute trend to pick its conviction. The 15-minute trend must not point against the side. Spot-derived fair value must be at least the ask (no overpaying). Price must be on the trade\u2019s side of 1m VWAP. At most 1 ticket per 15-minute window and never the opposite side of a held ticket. Holds every ticket to official Kalshi settlement (no early exits).",
     "last_promoted_at": "2026-11-28T08:51:14Z",
     "last_promoted_at_pt": "Nov 28, 2026, 12:51 AM PT",
-    "metrics_updated_at": "2026-11-28T09:52:36Z",
-    "metrics_updated_at_pt": "Nov 28, 2026, 1:52 AM PT"
+    "metrics_updated_at": "2026-11-28T10:52:01Z",
+    "metrics_updated_at_pt": "Nov 28, 2026, 2:52 AM PT"
   }
 }
