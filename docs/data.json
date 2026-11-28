@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-28T16:44:18Z",
-  "generated_at_pt": "Nov 28, 2026, 8:44 AM PT",
+  "generated_at": "2026-11-28T16:49:19Z",
+  "generated_at_pt": "Nov 28, 2026, 8:49 AM PT",
   "series_ticker": "KXBTC15M",
   "price_source": "coinbase",
   "candle_source_1m": "coinbase",
@@ -11,51 +11,51 @@
     "charts": {
       "1m": {
         "tf": "1m",
-        "bias": "flat",
+        "bias": "up",
         "ready": true,
-        "ema9": 59383.25,
-        "ema21": 59384.03,
-        "ema50": 59380.24,
-        "rsi14": 52.51,
-        "macd_hist": 2.63,
-        "ema_slope": 5.38,
-        "vwap": 59386.54,
-        "vwap_dist": 7.96,
-        "atr": 28.38,
-        "momentum": 24.28,
-        "close": 59394.5
+        "ema9": 59476.57,
+        "ema21": 59432.43,
+        "ema50": 59403.25,
+        "rsi14": 78.12,
+        "macd_hist": 22.51,
+        "ema_slope": 72.91,
+        "vwap": 59419.53,
+        "vwap_dist": 160.93,
+        "atr": 40.93,
+        "momentum": 123.38,
+        "close": 59580.46
       },
       "5m": {
         "tf": "5m",
         "bias": "up",
         "ready": true,
-        "ema9": 59381.65,
-        "ema21": 59342.79,
-        "ema50": 59294.09,
-        "rsi14": 56.02,
-        "macd_hist": -4.52,
-        "ema_slope": 0.24,
-        "vwap": 59344.27,
-        "vwap_dist": 45.52,
-        "atr": 81.07,
-        "momentum": 30.09,
-        "close": 59389.79
+        "ema9": 59389.02,
+        "ema21": 59349.68,
+        "ema50": 59298.97,
+        "rsi14": 58.23,
+        "macd_hist": -3.52,
+        "ema_slope": 4.29,
+        "vwap": 59348.7,
+        "vwap_dist": 69.82,
+        "atr": 79.61,
+        "momentum": 20.48,
+        "close": 59418.52
       },
       "15m": {
         "tf": "15m",
         "bias": "up",
         "ready": true,
-        "ema9": 59325.8,
-        "ema21": 59298.29,
-        "ema50": 59442.28,
-        "rsi14": 55.33,
-        "macd_hist": 49.72,
-        "ema_slope": 95.9,
-        "vwap": 59207.79,
-        "vwap_dist": 190.25,
-        "atr": 151.95,
-        "momentum": 139.37,
-        "close": 59398.04
+        "ema9": 59344.35,
+        "ema21": 59309.22,
+        "ema50": 59441.35,
+        "rsi14": 56.52,
+        "macd_hist": 47.55,
+        "ema_slope": 71.14,
+        "vwap": 59221.24,
+        "vwap_dist": 197.28,
+        "atr": 147.4,
+        "momentum": -27.88,
+        "close": 59418.52
       },
       "1h": {
         "tf": "1h",
@@ -83,6 +83,7 @@
         "1h"
       ],
       "up": [
+        "1m",
         "5m",
         "15m"
       ],
@@ -99,7 +100,7 @@
         "1h"
       ],
       "higher_agree": 2,
-      "score": 1,
+      "score": 2,
       "label": "Bullish alignment"
     },
     "best_chart": "1m",
@@ -111,24 +112,24 @@
           "name": "1m",
           "kind": "chart",
           "train": {
-            "trade_count": 70,
-            "wins": 45,
+            "trade_count": 71,
+            "wins": 46,
             "losses": 25,
-            "win_rate": 64.3,
-            "net_pnl": 20.65,
-            "profit_factor": 1.143,
+            "win_rate": 64.8,
+            "net_pnl": 23.21,
+            "profit_factor": 1.161,
             "max_drawdown_pct": 29.6,
-            "ending_equity": 120.65
+            "ending_equity": 123.21
           },
           "val": {
-            "trade_count": 30,
-            "wins": 25,
+            "trade_count": 29,
+            "wins": 24,
             "losses": 5,
-            "win_rate": 83.3,
-            "net_pnl": 57.14,
-            "profit_factor": 2.954,
-            "max_drawdown_pct": 7.58,
-            "ending_equity": 157.14
+            "win_rate": 82.8,
+            "net_pnl": 54.58,
+            "profit_factor": 2.867,
+            "max_drawdown_pct": 7.77,
+            "ending_equity": 154.58
           },
           "overall": {
             "trade_count": 100,
@@ -145,24 +146,24 @@
           "name": "5m",
           "kind": "chart",
           "train": {
-            "trade_count": 48,
-            "wins": 35,
+            "trade_count": 49,
+            "wins": 36,
             "losses": 13,
-            "win_rate": 72.9,
-            "net_pnl": 45.9,
-            "profit_factor": 1.53,
+            "win_rate": 73.5,
+            "net_pnl": 48.46,
+            "profit_factor": 1.559,
             "max_drawdown_pct": 17.14,
-            "ending_equity": 145.9
+            "ending_equity": 148.46
           },
           "val": {
-            "trade_count": 22,
-            "wins": 19,
+            "trade_count": 21,
+            "wins": 18,
             "losses": 3,
-            "win_rate": 86.4,
-            "net_pnl": 55.12,
-            "profit_factor": 5.092,
-            "max_drawdown_pct": 6.48,
-            "ending_equity": 155.12
+            "win_rate": 85.7,
+            "net_pnl": 52.56,
+            "profit_factor": 4.902,
+            "max_drawdown_pct": 6.63,
+            "ending_equity": 152.56
           },
           "overall": {
             "trade_count": 70,
@@ -179,24 +180,24 @@
           "name": "15m",
           "kind": "chart",
           "train": {
-            "trade_count": 41,
-            "wins": 30,
+            "trade_count": 42,
+            "wins": 31,
             "losses": 11,
-            "win_rate": 73.2,
-            "net_pnl": 42.18,
-            "profit_factor": 1.605,
+            "win_rate": 73.8,
+            "net_pnl": 44.74,
+            "profit_factor": 1.641,
             "max_drawdown_pct": 17.57,
-            "ending_equity": 142.18
+            "ending_equity": 144.74
           },
           "val": {
-            "trade_count": 21,
-            "wins": 18,
+            "trade_count": 20,
+            "wins": 17,
             "losses": 3,
-            "win_rate": 85.7,
-            "net_pnl": 51.89,
-            "profit_factor": 4.852,
-            "max_drawdown_pct": 6.48,
-            "ending_equity": 151.89
+            "win_rate": 85.0,
+            "net_pnl": 49.33,
+            "profit_factor": 4.662,
+            "max_drawdown_pct": 6.63,
+            "ending_equity": 149.33
           },
           "overall": {
             "trade_count": 62,
@@ -213,24 +214,24 @@
           "name": "1h",
           "kind": "chart",
           "train": {
-            "trade_count": 39,
-            "wins": 24,
+            "trade_count": 40,
+            "wins": 25,
             "losses": 15,
-            "win_rate": 61.5,
-            "net_pnl": -2.25,
-            "profit_factor": 0.976,
+            "win_rate": 62.5,
+            "net_pnl": 0.31,
+            "profit_factor": 1.003,
             "max_drawdown_pct": 21.36,
-            "ending_equity": 97.75
+            "ending_equity": 100.31
           },
           "val": {
-            "trade_count": 20,
-            "wins": 16,
+            "trade_count": 19,
+            "wins": 15,
             "losses": 4,
-            "win_rate": 80.0,
-            "net_pnl": 38.57,
-            "profit_factor": 2.816,
-            "max_drawdown_pct": 7.58,
-            "ending_equity": 138.57
+            "win_rate": 78.9,
+            "net_pnl": 36.01,
+            "profit_factor": 2.695,
+            "max_drawdown_pct": 7.77,
+            "ending_equity": 136.01
           },
           "overall": {
             "trade_count": 59,
@@ -247,24 +248,24 @@
           "name": "multi-TF",
           "kind": "chart",
           "train": {
-            "trade_count": 40,
-            "wins": 29,
+            "trade_count": 41,
+            "wins": 30,
             "losses": 11,
-            "win_rate": 72.5,
-            "net_pnl": 34.4,
-            "profit_factor": 1.483,
+            "win_rate": 73.2,
+            "net_pnl": 36.96,
+            "profit_factor": 1.519,
             "max_drawdown_pct": 17.75,
-            "ending_equity": 134.4
+            "ending_equity": 136.96
           },
           "val": {
-            "trade_count": 21,
-            "wins": 18,
+            "trade_count": 20,
+            "wins": 17,
             "losses": 3,
-            "win_rate": 85.7,
-            "net_pnl": 52.46,
-            "profit_factor": 4.895,
-            "max_drawdown_pct": 6.48,
-            "ending_equity": 152.46
+            "win_rate": 85.0,
+            "net_pnl": 49.9,
+            "profit_factor": 4.705,
+            "max_drawdown_pct": 6.63,
+            "ending_equity": 149.9
           },
           "overall": {
             "trade_count": 61,
@@ -281,24 +282,24 @@
           "name": "no fair-edge gate",
           "kind": "reader",
           "train": {
-            "trade_count": 78,
-            "wins": 55,
+            "trade_count": 79,
+            "wins": 56,
             "losses": 23,
-            "win_rate": 70.5,
-            "net_pnl": 51.98,
-            "profit_factor": 1.342,
+            "win_rate": 70.9,
+            "net_pnl": 54.54,
+            "profit_factor": 1.359,
             "max_drawdown_pct": 19.23,
-            "ending_equity": 151.98
+            "ending_equity": 154.54
           },
           "val": {
-            "trade_count": 35,
-            "wins": 25,
+            "trade_count": 34,
+            "wins": 24,
             "losses": 10,
-            "win_rate": 71.4,
-            "net_pnl": 25.34,
-            "profit_factor": 1.394,
-            "max_drawdown_pct": 14.38,
-            "ending_equity": 125.34
+            "win_rate": 70.6,
+            "net_pnl": 22.78,
+            "profit_factor": 1.354,
+            "max_drawdown_pct": 14.75,
+            "ending_equity": 122.78
           },
           "overall": {
             "trade_count": 113,
@@ -315,24 +316,24 @@
           "name": "fair edge 3\u00a2",
           "kind": "reader",
           "train": {
-            "trade_count": 23,
-            "wins": 16,
+            "trade_count": 24,
+            "wins": 17,
             "losses": 7,
-            "win_rate": 69.6,
-            "net_pnl": 8.34,
-            "profit_factor": 1.173,
+            "win_rate": 70.8,
+            "net_pnl": 10.9,
+            "profit_factor": 1.226,
             "max_drawdown_pct": 16.88,
-            "ending_equity": 108.34
+            "ending_equity": 110.9
           },
           "val": {
-            "trade_count": 14,
-            "wins": 13,
+            "trade_count": 13,
+            "wins": 12,
             "losses": 1,
-            "win_rate": 92.9,
-            "net_pnl": 40.13,
-            "profit_factor": 6.416,
-            "max_drawdown_pct": 6.48,
-            "ending_equity": 140.13
+            "win_rate": 92.3,
+            "net_pnl": 37.57,
+            "profit_factor": 6.07,
+            "max_drawdown_pct": 6.63,
+            "ending_equity": 137.57
           },
           "overall": {
             "trade_count": 37,
@@ -349,24 +350,24 @@
           "name": "fair edge 5\u00a2",
           "kind": "reader",
           "train": {
-            "trade_count": 10,
-            "wins": 6,
+            "trade_count": 11,
+            "wins": 7,
             "losses": 4,
-            "win_rate": 60.0,
-            "net_pnl": -8.3,
-            "profit_factor": 0.699,
+            "win_rate": 63.6,
+            "net_pnl": -5.74,
+            "profit_factor": 0.792,
             "max_drawdown_pct": 19.28,
-            "ending_equity": 91.7
+            "ending_equity": 94.26
           },
           "val": {
-            "trade_count": 6,
-            "wins": 5,
+            "trade_count": 5,
+            "wins": 4,
             "losses": 1,
-            "win_rate": 83.3,
-            "net_pnl": 8.24,
-            "profit_factor": 2.112,
-            "max_drawdown_pct": 7.23,
-            "ending_equity": 108.24
+            "win_rate": 80.0,
+            "net_pnl": 5.68,
+            "profit_factor": 1.767,
+            "max_drawdown_pct": 7.41,
+            "ending_equity": 105.68
           },
           "overall": {
             "trade_count": 16,
@@ -417,24 +418,24 @@
           "name": "spread \u22644\u00a2",
           "kind": "reader",
           "train": {
-            "trade_count": 48,
-            "wins": 35,
+            "trade_count": 49,
+            "wins": 36,
             "losses": 13,
-            "win_rate": 72.9,
-            "net_pnl": 45.9,
-            "profit_factor": 1.53,
+            "win_rate": 73.5,
+            "net_pnl": 48.46,
+            "profit_factor": 1.559,
             "max_drawdown_pct": 17.14,
-            "ending_equity": 145.9
+            "ending_equity": 148.46
           },
           "val": {
-            "trade_count": 22,
-            "wins": 19,
+            "trade_count": 21,
+            "wins": 18,
             "losses": 3,
-            "win_rate": 86.4,
-            "net_pnl": 55.12,
-            "profit_factor": 5.092,
-            "max_drawdown_pct": 6.48,
-            "ending_equity": 155.12
+            "win_rate": 85.7,
+            "net_pnl": 52.56,
+            "profit_factor": 4.902,
+            "max_drawdown_pct": 6.63,
+            "ending_equity": 152.56
           },
           "overall": {
             "trade_count": 70,
@@ -451,24 +452,24 @@
           "name": "spread \u22646\u00a2",
           "kind": "reader",
           "train": {
-            "trade_count": 48,
-            "wins": 35,
+            "trade_count": 49,
+            "wins": 36,
             "losses": 13,
-            "win_rate": 72.9,
-            "net_pnl": 45.9,
-            "profit_factor": 1.53,
+            "win_rate": 73.5,
+            "net_pnl": 48.46,
+            "profit_factor": 1.559,
             "max_drawdown_pct": 17.14,
-            "ending_equity": 145.9
+            "ending_equity": 148.46
           },
           "val": {
-            "trade_count": 22,
-            "wins": 19,
+            "trade_count": 21,
+            "wins": 18,
             "losses": 3,
-            "win_rate": 86.4,
-            "net_pnl": 55.12,
-            "profit_factor": 5.092,
-            "max_drawdown_pct": 6.48,
-            "ending_equity": 155.12
+            "win_rate": 85.7,
+            "net_pnl": 52.56,
+            "profit_factor": 4.902,
+            "max_drawdown_pct": 6.63,
+            "ending_equity": 152.56
           },
           "overall": {
             "trade_count": 70,
@@ -485,24 +486,24 @@
           "name": "hold to expiry",
           "kind": "exit",
           "train": {
-            "trade_count": 48,
-            "wins": 35,
+            "trade_count": 49,
+            "wins": 36,
             "losses": 13,
-            "win_rate": 72.9,
-            "net_pnl": 45.9,
-            "profit_factor": 1.53,
+            "win_rate": 73.5,
+            "net_pnl": 48.46,
+            "profit_factor": 1.559,
             "max_drawdown_pct": 17.14,
-            "ending_equity": 145.9
+            "ending_equity": 148.46
           },
           "val": {
-            "trade_count": 22,
-            "wins": 19,
+            "trade_count": 21,
+            "wins": 18,
             "losses": 3,
-            "win_rate": 86.4,
-            "net_pnl": 55.12,
-            "profit_factor": 5.092,
-            "max_drawdown_pct": 6.48,
-            "ending_equity": 155.12
+            "win_rate": 85.7,
+            "net_pnl": 52.56,
+            "profit_factor": 4.902,
+            "max_drawdown_pct": 6.63,
+            "ending_equity": 152.56
           },
           "overall": {
             "trade_count": 70,
@@ -519,24 +520,24 @@
           "name": "current TP/SL",
           "kind": "exit",
           "train": {
-            "trade_count": 48,
-            "wins": 35,
+            "trade_count": 49,
+            "wins": 36,
             "losses": 13,
-            "win_rate": 72.9,
-            "net_pnl": 45.9,
-            "profit_factor": 1.53,
+            "win_rate": 73.5,
+            "net_pnl": 48.46,
+            "profit_factor": 1.559,
             "max_drawdown_pct": 17.14,
-            "ending_equity": 145.9
+            "ending_equity": 148.46
           },
           "val": {
-            "trade_count": 22,
-            "wins": 19,
+            "trade_count": 21,
+            "wins": 18,
             "losses": 3,
-            "win_rate": 86.4,
-            "net_pnl": 55.12,
-            "profit_factor": 5.092,
-            "max_drawdown_pct": 6.48,
-            "ending_equity": 155.12
+            "win_rate": 85.7,
+            "net_pnl": 52.56,
+            "profit_factor": 4.902,
+            "max_drawdown_pct": 6.63,
+            "ending_equity": 152.56
           },
           "overall": {
             "trade_count": 70,
@@ -553,24 +554,24 @@
           "name": "TP 85\u00a2 / +25\u00a2 + stall",
           "kind": "exit",
           "train": {
-            "trade_count": 48,
-            "wins": 35,
+            "trade_count": 49,
+            "wins": 36,
             "losses": 13,
-            "win_rate": 72.9,
-            "net_pnl": 45.9,
-            "profit_factor": 1.53,
+            "win_rate": 73.5,
+            "net_pnl": 48.46,
+            "profit_factor": 1.559,
             "max_drawdown_pct": 17.14,
-            "ending_equity": 145.9
+            "ending_equity": 148.46
           },
           "val": {
-            "trade_count": 22,
-            "wins": 19,
+            "trade_count": 21,
+            "wins": 18,
             "losses": 3,
-            "win_rate": 86.4,
-            "net_pnl": 55.12,
-            "profit_factor": 5.092,
-            "max_drawdown_pct": 6.48,
-            "ending_equity": 155.12
+            "win_rate": 85.7,
+            "net_pnl": 52.56,
+            "profit_factor": 4.902,
+            "max_drawdown_pct": 6.63,
+            "ending_equity": 152.56
           },
           "overall": {
             "trade_count": 70,
@@ -587,24 +588,24 @@
           "name": "TP 90\u00a2 / +35\u00a2",
           "kind": "exit",
           "train": {
-            "trade_count": 48,
-            "wins": 35,
+            "trade_count": 49,
+            "wins": 36,
             "losses": 13,
-            "win_rate": 72.9,
-            "net_pnl": 45.9,
-            "profit_factor": 1.53,
+            "win_rate": 73.5,
+            "net_pnl": 48.46,
+            "profit_factor": 1.559,
             "max_drawdown_pct": 17.14,
-            "ending_equity": 145.9
+            "ending_equity": 148.46
           },
           "val": {
-            "trade_count": 22,
-            "wins": 19,
+            "trade_count": 21,
+            "wins": 18,
             "losses": 3,
-            "win_rate": 86.4,
-            "net_pnl": 55.12,
-            "profit_factor": 5.092,
-            "max_drawdown_pct": 6.48,
-            "ending_equity": 155.12
+            "win_rate": 85.7,
+            "net_pnl": 52.56,
+            "profit_factor": 4.902,
+            "max_drawdown_pct": 6.63,
+            "ending_equity": 152.56
           },
           "overall": {
             "trade_count": 70,
@@ -621,24 +622,24 @@
           "name": "SL only on reversal",
           "kind": "exit",
           "train": {
-            "trade_count": 48,
-            "wins": 35,
+            "trade_count": 49,
+            "wins": 36,
             "losses": 13,
-            "win_rate": 72.9,
-            "net_pnl": 45.9,
-            "profit_factor": 1.53,
+            "win_rate": 73.5,
+            "net_pnl": 48.46,
+            "profit_factor": 1.559,
             "max_drawdown_pct": 17.14,
-            "ending_equity": 145.9
+            "ending_equity": 148.46
           },
           "val": {
-            "trade_count": 22,
-            "wins": 19,
+            "trade_count": 21,
+            "wins": 18,
             "losses": 3,
-            "win_rate": 86.4,
-            "net_pnl": 55.12,
-            "profit_factor": 5.092,
-            "max_drawdown_pct": 6.48,
-            "ending_equity": 155.12
+            "win_rate": 85.7,
+            "net_pnl": 52.56,
+            "profit_factor": 4.902,
+            "max_drawdown_pct": 6.63,
+            "ending_equity": 152.56
           },
           "overall": {
             "trade_count": 70,
@@ -655,24 +656,24 @@
           "name": "fair giveback",
           "kind": "exit",
           "train": {
-            "trade_count": 48,
-            "wins": 35,
+            "trade_count": 49,
+            "wins": 36,
             "losses": 13,
-            "win_rate": 72.9,
-            "net_pnl": 45.9,
-            "profit_factor": 1.53,
+            "win_rate": 73.5,
+            "net_pnl": 48.46,
+            "profit_factor": 1.559,
             "max_drawdown_pct": 17.14,
-            "ending_equity": 145.9
+            "ending_equity": 148.46
           },
           "val": {
-            "trade_count": 22,
-            "wins": 19,
+            "trade_count": 21,
+            "wins": 18,
             "losses": 3,
-            "win_rate": 86.4,
-            "net_pnl": 55.12,
-            "profit_factor": 5.092,
-            "max_drawdown_pct": 6.48,
-            "ending_equity": 155.12
+            "win_rate": 85.7,
+            "net_pnl": 52.56,
+            "profit_factor": 4.902,
+            "max_drawdown_pct": 6.63,
+            "ending_equity": 152.56
           },
           "overall": {
             "trade_count": 70,
@@ -689,24 +690,24 @@
           "name": "protective exits",
           "kind": "exit",
           "train": {
-            "trade_count": 48,
-            "wins": 35,
+            "trade_count": 49,
+            "wins": 36,
             "losses": 13,
-            "win_rate": 72.9,
-            "net_pnl": 45.9,
-            "profit_factor": 1.53,
+            "win_rate": 73.5,
+            "net_pnl": 48.46,
+            "profit_factor": 1.559,
             "max_drawdown_pct": 17.14,
-            "ending_equity": 145.9
+            "ending_equity": 148.46
           },
           "val": {
-            "trade_count": 22,
-            "wins": 19,
+            "trade_count": 21,
+            "wins": 18,
             "losses": 3,
-            "win_rate": 86.4,
-            "net_pnl": 55.12,
-            "profit_factor": 5.092,
-            "max_drawdown_pct": 6.48,
-            "ending_equity": 155.12
+            "win_rate": 85.7,
+            "net_pnl": 52.56,
+            "profit_factor": 4.902,
+            "max_drawdown_pct": 6.63,
+            "ending_equity": 152.56
           },
           "overall": {
             "trade_count": 70,
@@ -723,52 +724,52 @@
       "best_chart": "1m",
       "best_exit": "hold to expiry",
       "best_reader": "spread \u22644\u00a2",
-      "takeaway": "Best unseen chart is 1m (+$57.14, 83.3% WR on 30 trades). Best market-reader gate is spread \u22644\u00a2 (+$55.12). Best exit rule is hold to expiry (+$55.12, 86.4% WR on 22 trades) on 1328 windows with a full bid path."
+      "takeaway": "Best unseen chart is 1m (+$54.58, 82.8% WR on 29 trades). Best market-reader gate is spread \u22644\u00a2 (+$52.56). Best exit rule is hold to expiry (+$52.56, 85.7% WR on 21 trades) on 1328 windows with a full bid path."
     },
-    "fair_yes": 0.6877,
-    "fair_no": 0.3123,
-    "implied_yes": 0.14,
-    "yes_edge": 0.5477,
-    "no_edge": -0.5577,
-    "yes_bid": 0.13,
-    "yes_ask": 0.14,
-    "no_bid": 0.86,
-    "no_ask": 0.87,
-    "sigma_usd_per_sqrt_min": 18.0,
-    "minutes_left": 0.7,
+    "fair_yes": 0.99,
+    "fair_no": 0.01,
+    "implied_yes": 0.927,
+    "yes_edge": 0.063,
+    "no_edge": -0.064,
+    "yes_bid": 0.926,
+    "yes_ask": 0.927,
+    "no_bid": 0.073,
+    "no_ask": 0.074,
+    "sigma_usd_per_sqrt_min": 21.62,
+    "minutes_left": 10.68,
     "btc_book": {
-      "best_bid": 59428.8,
-      "best_ask": 59428.9,
-      "spread": 0.09999999999854481,
-      "mid": 59428.850000000006,
-      "bid_depth": 2.803,
-      "ask_depth": 2.745,
-      "imbalance": 0.0105,
-      "bias": "neutral",
+      "best_bid": 59577.7,
+      "best_ask": 59577.8,
+      "spread": 0.10000000000582077,
+      "mid": 59577.75,
+      "bid_depth": 1.27,
+      "ask_depth": 1.987,
+      "imbalance": -0.2201,
+      "bias": "sell",
       "levels": 10,
       "source": "kraken"
     },
     "btc_flow": {
       "source": "coinbase",
       "trades": 80,
-      "buy_volume": 0.045578,
-      "sell_volume": 0.01392,
-      "delta": 0.5321,
+      "buy_volume": 0.122008,
+      "sell_volume": 0.039213,
+      "delta": 0.5136,
       "bias": "buy"
     },
-    "btc_bias": "buy",
+    "btc_bias": "mixed",
     "btc_spread_usd": 0.1,
     "kalshi_book": {
-      "yes_depth": 0,
-      "no_depth": 0,
-      "imbalance": 0.0,
-      "bias": "neutral",
-      "yes_bid": 0.13,
-      "yes_ask": 0.14,
-      "spread": 0.01,
-      "spread_cents": 1.0,
-      "yes_levels": 0,
-      "no_levels": 0,
+      "yes_depth": 16612.79,
+      "no_depth": 26080.71,
+      "imbalance": -0.2218,
+      "bias": "no",
+      "yes_bid": 0.926,
+      "yes_ask": 0.927,
+      "spread": 0.001,
+      "spread_cents": 0.1,
+      "yes_levels": 20,
+      "no_levels": 20,
       "ok": true
     },
     "buy_rules": "Buys Yes/No when the 1-minute trend is clean, BTC is at least $40 from the strike, the ask is 35\u201375\u00a2, and 2\u201315 minutes remain in the window. Requires the 50-period EMA to agree. Requires the 5-minute trend to agree. Only buys when the spot-derived fair probability is at least the ask (no overpaying vs fair value). No extra chop filter. Sells early at the live Kalshi bid only when BTC breaks back through the strike and the 1m EMA 9/21 plus MACD both flip against the ticket. Otherwise holds to official settlement.",
@@ -780,79 +781,79 @@
     "note": "The dashboard polls Coinbase\u2019s public API every 20 seconds for a live BTC price and 1-minute indicators (CORS is open). Kalshi\u2019s public API blocks browser CORS, so contract quotes, the official Buy/Sell/Wait call, and paper-trade grading refresh with each GitHub Actions run (every 5 minutes)."
   },
   "live": {
-    "btc_price": 59415.4,
-    "strike": 59408.03,
-    "distance": 7.37,
+    "btc_price": 59588.44,
+    "strike": 59403.91,
+    "distance": 184.53,
     "call": "WAIT",
-    "call_label": "WAIT \u2014 Too close to expiry",
-    "reason": "Only 0:42 left in this window. The bot stands aside under 2 minutes.",
+    "call_label": "WAIT \u2014 No Trade",
+    "reason": "Choppy / no clean edge: price is above the strike, but the 1-minute trend/momentum is not cleanly bullish (RSI 78 looks overheated); Yes ask 93\u00a2.",
     "side": null,
     "ask": null,
     "bid": null,
     "market": {
-      "ticker": "KXBTC15M-26NOV281145-45",
-      "event_ticker": "KXBTC15M-26NOV281145",
+      "ticker": "KXBTC15M-26NOV281200-00",
+      "event_ticker": "KXBTC15M-26NOV281200",
       "title": "BTC price up in next 15 mins?",
-      "subtitle": "Target Price: $59,408.03",
+      "subtitle": "Target Price: $59,403.91",
       "status": "active",
-      "strike": 59408.03,
-      "open_time": "2026-11-28T16:30:00Z",
-      "open_time_pt": "Nov 28, 2026, 8:30 AM PT",
-      "close_time": "2026-11-28T16:45:00Z",
-      "close_time_pt": "Nov 28, 2026, 8:45 AM PT",
-      "remaining_sec": 42,
-      "yes_bid": 0.13,
-      "yes_ask": 0.14,
-      "no_bid": 0.86,
-      "no_ask": 0.87,
-      "last": 0.13,
-      "volume": 2718967.41,
+      "strike": 59403.91,
+      "open_time": "2026-11-28T16:45:00Z",
+      "open_time_pt": "Nov 28, 2026, 8:45 AM PT",
+      "close_time": "2026-11-28T17:00:00Z",
+      "close_time_pt": "Nov 28, 2026, 9:00 AM PT",
+      "remaining_sec": 641,
+      "yes_bid": 0.926,
+      "yes_ask": 0.927,
+      "no_bid": 0.073,
+      "no_ask": 0.074,
+      "last": 0.926,
+      "volume": 953176.76,
       "result": null,
       "expiration_value": null,
-      "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov281145-45",
-      "rules": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 11:45 AM EST on Nov 28, 2026 is at least the simple average of the sixty seconds of CF Benchmarks' BRTI before 11:30 AM EST on November 28, 2026, then the market resolves to Yes."
+      "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov281200-00",
+      "rules": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12:00 PM EST on Nov 28, 2026 is at least the simple average of the sixty seconds of CF Benchmarks' BRTI before 11:45 AM EST on November 28, 2026, then the market resolves to Yes."
     },
     "indicators_1m": {
-      "ema9": 59383.25,
-      "ema21": 59384.03,
-      "ema50": 59380.24,
-      "rsi14": 52.51,
-      "macd_hist": 2.63,
-      "close": 59394.5,
+      "ema9": 59476.57,
+      "ema21": 59432.43,
+      "ema50": 59403.25,
+      "rsi14": 78.12,
+      "macd_hist": 22.51,
+      "close": 59580.46,
       "ready": true,
-      "ema_slope": 5.38,
-      "vwap": 59386.54,
-      "vwap_dist": 7.96,
-      "atr": 28.38,
-      "momentum": 24.28
+      "ema_slope": 72.91,
+      "vwap": 59419.53,
+      "vwap_dist": 160.93,
+      "atr": 40.93,
+      "momentum": 123.38
     },
     "indicators_5m": {
-      "ema9": 59381.65,
-      "ema21": 59342.79,
-      "ema50": 59294.09,
-      "rsi14": 56.02,
-      "macd_hist": -4.52,
-      "close": 59389.79,
+      "ema9": 59389.02,
+      "ema21": 59349.68,
+      "ema50": 59298.97,
+      "rsi14": 58.23,
+      "macd_hist": -3.52,
+      "close": 59418.52,
       "ready": true,
-      "ema_slope": 0.24,
-      "vwap": 59344.27,
-      "vwap_dist": 45.52,
-      "atr": 81.07,
-      "momentum": 30.09
+      "ema_slope": 4.29,
+      "vwap": 59348.7,
+      "vwap_dist": 69.82,
+      "atr": 79.61,
+      "momentum": 20.48
     },
     "indicators_15m": {
-      "ema9": 59325.8,
-      "ema21": 59298.29,
-      "ema50": 59442.28,
-      "rsi14": 55.33,
-      "macd_hist": 49.72,
-      "close": 59398.04,
+      "ema9": 59344.35,
+      "ema21": 59309.22,
+      "ema50": 59441.35,
+      "rsi14": 56.52,
+      "macd_hist": 47.55,
+      "close": 59418.52,
       "ready": true,
-      "ema_slope": 95.9,
-      "vwap": 59207.79,
-      "vwap_dist": 190.25,
-      "atr": 151.95,
-      "momentum": 139.37
+      "ema_slope": 71.14,
+      "vwap": 59221.24,
+      "vwap_dist": 197.28,
+      "atr": 147.4,
+      "momentum": -27.88
     },
     "indicators_1h": {
       "ema9": 59368.28,
@@ -868,8 +869,8 @@
       "atr": 375.76,
       "momentum": 296.65
     },
-    "last_1m_close": 59394.5,
-    "last_1m_time_pt": "Nov 28, 2026, 8:43 AM PT",
+    "last_1m_close": 59580.46,
+    "last_1m_time_pt": "Nov 28, 2026, 8:48 AM PT",
     "cash": 89.93,
     "equity": 89.93,
     "pnl": -10.07,
@@ -2742,6 +2743,11 @@
         "t": 1795884258,
         "t_pt": "Nov 28, 2026, 8:44 AM PT",
         "equity": 89.93
+      },
+      {
+        "t": 1795884559,
+        "t_pt": "Nov 28, 2026, 8:49 AM PT",
+        "equity": 89.93
       }
     ],
     "trades": [
@@ -3508,30 +3514,6 @@
         }
       ],
       "checks": [
-        {
-          "t": "2026-11-28T10:42:53Z",
-          "t_pt": "Nov 28, 2026, 2:42 AM PT",
-          "ticker": "KXBTC15M-26NOV280545-45",
-          "close_time": "2026-11-28T10:45:00Z",
-          "close_time_pt": "Nov 28, 2026, 2:45 AM PT",
-          "window_label": "2:30 AM \u2013 2:45 AM PT",
-          "action": "WAIT",
-          "label": "WAIT \u2014 No tradable ask",
-          "reason": "Neither Yes nor No is in Version 1\u2019s 35\u00a2\u201365\u00a2 buy band, so it stands aside.",
-          "reason_full": "Neither Yes nor No is in Version 1\u2019s 35\u00a2\u201365\u00a2 buy band, so it stands aside.",
-          "btc_price": 59226.05,
-          "strike": 59266.28,
-          "yes_ask": 0.086,
-          "no_ask": 0.915,
-          "side": null,
-          "ask": null,
-          "contracts": null,
-          "entry_price": null,
-          "cash": 99.88,
-          "book_id": "v1",
-          "book_label": "Version 1.2",
-          "open_count": 0
-        },
         {
           "t": "2026-11-28T10:47:53Z",
           "t_pt": "Nov 28, 2026, 2:47 AM PT",
@@ -5427,6 +5409,30 @@
           "book_id": "v1",
           "book_label": "Version 1.2",
           "open_count": 0
+        },
+        {
+          "t": "2026-11-28T16:49:19Z",
+          "t_pt": "Nov 28, 2026, 8:49 AM PT",
+          "ticker": "KXBTC15M-26NOV281200-00",
+          "close_time": "2026-11-28T17:00:00Z",
+          "close_time_pt": "Nov 28, 2026, 9:00 AM PT",
+          "window_label": "8:45 AM \u2013 9:00 AM PT",
+          "action": "WAIT",
+          "label": "WAIT \u2014 No tradable ask",
+          "reason": "Neither Yes nor No is in Version 1\u2019s 35\u00a2\u201365\u00a2 buy band, so it stands aside.",
+          "reason_full": "Neither Yes nor No is in Version 1\u2019s 35\u00a2\u201365\u00a2 buy band, so it stands aside.",
+          "btc_price": 59588.44,
+          "strike": 59403.91,
+          "yes_ask": 0.927,
+          "no_ask": 0.074,
+          "side": null,
+          "ask": null,
+          "contracts": null,
+          "entry_price": null,
+          "cash": 91.88,
+          "book_id": "v1",
+          "book_label": "Version 1.2",
+          "open_count": 0
         }
       ],
       "equity": 91.88,
@@ -5453,8 +5459,8 @@
         "Settled NO on KXBTC15M-26NOV280600-00: Settled YES at BTC 59208.07 vs strike 59194.17. PnL -8.00"
       ],
       "net_pnl": -8.12,
-      "updated_at": "2026-11-28T16:44:18Z",
-      "updated_at_pt": "Nov 28, 2026, 8:44 AM PT"
+      "updated_at": "2026-11-28T16:49:19Z",
+      "updated_at_pt": "Nov 28, 2026, 8:49 AM PT"
     },
     "v2": {
       "id": "v2",
@@ -5695,30 +5701,6 @@
         }
       ],
       "checks": [
-        {
-          "t": "2026-11-28T10:42:53Z",
-          "t_pt": "Nov 28, 2026, 2:42 AM PT",
-          "ticker": "KXBTC15M-26NOV280545-45",
-          "close_time": "2026-11-28T10:45:00Z",
-          "close_time_pt": "Nov 28, 2026, 2:45 AM PT",
-          "window_label": "2:30 AM \u2013 2:45 AM PT",
-          "action": "WAIT",
-          "label": "WAIT \u2014 No Trade",
-          "reason": "Choppy / no clean edge: price is below the strike, but the 1-minute trend/momentum is not cleanly bearish (MACD histogram is still positive); Yes ask 9\u00a2.",
-          "reason_full": "Choppy / no clean edge: price is below the strike, but the 1-minute trend/momentum is not cleanly bearish (MACD histogram is still positive); Yes ask 9\u00a2.",
-          "btc_price": 59226.05,
-          "strike": 59266.28,
-          "yes_ask": 0.086,
-          "no_ask": 0.915,
-          "side": null,
-          "ask": null,
-          "contracts": null,
-          "entry_price": null,
-          "cash": 110.05,
-          "book_id": "v2",
-          "book_label": "Version 2.2",
-          "open_count": 0
-        },
         {
           "t": "2026-11-28T10:47:53Z",
           "t_pt": "Nov 28, 2026, 2:47 AM PT",
@@ -7614,6 +7596,30 @@
           "book_id": "v2",
           "book_label": "Version 2.2",
           "open_count": 0
+        },
+        {
+          "t": "2026-11-28T16:49:19Z",
+          "t_pt": "Nov 28, 2026, 8:49 AM PT",
+          "ticker": "KXBTC15M-26NOV281200-00",
+          "close_time": "2026-11-28T17:00:00Z",
+          "close_time_pt": "Nov 28, 2026, 9:00 AM PT",
+          "window_label": "8:45 AM \u2013 9:00 AM PT",
+          "action": "WAIT",
+          "label": "WAIT \u2014 No Trade",
+          "reason": "Choppy / no clean edge: price is above the strike, but the 1-minute trend/momentum is not cleanly bullish (RSI 78 looks overheated); Yes ask 93\u00a2.",
+          "reason_full": "Choppy / no clean edge: price is above the strike, but the 1-minute trend/momentum is not cleanly bullish (RSI 78 looks overheated); Yes ask 93\u00a2.",
+          "btc_price": 59588.44,
+          "strike": 59403.91,
+          "yes_ask": 0.927,
+          "no_ask": 0.074,
+          "side": null,
+          "ask": null,
+          "contracts": null,
+          "entry_price": null,
+          "cash": 109.8,
+          "book_id": "v2",
+          "book_label": "Version 2.2",
+          "open_count": 0
         }
       ],
       "equity": 109.8,
@@ -7629,8 +7635,8 @@
       "created_at": "2026-11-28T00:04:13Z",
       "events": [],
       "net_pnl": 9.8,
-      "updated_at": "2026-11-28T16:44:18Z",
-      "updated_at_pt": "Nov 28, 2026, 8:44 AM PT"
+      "updated_at": "2026-11-28T16:49:19Z",
+      "updated_at_pt": "Nov 28, 2026, 8:49 AM PT"
     },
     "leader": "v2",
     "leader_label": "Version 2 ahead",
@@ -7639,8 +7645,8 @@
     "choice": {
       "v1": {
         "action": "WAIT",
-        "label": "Too close to expiry",
-        "reason": "Only 0:42 left in this window, so Version 1 won\u2019t open another ticket.",
+        "label": "WAIT \u2014 No tradable ask",
+        "reason": "Neither Yes nor No is in Version 1\u2019s 35\u00a2\u201365\u00a2 buy band, so it stands aside.",
         "side": null,
         "ask": null,
         "strength": null,
@@ -7648,2400 +7654,2400 @@
       },
       "v2": {
         "action": "WAIT",
-        "label": "WAIT \u2014 Too close to expiry",
-        "reason": "Only 0:42 left in this window. The bot stands aside under 2 minutes.",
+        "label": "WAIT \u2014 No Trade",
+        "reason": "Choppy / no clean edge: price is above the strike, but the 1-minute trend/momentum is not cleanly bullish (RSI 78 looks overheated); Yes ask 93\u00a2.",
         "side": null,
         "ask": null,
         "strength": null,
         "base_stake": null
       }
     },
-    "updated_at": "2026-11-28T16:44:18Z",
-    "updated_at_pt": "Nov 28, 2026, 8:44 AM PT"
+    "updated_at": "2026-11-28T16:49:19Z",
+    "updated_at_pt": "Nov 28, 2026, 8:49 AM PT"
   },
   "backtest": {
-    "start": "2026-11-23T16:45:00Z",
-    "end": "2026-11-28T16:30:00Z",
-    "start_pt": "Nov 23, 2026, 8:45 AM PT",
-    "end_pt": "Nov 28, 2026, 8:30 AM PT",
+    "start": "2026-11-23T17:00:00Z",
+    "end": "2026-11-28T16:45:00Z",
+    "start_pt": "Nov 23, 2026, 9:00 AM PT",
+    "end_pt": "Nov 28, 2026, 8:45 AM PT",
     "days": 5.0,
     "windows_scanned": 471,
-    "windows_traded": 29,
-    "windows_skipped": 442,
+    "windows_traded": 28,
+    "windows_skipped": 443,
     "skip_reasons": {
       "WAIT \u2014 No Trade": 145,
-      "WAIT \u2014 Too close to strike": 276,
+      "WAIT \u2014 Too close to strike": 277,
       "WAIT \u2014 No Edge": 21
     },
     "starting_balance": 100.0,
     "stake": 4.0,
-    "ending_equity": 171.81,
-    "return_pct": 71.81,
-    "max_drawdown_pct": 7.51,
-    "trade_count": 29,
+    "ending_equity": 179.32,
+    "return_pct": 79.32,
+    "max_drawdown_pct": 5.35,
+    "trade_count": 28,
     "wins": 25,
-    "losses": 4,
-    "win_rate": 86.2,
-    "profit_factor": 4.42,
+    "losses": 3,
+    "win_rate": 89.3,
+    "profit_factor": 6.89,
     "profit_factor_note": null,
     "gross_profit": 92.79,
-    "gross_loss": 20.98,
-    "net_pnl": 71.81,
+    "gross_loss": 13.47,
+    "net_pnl": 79.32,
     "equity_history": [
-      {
-        "t": 1795453204,
-        "t_pt": "Nov 23, 2026, 9:00 AM PT",
-        "equity": 92.49
-      },
       {
         "t": 1795453260,
         "t_pt": "Nov 23, 2026, 9:01 AM PT",
-        "equity": 92.49
+        "equity": 100.0
       },
       {
         "t": 1795454160,
         "t_pt": "Nov 23, 2026, 9:16 AM PT",
-        "equity": 92.49
+        "equity": 100.0
       },
       {
         "t": 1795455904,
         "t_pt": "Nov 23, 2026, 9:45 AM PT",
-        "equity": 97.85
+        "equity": 105.36
       },
       {
         "t": 1795455960,
         "t_pt": "Nov 23, 2026, 9:46 AM PT",
-        "equity": 97.85
+        "equity": 105.36
       },
       {
         "t": 1795456860,
         "t_pt": "Nov 23, 2026, 10:01 AM PT",
-        "equity": 97.85
+        "equity": 105.36
       },
       {
         "t": 1795457760,
         "t_pt": "Nov 23, 2026, 10:16 AM PT",
-        "equity": 97.85
+        "equity": 105.36
       },
       {
         "t": 1795459504,
         "t_pt": "Nov 23, 2026, 10:45 AM PT",
-        "equity": 101.97
+        "equity": 109.48
       },
       {
         "t": 1795459560,
         "t_pt": "Nov 23, 2026, 10:46 AM PT",
-        "equity": 101.97
+        "equity": 109.48
       },
       {
         "t": 1795460460,
         "t_pt": "Nov 23, 2026, 11:01 AM PT",
-        "equity": 101.97
+        "equity": 109.48
       },
       {
         "t": 1795461360,
         "t_pt": "Nov 23, 2026, 11:16 AM PT",
-        "equity": 101.97
+        "equity": 109.48
       },
       {
         "t": 1795462260,
         "t_pt": "Nov 23, 2026, 11:31 AM PT",
-        "equity": 101.97
+        "equity": 109.48
       },
       {
         "t": 1795463160,
         "t_pt": "Nov 23, 2026, 11:46 AM PT",
-        "equity": 101.97
+        "equity": 109.48
       },
       {
         "t": 1795464060,
         "t_pt": "Nov 23, 2026, 12:01 PM PT",
-        "equity": 101.97
+        "equity": 109.48
       },
       {
         "t": 1795464960,
         "t_pt": "Nov 23, 2026, 12:16 PM PT",
-        "equity": 101.97
+        "equity": 109.48
       },
       {
         "t": 1795465860,
         "t_pt": "Nov 23, 2026, 12:31 PM PT",
-        "equity": 101.97
+        "equity": 109.48
       },
       {
         "t": 1795466760,
         "t_pt": "Nov 23, 2026, 12:46 PM PT",
-        "equity": 101.97
+        "equity": 109.48
       },
       {
         "t": 1795467660,
         "t_pt": "Nov 23, 2026, 1:01 PM PT",
-        "equity": 101.97
+        "equity": 109.48
       },
       {
         "t": 1795468560,
         "t_pt": "Nov 23, 2026, 1:16 PM PT",
-        "equity": 101.97
+        "equity": 109.48
       },
       {
         "t": 1795469460,
         "t_pt": "Nov 23, 2026, 1:31 PM PT",
-        "equity": 101.97
+        "equity": 109.48
       },
       {
         "t": 1795470360,
         "t_pt": "Nov 23, 2026, 1:46 PM PT",
-        "equity": 101.97
+        "equity": 109.48
       },
       {
         "t": 1795471260,
         "t_pt": "Nov 23, 2026, 2:01 PM PT",
-        "equity": 101.97
+        "equity": 109.48
       },
       {
         "t": 1795472160,
         "t_pt": "Nov 23, 2026, 2:16 PM PT",
-        "equity": 101.97
+        "equity": 109.48
       },
       {
         "t": 1795473060,
         "t_pt": "Nov 23, 2026, 2:31 PM PT",
-        "equity": 101.97
+        "equity": 109.48
       },
       {
         "t": 1795473960,
         "t_pt": "Nov 23, 2026, 2:46 PM PT",
-        "equity": 101.97
+        "equity": 109.48
       },
       {
         "t": 1795474860,
         "t_pt": "Nov 23, 2026, 3:01 PM PT",
-        "equity": 101.97
+        "equity": 109.48
       },
       {
         "t": 1795476604,
         "t_pt": "Nov 23, 2026, 3:30 PM PT",
-        "equity": 107.2
+        "equity": 114.71
       },
       {
         "t": 1795476660,
         "t_pt": "Nov 23, 2026, 3:31 PM PT",
-        "equity": 107.2
+        "equity": 114.71
       },
       {
         "t": 1795477560,
         "t_pt": "Nov 23, 2026, 3:46 PM PT",
-        "equity": 107.2
+        "equity": 114.71
       },
       {
         "t": 1795478460,
         "t_pt": "Nov 23, 2026, 4:01 PM PT",
-        "equity": 107.2
+        "equity": 114.71
       },
       {
         "t": 1795479360,
         "t_pt": "Nov 23, 2026, 4:16 PM PT",
-        "equity": 107.2
+        "equity": 114.71
       },
       {
         "t": 1795480260,
         "t_pt": "Nov 23, 2026, 4:31 PM PT",
-        "equity": 107.2
+        "equity": 114.71
       },
       {
         "t": 1795481160,
         "t_pt": "Nov 23, 2026, 4:46 PM PT",
-        "equity": 107.2
+        "equity": 114.71
       },
       {
         "t": 1795482060,
         "t_pt": "Nov 23, 2026, 5:01 PM PT",
-        "equity": 107.2
+        "equity": 114.71
       },
       {
         "t": 1795482960,
         "t_pt": "Nov 23, 2026, 5:16 PM PT",
-        "equity": 107.2
+        "equity": 114.71
       },
       {
         "t": 1795483860,
         "t_pt": "Nov 23, 2026, 5:31 PM PT",
-        "equity": 107.2
+        "equity": 114.71
       },
       {
         "t": 1795484760,
         "t_pt": "Nov 23, 2026, 5:46 PM PT",
-        "equity": 107.2
+        "equity": 114.71
       },
       {
         "t": 1795486504,
         "t_pt": "Nov 23, 2026, 6:15 PM PT",
-        "equity": 111.68
+        "equity": 119.19
       },
       {
         "t": 1795486560,
         "t_pt": "Nov 23, 2026, 6:16 PM PT",
-        "equity": 111.68
+        "equity": 119.19
       },
       {
         "t": 1795487460,
         "t_pt": "Nov 23, 2026, 6:31 PM PT",
-        "equity": 111.68
+        "equity": 119.19
       },
       {
         "t": 1795488360,
         "t_pt": "Nov 23, 2026, 6:46 PM PT",
-        "equity": 111.68
+        "equity": 119.19
       },
       {
         "t": 1795489260,
         "t_pt": "Nov 23, 2026, 7:01 PM PT",
-        "equity": 111.68
+        "equity": 119.19
       },
       {
         "t": 1795490160,
         "t_pt": "Nov 23, 2026, 7:16 PM PT",
-        "equity": 111.68
+        "equity": 119.19
       },
       {
         "t": 1795491060,
         "t_pt": "Nov 23, 2026, 7:31 PM PT",
-        "equity": 111.68
+        "equity": 119.19
       },
       {
         "t": 1795491960,
         "t_pt": "Nov 23, 2026, 7:46 PM PT",
-        "equity": 111.68
+        "equity": 119.19
       },
       {
         "t": 1795492860,
         "t_pt": "Nov 23, 2026, 8:01 PM PT",
-        "equity": 111.68
+        "equity": 119.19
       },
       {
         "t": 1795493760,
         "t_pt": "Nov 23, 2026, 8:16 PM PT",
-        "equity": 111.68
+        "equity": 119.19
       },
       {
         "t": 1795494660,
         "t_pt": "Nov 23, 2026, 8:31 PM PT",
-        "equity": 111.68
+        "equity": 119.19
       },
       {
         "t": 1795495560,
         "t_pt": "Nov 23, 2026, 8:46 PM PT",
-        "equity": 111.68
+        "equity": 119.19
       },
       {
         "t": 1795496460,
         "t_pt": "Nov 23, 2026, 9:01 PM PT",
-        "equity": 111.68
+        "equity": 119.19
       },
       {
         "t": 1795497360,
         "t_pt": "Nov 23, 2026, 9:16 PM PT",
-        "equity": 111.68
+        "equity": 119.19
       },
       {
         "t": 1795499104,
         "t_pt": "Nov 23, 2026, 9:45 PM PT",
-        "equity": 114.33
+        "equity": 121.84
       },
       {
         "t": 1795499160,
         "t_pt": "Nov 23, 2026, 9:46 PM PT",
-        "equity": 114.33
+        "equity": 121.84
       },
       {
         "t": 1795500060,
         "t_pt": "Nov 23, 2026, 10:01 PM PT",
-        "equity": 114.33
+        "equity": 121.84
       },
       {
         "t": 1795500960,
         "t_pt": "Nov 23, 2026, 10:16 PM PT",
-        "equity": 114.33
+        "equity": 121.84
       },
       {
         "t": 1795501860,
         "t_pt": "Nov 23, 2026, 10:31 PM PT",
-        "equity": 114.33
+        "equity": 121.84
       },
       {
         "t": 1795502760,
         "t_pt": "Nov 23, 2026, 10:46 PM PT",
-        "equity": 114.33
+        "equity": 121.84
       },
       {
         "t": 1795503660,
         "t_pt": "Nov 23, 2026, 11:01 PM PT",
-        "equity": 114.33
+        "equity": 121.84
       },
       {
         "t": 1795504560,
         "t_pt": "Nov 23, 2026, 11:16 PM PT",
-        "equity": 114.33
+        "equity": 121.84
       },
       {
         "t": 1795505460,
         "t_pt": "Nov 23, 2026, 11:31 PM PT",
-        "equity": 114.33
+        "equity": 121.84
       },
       {
         "t": 1795506360,
         "t_pt": "Nov 23, 2026, 11:46 PM PT",
-        "equity": 114.33
+        "equity": 121.84
       },
       {
         "t": 1795507260,
         "t_pt": "Nov 24, 2026, 12:01 AM PT",
-        "equity": 114.33
+        "equity": 121.84
       },
       {
         "t": 1795508160,
         "t_pt": "Nov 24, 2026, 12:16 AM PT",
-        "equity": 114.33
+        "equity": 121.84
       },
       {
         "t": 1795509060,
         "t_pt": "Nov 24, 2026, 12:31 AM PT",
-        "equity": 114.33
+        "equity": 121.84
       },
       {
         "t": 1795509960,
         "t_pt": "Nov 24, 2026, 12:46 AM PT",
-        "equity": 114.33
+        "equity": 121.84
       },
       {
         "t": 1795511704,
         "t_pt": "Nov 24, 2026, 1:15 AM PT",
-        "equity": 116.69
+        "equity": 124.2
       },
       {
         "t": 1795511760,
         "t_pt": "Nov 24, 2026, 1:16 AM PT",
-        "equity": 116.69
+        "equity": 124.2
       },
       {
         "t": 1795512660,
         "t_pt": "Nov 24, 2026, 1:31 AM PT",
-        "equity": 116.69
+        "equity": 124.2
       },
       {
         "t": 1795513560,
         "t_pt": "Nov 24, 2026, 1:46 AM PT",
-        "equity": 116.69
+        "equity": 124.2
       },
       {
         "t": 1795514460,
         "t_pt": "Nov 24, 2026, 2:01 AM PT",
-        "equity": 116.69
+        "equity": 124.2
       },
       {
         "t": 1795515360,
         "t_pt": "Nov 24, 2026, 2:16 AM PT",
-        "equity": 116.69
+        "equity": 124.2
       },
       {
         "t": 1795517104,
         "t_pt": "Nov 24, 2026, 2:45 AM PT",
-        "equity": 119.25
+        "equity": 126.76
       },
       {
         "t": 1795517160,
         "t_pt": "Nov 24, 2026, 2:46 AM PT",
-        "equity": 119.25
+        "equity": 126.76
       },
       {
         "t": 1795518060,
         "t_pt": "Nov 24, 2026, 3:01 AM PT",
-        "equity": 119.25
+        "equity": 126.76
       },
       {
         "t": 1795518960,
         "t_pt": "Nov 24, 2026, 3:16 AM PT",
-        "equity": 119.25
+        "equity": 126.76
       },
       {
         "t": 1795519860,
         "t_pt": "Nov 24, 2026, 3:31 AM PT",
-        "equity": 119.25
+        "equity": 126.76
       },
       {
         "t": 1795520760,
         "t_pt": "Nov 24, 2026, 3:46 AM PT",
-        "equity": 119.25
+        "equity": 126.76
       },
       {
         "t": 1795521660,
         "t_pt": "Nov 24, 2026, 4:01 AM PT",
-        "equity": 119.25
+        "equity": 126.76
       },
       {
         "t": 1795522560,
         "t_pt": "Nov 24, 2026, 4:16 AM PT",
-        "equity": 119.25
+        "equity": 126.76
       },
       {
         "t": 1795523460,
         "t_pt": "Nov 24, 2026, 4:31 AM PT",
-        "equity": 119.25
+        "equity": 126.76
       },
       {
         "t": 1795524360,
         "t_pt": "Nov 24, 2026, 4:46 AM PT",
-        "equity": 119.25
+        "equity": 126.76
       },
       {
         "t": 1795525260,
         "t_pt": "Nov 24, 2026, 5:01 AM PT",
-        "equity": 119.25
+        "equity": 126.76
       },
       {
         "t": 1795526160,
         "t_pt": "Nov 24, 2026, 5:16 AM PT",
-        "equity": 119.25
+        "equity": 126.76
       },
       {
         "t": 1795527060,
         "t_pt": "Nov 24, 2026, 5:31 AM PT",
-        "equity": 119.25
+        "equity": 126.76
       },
       {
         "t": 1795527960,
         "t_pt": "Nov 24, 2026, 5:46 AM PT",
-        "equity": 119.25
+        "equity": 126.76
       },
       {
         "t": 1795528860,
         "t_pt": "Nov 24, 2026, 6:01 AM PT",
-        "equity": 119.25
+        "equity": 126.76
       },
       {
         "t": 1795529760,
         "t_pt": "Nov 24, 2026, 6:16 AM PT",
-        "equity": 119.25
+        "equity": 126.76
       },
       {
         "t": 1795530660,
         "t_pt": "Nov 24, 2026, 6:31 AM PT",
-        "equity": 119.25
+        "equity": 126.76
       },
       {
         "t": 1795531560,
         "t_pt": "Nov 24, 2026, 6:46 AM PT",
-        "equity": 119.25
+        "equity": 126.76
       },
       {
         "t": 1795532460,
         "t_pt": "Nov 24, 2026, 7:01 AM PT",
-        "equity": 119.25
+        "equity": 126.76
       },
       {
         "t": 1795534204,
         "t_pt": "Nov 24, 2026, 7:30 AM PT",
-        "equity": 125.72
+        "equity": 133.23
       },
       {
         "t": 1795534260,
         "t_pt": "Nov 24, 2026, 7:31 AM PT",
-        "equity": 125.72
+        "equity": 133.23
       },
       {
         "t": 1795535160,
         "t_pt": "Nov 24, 2026, 7:46 AM PT",
-        "equity": 125.72
+        "equity": 133.23
       },
       {
         "t": 1795536905,
         "t_pt": "Nov 24, 2026, 8:15 AM PT",
-        "equity": 131.08
+        "equity": 138.59
       },
       {
         "t": 1795536960,
         "t_pt": "Nov 24, 2026, 8:16 AM PT",
-        "equity": 131.08
+        "equity": 138.59
       },
       {
         "t": 1795537860,
         "t_pt": "Nov 24, 2026, 8:31 AM PT",
-        "equity": 131.08
+        "equity": 138.59
       },
       {
         "t": 1795538760,
         "t_pt": "Nov 24, 2026, 8:46 AM PT",
-        "equity": 131.08
+        "equity": 138.59
       },
       {
         "t": 1795539660,
         "t_pt": "Nov 24, 2026, 9:01 AM PT",
-        "equity": 131.08
+        "equity": 138.59
       },
       {
         "t": 1795540560,
         "t_pt": "Nov 24, 2026, 9:16 AM PT",
-        "equity": 131.08
+        "equity": 138.59
       },
       {
         "t": 1795541460,
         "t_pt": "Nov 24, 2026, 9:31 AM PT",
-        "equity": 131.08
+        "equity": 138.59
       },
       {
         "t": 1795542360,
         "t_pt": "Nov 24, 2026, 9:46 AM PT",
-        "equity": 131.08
+        "equity": 138.59
       },
       {
         "t": 1795543260,
         "t_pt": "Nov 24, 2026, 10:01 AM PT",
-        "equity": 131.08
+        "equity": 138.59
       },
       {
         "t": 1795544160,
         "t_pt": "Nov 24, 2026, 10:16 AM PT",
-        "equity": 131.08
+        "equity": 138.59
       },
       {
         "t": 1795545060,
         "t_pt": "Nov 24, 2026, 10:31 AM PT",
-        "equity": 131.08
+        "equity": 138.59
       },
       {
         "t": 1795545960,
         "t_pt": "Nov 24, 2026, 10:46 AM PT",
-        "equity": 131.08
+        "equity": 138.59
       },
       {
         "t": 1795546860,
         "t_pt": "Nov 24, 2026, 11:01 AM PT",
-        "equity": 131.08
+        "equity": 138.59
       },
       {
         "t": 1795547760,
         "t_pt": "Nov 24, 2026, 11:16 AM PT",
-        "equity": 131.08
+        "equity": 138.59
       },
       {
         "t": 1795548660,
         "t_pt": "Nov 24, 2026, 11:31 AM PT",
-        "equity": 131.08
+        "equity": 138.59
       },
       {
         "t": 1795549560,
         "t_pt": "Nov 24, 2026, 11:46 AM PT",
-        "equity": 131.08
+        "equity": 138.59
       },
       {
         "t": 1795551304,
         "t_pt": "Nov 24, 2026, 12:15 PM PT",
-        "equity": 123.67
+        "equity": 131.18
       },
       {
         "t": 1795551360,
         "t_pt": "Nov 24, 2026, 12:16 PM PT",
-        "equity": 123.67
+        "equity": 131.18
       },
       {
         "t": 1795552260,
         "t_pt": "Nov 24, 2026, 12:31 PM PT",
-        "equity": 123.67
+        "equity": 131.18
       },
       {
         "t": 1795553160,
         "t_pt": "Nov 24, 2026, 12:46 PM PT",
-        "equity": 123.67
+        "equity": 131.18
       },
       {
         "t": 1795554060,
         "t_pt": "Nov 24, 2026, 1:01 PM PT",
-        "equity": 123.67
+        "equity": 131.18
       },
       {
         "t": 1795554960,
         "t_pt": "Nov 24, 2026, 1:16 PM PT",
-        "equity": 123.67
+        "equity": 131.18
       },
       {
         "t": 1795555860,
         "t_pt": "Nov 24, 2026, 1:31 PM PT",
-        "equity": 123.67
+        "equity": 131.18
       },
       {
         "t": 1795556760,
         "t_pt": "Nov 24, 2026, 1:46 PM PT",
-        "equity": 123.67
+        "equity": 131.18
       },
       {
         "t": 1795557660,
         "t_pt": "Nov 24, 2026, 2:01 PM PT",
-        "equity": 123.67
+        "equity": 131.18
       },
       {
         "t": 1795558560,
         "t_pt": "Nov 24, 2026, 2:16 PM PT",
-        "equity": 123.67
+        "equity": 131.18
       },
       {
         "t": 1795559460,
         "t_pt": "Nov 24, 2026, 2:31 PM PT",
-        "equity": 123.67
+        "equity": 131.18
       },
       {
         "t": 1795560360,
         "t_pt": "Nov 24, 2026, 2:46 PM PT",
-        "equity": 123.67
+        "equity": 131.18
       },
       {
         "t": 1795561260,
         "t_pt": "Nov 24, 2026, 3:01 PM PT",
-        "equity": 123.67
+        "equity": 131.18
       },
       {
         "t": 1795562160,
         "t_pt": "Nov 24, 2026, 3:16 PM PT",
-        "equity": 123.67
+        "equity": 131.18
       },
       {
         "t": 1795563060,
         "t_pt": "Nov 24, 2026, 3:31 PM PT",
-        "equity": 123.67
+        "equity": 131.18
       },
       {
         "t": 1795563960,
         "t_pt": "Nov 24, 2026, 3:46 PM PT",
-        "equity": 123.67
+        "equity": 131.18
       },
       {
         "t": 1795564860,
         "t_pt": "Nov 24, 2026, 4:01 PM PT",
-        "equity": 123.67
+        "equity": 131.18
       },
       {
         "t": 1795566604,
         "t_pt": "Nov 24, 2026, 4:30 PM PT",
-        "equity": 128.03
+        "equity": 135.54
       },
       {
         "t": 1795566660,
         "t_pt": "Nov 24, 2026, 4:31 PM PT",
-        "equity": 128.03
+        "equity": 135.54
       },
       {
         "t": 1795567560,
         "t_pt": "Nov 24, 2026, 4:46 PM PT",
-        "equity": 128.03
+        "equity": 135.54
       },
       {
         "t": 1795568460,
         "t_pt": "Nov 24, 2026, 5:01 PM PT",
-        "equity": 128.03
+        "equity": 135.54
       },
       {
         "t": 1795569360,
         "t_pt": "Nov 24, 2026, 5:16 PM PT",
-        "equity": 128.03
+        "equity": 135.54
       },
       {
         "t": 1795570260,
         "t_pt": "Nov 24, 2026, 5:31 PM PT",
-        "equity": 128.03
+        "equity": 135.54
       },
       {
         "t": 1795572004,
         "t_pt": "Nov 24, 2026, 6:00 PM PT",
-        "equity": 132.27
+        "equity": 139.78
       },
       {
         "t": 1795572060,
         "t_pt": "Nov 24, 2026, 6:01 PM PT",
-        "equity": 132.27
+        "equity": 139.78
       },
       {
         "t": 1795572960,
         "t_pt": "Nov 24, 2026, 6:16 PM PT",
-        "equity": 132.27
+        "equity": 139.78
       },
       {
         "t": 1795573860,
         "t_pt": "Nov 24, 2026, 6:31 PM PT",
-        "equity": 132.27
+        "equity": 139.78
       },
       {
         "t": 1795574760,
         "t_pt": "Nov 24, 2026, 6:46 PM PT",
-        "equity": 132.27
+        "equity": 139.78
       },
       {
         "t": 1795575660,
         "t_pt": "Nov 24, 2026, 7:01 PM PT",
-        "equity": 132.27
+        "equity": 139.78
       },
       {
         "t": 1795576560,
         "t_pt": "Nov 24, 2026, 7:16 PM PT",
-        "equity": 132.27
+        "equity": 139.78
       },
       {
         "t": 1795577460,
         "t_pt": "Nov 24, 2026, 7:31 PM PT",
-        "equity": 132.27
+        "equity": 139.78
       },
       {
         "t": 1795578360,
         "t_pt": "Nov 24, 2026, 7:46 PM PT",
-        "equity": 132.27
+        "equity": 139.78
       },
       {
         "t": 1795579260,
         "t_pt": "Nov 24, 2026, 8:01 PM PT",
-        "equity": 132.27
+        "equity": 139.78
       },
       {
         "t": 1795580160,
         "t_pt": "Nov 24, 2026, 8:16 PM PT",
-        "equity": 132.27
+        "equity": 139.78
       },
       {
         "t": 1795581904,
         "t_pt": "Nov 24, 2026, 8:45 PM PT",
-        "equity": 135.4
+        "equity": 142.91
       },
       {
         "t": 1795581960,
         "t_pt": "Nov 24, 2026, 8:46 PM PT",
-        "equity": 135.4
+        "equity": 142.91
       },
       {
         "t": 1795582860,
         "t_pt": "Nov 24, 2026, 9:01 PM PT",
-        "equity": 135.4
+        "equity": 142.91
       },
       {
         "t": 1795583760,
         "t_pt": "Nov 24, 2026, 9:16 PM PT",
-        "equity": 135.4
+        "equity": 142.91
       },
       {
         "t": 1795585504,
         "t_pt": "Nov 24, 2026, 9:45 PM PT",
-        "equity": 138.64
+        "equity": 146.15
       },
       {
         "t": 1795585560,
         "t_pt": "Nov 24, 2026, 9:46 PM PT",
-        "equity": 138.64
+        "equity": 146.15
       },
       {
         "t": 1795586460,
         "t_pt": "Nov 24, 2026, 10:01 PM PT",
-        "equity": 138.64
+        "equity": 146.15
       },
       {
         "t": 1795587360,
         "t_pt": "Nov 24, 2026, 10:16 PM PT",
-        "equity": 138.64
+        "equity": 146.15
       },
       {
         "t": 1795588260,
         "t_pt": "Nov 24, 2026, 10:31 PM PT",
-        "equity": 138.64
+        "equity": 146.15
       },
       {
         "t": 1795589160,
         "t_pt": "Nov 24, 2026, 10:46 PM PT",
-        "equity": 138.64
+        "equity": 146.15
       },
       {
         "t": 1795590060,
         "t_pt": "Nov 24, 2026, 11:01 PM PT",
-        "equity": 138.64
+        "equity": 146.15
       },
       {
         "t": 1795590960,
         "t_pt": "Nov 24, 2026, 11:16 PM PT",
-        "equity": 138.64
+        "equity": 146.15
       },
       {
         "t": 1795591860,
         "t_pt": "Nov 24, 2026, 11:31 PM PT",
-        "equity": 138.64
+        "equity": 146.15
       },
       {
         "t": 1795592760,
         "t_pt": "Nov 24, 2026, 11:46 PM PT",
-        "equity": 138.64
+        "equity": 146.15
       },
       {
         "t": 1795593660,
         "t_pt": "Nov 25, 2026, 12:01 AM PT",
-        "equity": 138.64
+        "equity": 146.15
       },
       {
         "t": 1795594560,
         "t_pt": "Nov 25, 2026, 12:16 AM PT",
-        "equity": 138.64
+        "equity": 146.15
       },
       {
         "t": 1795595460,
         "t_pt": "Nov 25, 2026, 12:31 AM PT",
-        "equity": 138.64
+        "equity": 146.15
       },
       {
         "t": 1795596360,
         "t_pt": "Nov 25, 2026, 12:46 AM PT",
-        "equity": 138.64
+        "equity": 146.15
       },
       {
         "t": 1795597260,
         "t_pt": "Nov 25, 2026, 1:01 AM PT",
-        "equity": 138.64
+        "equity": 146.15
       },
       {
         "t": 1795598160,
         "t_pt": "Nov 25, 2026, 1:16 AM PT",
-        "equity": 138.64
+        "equity": 146.15
       },
       {
         "t": 1795599060,
         "t_pt": "Nov 25, 2026, 1:31 AM PT",
-        "equity": 138.64
+        "equity": 146.15
       },
       {
         "t": 1795599960,
         "t_pt": "Nov 25, 2026, 1:46 AM PT",
-        "equity": 138.64
+        "equity": 146.15
       },
       {
         "t": 1795600860,
         "t_pt": "Nov 25, 2026, 2:01 AM PT",
-        "equity": 138.64
+        "equity": 146.15
       },
       {
         "t": 1795601760,
         "t_pt": "Nov 25, 2026, 2:16 AM PT",
-        "equity": 138.64
+        "equity": 146.15
       },
       {
         "t": 1795602660,
         "t_pt": "Nov 25, 2026, 2:31 AM PT",
-        "equity": 138.64
+        "equity": 146.15
       },
       {
         "t": 1795603560,
         "t_pt": "Nov 25, 2026, 2:46 AM PT",
-        "equity": 138.64
+        "equity": 146.15
       },
       {
         "t": 1795604460,
         "t_pt": "Nov 25, 2026, 3:01 AM PT",
-        "equity": 138.64
+        "equity": 146.15
       },
       {
         "t": 1795605360,
         "t_pt": "Nov 25, 2026, 3:16 AM PT",
-        "equity": 138.64
+        "equity": 146.15
       },
       {
         "t": 1795607104,
         "t_pt": "Nov 25, 2026, 3:45 AM PT",
-        "equity": 142.64
+        "equity": 150.15
       },
       {
         "t": 1795607160,
         "t_pt": "Nov 25, 2026, 3:46 AM PT",
-        "equity": 142.64
+        "equity": 150.15
       },
       {
         "t": 1795608060,
         "t_pt": "Nov 25, 2026, 4:01 AM PT",
-        "equity": 142.64
+        "equity": 150.15
       },
       {
         "t": 1795608960,
         "t_pt": "Nov 25, 2026, 4:16 AM PT",
-        "equity": 142.64
+        "equity": 150.15
       },
       {
         "t": 1795609860,
         "t_pt": "Nov 25, 2026, 4:31 AM PT",
-        "equity": 142.64
+        "equity": 150.15
       },
       {
         "t": 1795610760,
         "t_pt": "Nov 25, 2026, 4:46 AM PT",
-        "equity": 142.64
+        "equity": 150.15
       },
       {
         "t": 1795611660,
         "t_pt": "Nov 25, 2026, 5:01 AM PT",
-        "equity": 142.64
+        "equity": 150.15
       },
       {
         "t": 1795612560,
         "t_pt": "Nov 25, 2026, 5:16 AM PT",
-        "equity": 142.64
+        "equity": 150.15
       },
       {
         "t": 1795613460,
         "t_pt": "Nov 25, 2026, 5:31 AM PT",
-        "equity": 142.64
+        "equity": 150.15
       },
       {
         "t": 1795615204,
         "t_pt": "Nov 25, 2026, 6:00 AM PT",
-        "equity": 146.88
+        "equity": 154.39
       },
       {
         "t": 1795615260,
         "t_pt": "Nov 25, 2026, 6:01 AM PT",
-        "equity": 146.88
+        "equity": 154.39
       },
       {
         "t": 1795616160,
         "t_pt": "Nov 25, 2026, 6:16 AM PT",
-        "equity": 146.88
+        "equity": 154.39
       },
       {
         "t": 1795617060,
         "t_pt": "Nov 25, 2026, 6:31 AM PT",
-        "equity": 146.88
+        "equity": 154.39
       },
       {
         "t": 1795617960,
         "t_pt": "Nov 25, 2026, 6:46 AM PT",
-        "equity": 146.88
+        "equity": 154.39
       },
       {
         "t": 1795618860,
         "t_pt": "Nov 25, 2026, 7:01 AM PT",
-        "equity": 146.88
+        "equity": 154.39
       },
       {
         "t": 1795619760,
         "t_pt": "Nov 25, 2026, 7:16 AM PT",
-        "equity": 146.88
+        "equity": 154.39
       },
       {
         "t": 1795620660,
         "t_pt": "Nov 25, 2026, 7:31 AM PT",
-        "equity": 146.88
+        "equity": 154.39
       },
       {
         "t": 1795621560,
         "t_pt": "Nov 25, 2026, 7:46 AM PT",
-        "equity": 146.88
+        "equity": 154.39
       },
       {
         "t": 1795622460,
         "t_pt": "Nov 25, 2026, 8:01 AM PT",
-        "equity": 146.88
+        "equity": 154.39
       },
       {
         "t": 1795623360,
         "t_pt": "Nov 25, 2026, 8:16 AM PT",
-        "equity": 146.88
+        "equity": 154.39
       },
       {
         "t": 1795624260,
         "t_pt": "Nov 25, 2026, 8:31 AM PT",
-        "equity": 146.88
+        "equity": 154.39
       },
       {
         "t": 1795625160,
         "t_pt": "Nov 25, 2026, 8:46 AM PT",
-        "equity": 146.88
+        "equity": 154.39
       },
       {
         "t": 1795626060,
         "t_pt": "Nov 25, 2026, 9:01 AM PT",
-        "equity": 146.88
+        "equity": 154.39
       },
       {
         "t": 1795626960,
         "t_pt": "Nov 25, 2026, 9:16 AM PT",
-        "equity": 146.88
+        "equity": 154.39
       },
       {
         "t": 1795627860,
         "t_pt": "Nov 25, 2026, 9:31 AM PT",
-        "equity": 146.88
+        "equity": 154.39
       },
       {
         "t": 1795628760,
         "t_pt": "Nov 25, 2026, 9:46 AM PT",
-        "equity": 146.88
+        "equity": 154.39
       },
       {
         "t": 1795629660,
         "t_pt": "Nov 25, 2026, 10:01 AM PT",
-        "equity": 146.88
+        "equity": 154.39
       },
       {
         "t": 1795630560,
         "t_pt": "Nov 25, 2026, 10:16 AM PT",
-        "equity": 146.88
+        "equity": 154.39
       },
       {
         "t": 1795631460,
         "t_pt": "Nov 25, 2026, 10:31 AM PT",
-        "equity": 146.88
+        "equity": 154.39
       },
       {
         "t": 1795632360,
         "t_pt": "Nov 25, 2026, 10:46 AM PT",
-        "equity": 146.88
+        "equity": 154.39
       },
       {
         "t": 1795633260,
         "t_pt": "Nov 25, 2026, 11:01 AM PT",
-        "equity": 146.88
+        "equity": 154.39
       },
       {
         "t": 1795635004,
         "t_pt": "Nov 25, 2026, 11:30 AM PT",
-        "equity": 149.53
+        "equity": 157.04
       },
       {
         "t": 1795635060,
         "t_pt": "Nov 25, 2026, 11:31 AM PT",
-        "equity": 149.53
+        "equity": 157.04
       },
       {
         "t": 1795635960,
         "t_pt": "Nov 25, 2026, 11:46 AM PT",
-        "equity": 149.53
+        "equity": 157.04
       },
       {
         "t": 1795636860,
         "t_pt": "Nov 25, 2026, 12:01 PM PT",
-        "equity": 149.53
+        "equity": 157.04
       },
       {
         "t": 1795637760,
         "t_pt": "Nov 25, 2026, 12:16 PM PT",
-        "equity": 149.53
+        "equity": 157.04
       },
       {
         "t": 1795638660,
         "t_pt": "Nov 25, 2026, 12:31 PM PT",
-        "equity": 149.53
+        "equity": 157.04
       },
       {
         "t": 1795639560,
         "t_pt": "Nov 25, 2026, 12:46 PM PT",
-        "equity": 149.53
+        "equity": 157.04
       },
       {
         "t": 1795640460,
         "t_pt": "Nov 25, 2026, 1:01 PM PT",
-        "equity": 149.53
+        "equity": 157.04
       },
       {
         "t": 1795641360,
         "t_pt": "Nov 25, 2026, 1:16 PM PT",
-        "equity": 149.53
+        "equity": 157.04
       },
       {
         "t": 1795642260,
         "t_pt": "Nov 25, 2026, 1:31 PM PT",
-        "equity": 149.53
+        "equity": 157.04
       },
       {
         "t": 1795643160,
         "t_pt": "Nov 25, 2026, 1:46 PM PT",
-        "equity": 149.53
+        "equity": 157.04
       },
       {
         "t": 1795644060,
         "t_pt": "Nov 25, 2026, 2:01 PM PT",
-        "equity": 149.53
+        "equity": 157.04
       },
       {
         "t": 1795644960,
         "t_pt": "Nov 25, 2026, 2:16 PM PT",
-        "equity": 149.53
+        "equity": 157.04
       },
       {
         "t": 1795645860,
         "t_pt": "Nov 25, 2026, 2:31 PM PT",
-        "equity": 149.53
+        "equity": 157.04
       },
       {
         "t": 1795647604,
         "t_pt": "Nov 25, 2026, 3:00 PM PT",
-        "equity": 146.92
+        "equity": 154.43
       },
       {
         "t": 1795647660,
         "t_pt": "Nov 25, 2026, 3:01 PM PT",
-        "equity": 146.92
+        "equity": 154.43
       },
       {
         "t": 1795648560,
         "t_pt": "Nov 25, 2026, 3:16 PM PT",
-        "equity": 146.92
+        "equity": 154.43
       },
       {
         "t": 1795649460,
         "t_pt": "Nov 25, 2026, 3:31 PM PT",
-        "equity": 146.92
+        "equity": 154.43
       },
       {
         "t": 1795650360,
         "t_pt": "Nov 25, 2026, 3:46 PM PT",
-        "equity": 146.92
+        "equity": 154.43
       },
       {
         "t": 1795652104,
         "t_pt": "Nov 25, 2026, 4:15 PM PT",
-        "equity": 151.16
+        "equity": 158.67
       },
       {
         "t": 1795652160,
         "t_pt": "Nov 25, 2026, 4:16 PM PT",
-        "equity": 151.16
+        "equity": 158.67
       },
       {
         "t": 1795653060,
         "t_pt": "Nov 25, 2026, 4:31 PM PT",
-        "equity": 151.16
+        "equity": 158.67
       },
       {
         "t": 1795653960,
         "t_pt": "Nov 25, 2026, 4:46 PM PT",
-        "equity": 151.16
+        "equity": 158.67
       },
       {
         "t": 1795654860,
         "t_pt": "Nov 25, 2026, 5:01 PM PT",
-        "equity": 151.16
+        "equity": 158.67
       },
       {
         "t": 1795655760,
         "t_pt": "Nov 25, 2026, 5:16 PM PT",
-        "equity": 151.16
+        "equity": 158.67
       },
       {
         "t": 1795656660,
         "t_pt": "Nov 25, 2026, 5:31 PM PT",
-        "equity": 151.16
+        "equity": 158.67
       },
       {
         "t": 1795657560,
         "t_pt": "Nov 25, 2026, 5:46 PM PT",
-        "equity": 151.16
+        "equity": 158.67
       },
       {
         "t": 1795658460,
         "t_pt": "Nov 25, 2026, 6:01 PM PT",
-        "equity": 151.16
+        "equity": 158.67
       },
       {
         "t": 1795659360,
         "t_pt": "Nov 25, 2026, 6:16 PM PT",
-        "equity": 151.16
+        "equity": 158.67
       },
       {
         "t": 1795660260,
         "t_pt": "Nov 25, 2026, 6:31 PM PT",
-        "equity": 151.16
+        "equity": 158.67
       },
       {
         "t": 1795661160,
         "t_pt": "Nov 25, 2026, 6:46 PM PT",
-        "equity": 151.16
+        "equity": 158.67
       },
       {
         "t": 1795662060,
         "t_pt": "Nov 25, 2026, 7:01 PM PT",
-        "equity": 151.16
+        "equity": 158.67
       },
       {
         "t": 1795662960,
         "t_pt": "Nov 25, 2026, 7:16 PM PT",
-        "equity": 151.16
+        "equity": 158.67
       },
       {
         "t": 1795664704,
         "t_pt": "Nov 25, 2026, 7:45 PM PT",
-        "equity": 154.61
+        "equity": 162.12
       },
       {
         "t": 1795664760,
         "t_pt": "Nov 25, 2026, 7:46 PM PT",
-        "equity": 154.61
+        "equity": 162.12
       },
       {
         "t": 1795665660,
         "t_pt": "Nov 25, 2026, 8:01 PM PT",
-        "equity": 154.61
+        "equity": 162.12
       },
       {
         "t": 1795666560,
         "t_pt": "Nov 25, 2026, 8:16 PM PT",
-        "equity": 154.61
+        "equity": 162.12
       },
       {
         "t": 1795667460,
         "t_pt": "Nov 25, 2026, 8:31 PM PT",
-        "equity": 154.61
+        "equity": 162.12
       },
       {
         "t": 1795668360,
         "t_pt": "Nov 25, 2026, 8:46 PM PT",
-        "equity": 154.61
+        "equity": 162.12
       },
       {
         "t": 1795669260,
         "t_pt": "Nov 25, 2026, 9:01 PM PT",
-        "equity": 154.61
+        "equity": 162.12
       },
       {
         "t": 1795670160,
         "t_pt": "Nov 25, 2026, 9:16 PM PT",
-        "equity": 154.61
+        "equity": 162.12
       },
       {
         "t": 1795671060,
         "t_pt": "Nov 25, 2026, 9:31 PM PT",
-        "equity": 154.61
+        "equity": 162.12
       },
       {
         "t": 1795671960,
         "t_pt": "Nov 25, 2026, 9:46 PM PT",
-        "equity": 154.61
+        "equity": 162.12
       },
       {
         "t": 1795672860,
         "t_pt": "Nov 25, 2026, 10:01 PM PT",
-        "equity": 154.61
+        "equity": 162.12
       },
       {
         "t": 1795673760,
         "t_pt": "Nov 25, 2026, 10:16 PM PT",
-        "equity": 154.61
+        "equity": 162.12
       },
       {
         "t": 1795674660,
         "t_pt": "Nov 25, 2026, 10:31 PM PT",
-        "equity": 154.61
+        "equity": 162.12
       },
       {
         "t": 1795675560,
         "t_pt": "Nov 25, 2026, 10:46 PM PT",
-        "equity": 154.61
+        "equity": 162.12
       },
       {
         "t": 1795676460,
         "t_pt": "Nov 25, 2026, 11:01 PM PT",
-        "equity": 154.61
+        "equity": 162.12
       },
       {
         "t": 1795677360,
         "t_pt": "Nov 25, 2026, 11:16 PM PT",
-        "equity": 154.61
+        "equity": 162.12
       },
       {
         "t": 1795678260,
         "t_pt": "Nov 25, 2026, 11:31 PM PT",
-        "equity": 154.61
+        "equity": 162.12
       },
       {
         "t": 1795679160,
         "t_pt": "Nov 25, 2026, 11:46 PM PT",
-        "equity": 154.61
+        "equity": 162.12
       },
       {
         "t": 1795687260,
         "t_pt": "Nov 26, 2026, 2:01 AM PT",
-        "equity": 154.61
+        "equity": 162.12
       },
       {
         "t": 1795688160,
         "t_pt": "Nov 26, 2026, 2:16 AM PT",
-        "equity": 154.61
+        "equity": 162.12
       },
       {
         "t": 1795689060,
         "t_pt": "Nov 26, 2026, 2:31 AM PT",
-        "equity": 154.61
+        "equity": 162.12
       },
       {
         "t": 1795689960,
         "t_pt": "Nov 26, 2026, 2:46 AM PT",
-        "equity": 154.61
+        "equity": 162.12
       },
       {
         "t": 1795690860,
         "t_pt": "Nov 26, 2026, 3:01 AM PT",
-        "equity": 154.61
+        "equity": 162.12
       },
       {
         "t": 1795691760,
         "t_pt": "Nov 26, 2026, 3:16 AM PT",
-        "equity": 154.61
+        "equity": 162.12
       },
       {
         "t": 1795692660,
         "t_pt": "Nov 26, 2026, 3:31 AM PT",
-        "equity": 154.61
+        "equity": 162.12
       },
       {
         "t": 1795693560,
         "t_pt": "Nov 26, 2026, 3:46 AM PT",
-        "equity": 154.61
+        "equity": 162.12
       },
       {
         "t": 1795694460,
         "t_pt": "Nov 26, 2026, 4:01 AM PT",
-        "equity": 154.61
+        "equity": 162.12
       },
       {
         "t": 1795695360,
         "t_pt": "Nov 26, 2026, 4:16 AM PT",
-        "equity": 154.61
+        "equity": 162.12
       },
       {
         "t": 1795696260,
         "t_pt": "Nov 26, 2026, 4:31 AM PT",
-        "equity": 154.61
+        "equity": 162.12
       },
       {
         "t": 1795697160,
         "t_pt": "Nov 26, 2026, 4:46 AM PT",
-        "equity": 154.61
+        "equity": 162.12
       },
       {
         "t": 1795698060,
         "t_pt": "Nov 26, 2026, 5:01 AM PT",
-        "equity": 154.61
+        "equity": 162.12
       },
       {
         "t": 1795698960,
         "t_pt": "Nov 26, 2026, 5:16 AM PT",
-        "equity": 154.61
+        "equity": 162.12
       },
       {
         "t": 1795699860,
         "t_pt": "Nov 26, 2026, 5:31 AM PT",
-        "equity": 154.61
+        "equity": 162.12
       },
       {
         "t": 1795700760,
         "t_pt": "Nov 26, 2026, 5:46 AM PT",
-        "equity": 154.61
+        "equity": 162.12
       },
       {
         "t": 1795701660,
         "t_pt": "Nov 26, 2026, 6:01 AM PT",
-        "equity": 154.61
+        "equity": 162.12
       },
       {
         "t": 1795702560,
         "t_pt": "Nov 26, 2026, 6:16 AM PT",
-        "equity": 154.61
+        "equity": 162.12
       },
       {
         "t": 1795703460,
         "t_pt": "Nov 26, 2026, 6:31 AM PT",
-        "equity": 154.61
+        "equity": 162.12
       },
       {
         "t": 1795704360,
         "t_pt": "Nov 26, 2026, 6:46 AM PT",
-        "equity": 154.61
+        "equity": 162.12
       },
       {
         "t": 1795706105,
         "t_pt": "Nov 26, 2026, 7:15 AM PT",
-        "equity": 157.17
+        "equity": 164.68
       },
       {
         "t": 1795706160,
         "t_pt": "Nov 26, 2026, 7:16 AM PT",
-        "equity": 157.17
+        "equity": 164.68
       },
       {
         "t": 1795707060,
         "t_pt": "Nov 26, 2026, 7:31 AM PT",
-        "equity": 157.17
+        "equity": 164.68
       },
       {
         "t": 1795707960,
         "t_pt": "Nov 26, 2026, 7:46 AM PT",
-        "equity": 157.17
+        "equity": 164.68
       },
       {
         "t": 1795708860,
         "t_pt": "Nov 26, 2026, 8:01 AM PT",
-        "equity": 157.17
+        "equity": 164.68
       },
       {
         "t": 1795709760,
         "t_pt": "Nov 26, 2026, 8:16 AM PT",
-        "equity": 157.17
+        "equity": 164.68
       },
       {
         "t": 1795710660,
         "t_pt": "Nov 26, 2026, 8:31 AM PT",
-        "equity": 157.17
+        "equity": 164.68
       },
       {
         "t": 1795711560,
         "t_pt": "Nov 26, 2026, 8:46 AM PT",
-        "equity": 157.17
+        "equity": 164.68
       },
       {
         "t": 1795712460,
         "t_pt": "Nov 26, 2026, 9:01 AM PT",
-        "equity": 157.17
+        "equity": 164.68
       },
       {
         "t": 1795713360,
         "t_pt": "Nov 26, 2026, 9:16 AM PT",
-        "equity": 157.17
+        "equity": 164.68
       },
       {
         "t": 1795715105,
         "t_pt": "Nov 26, 2026, 9:45 AM PT",
-        "equity": 159.73
+        "equity": 167.24
       },
       {
         "t": 1795715160,
         "t_pt": "Nov 26, 2026, 9:46 AM PT",
-        "equity": 159.73
+        "equity": 167.24
       },
       {
         "t": 1795716060,
         "t_pt": "Nov 26, 2026, 10:01 AM PT",
-        "equity": 159.73
+        "equity": 167.24
       },
       {
         "t": 1795716960,
         "t_pt": "Nov 26, 2026, 10:16 AM PT",
-        "equity": 159.73
+        "equity": 167.24
       },
       {
         "t": 1795717860,
         "t_pt": "Nov 26, 2026, 10:31 AM PT",
-        "equity": 159.73
+        "equity": 167.24
       },
       {
         "t": 1795718760,
         "t_pt": "Nov 26, 2026, 10:46 AM PT",
-        "equity": 159.73
+        "equity": 167.24
       },
       {
         "t": 1795719660,
         "t_pt": "Nov 26, 2026, 11:01 AM PT",
-        "equity": 159.73
+        "equity": 167.24
       },
       {
         "t": 1795720560,
         "t_pt": "Nov 26, 2026, 11:16 AM PT",
-        "equity": 159.73
+        "equity": 167.24
       },
       {
         "t": 1795721460,
         "t_pt": "Nov 26, 2026, 11:31 AM PT",
-        "equity": 159.73
+        "equity": 167.24
       },
       {
         "t": 1795722360,
         "t_pt": "Nov 26, 2026, 11:46 AM PT",
-        "equity": 159.73
+        "equity": 167.24
       },
       {
         "t": 1795723260,
         "t_pt": "Nov 26, 2026, 12:01 PM PT",
-        "equity": 159.73
+        "equity": 167.24
       },
       {
         "t": 1795724160,
         "t_pt": "Nov 26, 2026, 12:16 PM PT",
-        "equity": 159.73
+        "equity": 167.24
       },
       {
         "t": 1795725060,
         "t_pt": "Nov 26, 2026, 12:31 PM PT",
-        "equity": 159.73
+        "equity": 167.24
       },
       {
         "t": 1795725960,
         "t_pt": "Nov 26, 2026, 12:46 PM PT",
-        "equity": 159.73
+        "equity": 167.24
       },
       {
         "t": 1795726860,
         "t_pt": "Nov 26, 2026, 1:01 PM PT",
-        "equity": 159.73
+        "equity": 167.24
       },
       {
         "t": 1795727760,
         "t_pt": "Nov 26, 2026, 1:16 PM PT",
-        "equity": 159.73
+        "equity": 167.24
       },
       {
         "t": 1795728660,
         "t_pt": "Nov 26, 2026, 1:31 PM PT",
-        "equity": 159.73
+        "equity": 167.24
       },
       {
         "t": 1795729560,
         "t_pt": "Nov 26, 2026, 1:46 PM PT",
-        "equity": 159.73
+        "equity": 167.24
       },
       {
         "t": 1795730460,
         "t_pt": "Nov 26, 2026, 2:01 PM PT",
-        "equity": 159.73
+        "equity": 167.24
       },
       {
         "t": 1795731360,
         "t_pt": "Nov 26, 2026, 2:16 PM PT",
-        "equity": 159.73
+        "equity": 167.24
       },
       {
         "t": 1795732260,
         "t_pt": "Nov 26, 2026, 2:31 PM PT",
-        "equity": 159.73
+        "equity": 167.24
       },
       {
         "t": 1795733160,
         "t_pt": "Nov 26, 2026, 2:46 PM PT",
-        "equity": 159.73
+        "equity": 167.24
       },
       {
         "t": 1795734905,
         "t_pt": "Nov 26, 2026, 3:15 PM PT",
-        "equity": 163.73
+        "equity": 171.24
       },
       {
         "t": 1795734960,
         "t_pt": "Nov 26, 2026, 3:16 PM PT",
-        "equity": 163.73
+        "equity": 171.24
       },
       {
         "t": 1795735860,
         "t_pt": "Nov 26, 2026, 3:31 PM PT",
-        "equity": 163.73
+        "equity": 171.24
       },
       {
         "t": 1795736760,
         "t_pt": "Nov 26, 2026, 3:46 PM PT",
-        "equity": 163.73
+        "equity": 171.24
       },
       {
         "t": 1795737660,
         "t_pt": "Nov 26, 2026, 4:01 PM PT",
-        "equity": 163.73
+        "equity": 171.24
       },
       {
         "t": 1795738560,
         "t_pt": "Nov 26, 2026, 4:16 PM PT",
-        "equity": 163.73
+        "equity": 171.24
       },
       {
         "t": 1795739460,
         "t_pt": "Nov 26, 2026, 4:31 PM PT",
-        "equity": 163.73
+        "equity": 171.24
       },
       {
         "t": 1795740360,
         "t_pt": "Nov 26, 2026, 4:46 PM PT",
-        "equity": 163.73
+        "equity": 171.24
       },
       {
         "t": 1795741260,
         "t_pt": "Nov 26, 2026, 5:01 PM PT",
-        "equity": 163.73
+        "equity": 171.24
       },
       {
         "t": 1795742160,
         "t_pt": "Nov 26, 2026, 5:16 PM PT",
-        "equity": 163.73
+        "equity": 171.24
       },
       {
         "t": 1795743060,
         "t_pt": "Nov 26, 2026, 5:31 PM PT",
-        "equity": 163.73
+        "equity": 171.24
       },
       {
         "t": 1795743960,
         "t_pt": "Nov 26, 2026, 5:46 PM PT",
-        "equity": 163.73
+        "equity": 171.24
       },
       {
         "t": 1795744860,
         "t_pt": "Nov 26, 2026, 6:01 PM PT",
-        "equity": 163.73
+        "equity": 171.24
       },
       {
         "t": 1795745760,
         "t_pt": "Nov 26, 2026, 6:16 PM PT",
-        "equity": 163.73
+        "equity": 171.24
       },
       {
         "t": 1795746660,
         "t_pt": "Nov 26, 2026, 6:31 PM PT",
-        "equity": 163.73
+        "equity": 171.24
       },
       {
         "t": 1795747560,
         "t_pt": "Nov 26, 2026, 6:46 PM PT",
-        "equity": 163.73
+        "equity": 171.24
       },
       {
         "t": 1795748460,
         "t_pt": "Nov 26, 2026, 7:01 PM PT",
-        "equity": 163.73
+        "equity": 171.24
       },
       {
         "t": 1795749360,
         "t_pt": "Nov 26, 2026, 7:16 PM PT",
-        "equity": 163.73
+        "equity": 171.24
       },
       {
         "t": 1795751105,
         "t_pt": "Nov 26, 2026, 7:45 PM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795751160,
         "t_pt": "Nov 26, 2026, 7:46 PM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795752060,
         "t_pt": "Nov 26, 2026, 8:01 PM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795752960,
         "t_pt": "Nov 26, 2026, 8:16 PM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795753860,
         "t_pt": "Nov 26, 2026, 8:31 PM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795754760,
         "t_pt": "Nov 26, 2026, 8:46 PM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795755660,
         "t_pt": "Nov 26, 2026, 9:01 PM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795756560,
         "t_pt": "Nov 26, 2026, 9:16 PM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795757460,
         "t_pt": "Nov 26, 2026, 9:31 PM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795758360,
         "t_pt": "Nov 26, 2026, 9:46 PM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795759260,
         "t_pt": "Nov 26, 2026, 10:01 PM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795760160,
         "t_pt": "Nov 26, 2026, 10:16 PM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795761060,
         "t_pt": "Nov 26, 2026, 10:31 PM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795761960,
         "t_pt": "Nov 26, 2026, 10:46 PM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795762860,
         "t_pt": "Nov 26, 2026, 11:01 PM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795763760,
         "t_pt": "Nov 26, 2026, 11:16 PM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795764660,
         "t_pt": "Nov 26, 2026, 11:31 PM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795765560,
         "t_pt": "Nov 26, 2026, 11:46 PM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795766460,
         "t_pt": "Nov 27, 2026, 12:01 AM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795767360,
         "t_pt": "Nov 27, 2026, 12:16 AM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795768260,
         "t_pt": "Nov 27, 2026, 12:31 AM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795769160,
         "t_pt": "Nov 27, 2026, 12:46 AM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795770060,
         "t_pt": "Nov 27, 2026, 1:01 AM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795770960,
         "t_pt": "Nov 27, 2026, 1:16 AM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795771860,
         "t_pt": "Nov 27, 2026, 1:31 AM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795772760,
         "t_pt": "Nov 27, 2026, 1:46 AM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795773660,
         "t_pt": "Nov 27, 2026, 2:01 AM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795774560,
         "t_pt": "Nov 27, 2026, 2:16 AM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795775460,
         "t_pt": "Nov 27, 2026, 2:31 AM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795776360,
         "t_pt": "Nov 27, 2026, 2:46 AM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795777260,
         "t_pt": "Nov 27, 2026, 3:01 AM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795778160,
         "t_pt": "Nov 27, 2026, 3:16 AM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795779060,
         "t_pt": "Nov 27, 2026, 3:31 AM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795779960,
         "t_pt": "Nov 27, 2026, 3:46 AM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795780860,
         "t_pt": "Nov 27, 2026, 4:01 AM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795781760,
         "t_pt": "Nov 27, 2026, 4:16 AM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795782660,
         "t_pt": "Nov 27, 2026, 4:31 AM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795783560,
         "t_pt": "Nov 27, 2026, 4:46 AM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795784460,
         "t_pt": "Nov 27, 2026, 5:01 AM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795785360,
         "t_pt": "Nov 27, 2026, 5:16 AM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795786260,
         "t_pt": "Nov 27, 2026, 5:31 AM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795787160,
         "t_pt": "Nov 27, 2026, 5:46 AM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795788060,
         "t_pt": "Nov 27, 2026, 6:01 AM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795788960,
         "t_pt": "Nov 27, 2026, 6:16 AM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795789860,
         "t_pt": "Nov 27, 2026, 6:31 AM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795790760,
         "t_pt": "Nov 27, 2026, 6:46 AM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795791660,
         "t_pt": "Nov 27, 2026, 7:01 AM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795792560,
         "t_pt": "Nov 27, 2026, 7:16 AM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795793460,
         "t_pt": "Nov 27, 2026, 7:31 AM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795794360,
         "t_pt": "Nov 27, 2026, 7:46 AM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795795260,
         "t_pt": "Nov 27, 2026, 8:01 AM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795796160,
         "t_pt": "Nov 27, 2026, 8:16 AM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795797060,
         "t_pt": "Nov 27, 2026, 8:31 AM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795797960,
         "t_pt": "Nov 27, 2026, 8:46 AM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795798860,
         "t_pt": "Nov 27, 2026, 9:01 AM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795799760,
         "t_pt": "Nov 27, 2026, 9:16 AM PT",
-        "equity": 160.28
+        "equity": 167.79
       },
       {
         "t": 1795801505,
         "t_pt": "Nov 27, 2026, 9:45 AM PT",
-        "equity": 164.4
+        "equity": 171.91
       },
       {
         "t": 1795801560,
         "t_pt": "Nov 27, 2026, 9:46 AM PT",
-        "equity": 164.4
+        "equity": 171.91
       },
       {
         "t": 1795802460,
         "t_pt": "Nov 27, 2026, 10:01 AM PT",
-        "equity": 164.4
+        "equity": 171.91
       },
       {
         "t": 1795803360,
         "t_pt": "Nov 27, 2026, 10:16 AM PT",
-        "equity": 164.4
+        "equity": 171.91
       },
       {
         "t": 1795804260,
         "t_pt": "Nov 27, 2026, 10:31 AM PT",
-        "equity": 164.4
+        "equity": 171.91
       },
       {
         "t": 1795805160,
         "t_pt": "Nov 27, 2026, 10:46 AM PT",
-        "equity": 164.4
+        "equity": 171.91
       },
       {
         "t": 1795806060,
         "t_pt": "Nov 27, 2026, 11:01 AM PT",
-        "equity": 164.4
+        "equity": 171.91
       },
       {
         "t": 1795806960,
         "t_pt": "Nov 27, 2026, 11:16 AM PT",
-        "equity": 164.4
+        "equity": 171.91
       },
       {
         "t": 1795807860,
         "t_pt": "Nov 27, 2026, 11:31 AM PT",
-        "equity": 164.4
+        "equity": 171.91
       },
       {
         "t": 1795808760,
         "t_pt": "Nov 27, 2026, 11:46 AM PT",
-        "equity": 164.4
+        "equity": 171.91
       },
       {
         "t": 1795809660,
         "t_pt": "Nov 27, 2026, 12:01 PM PT",
-        "equity": 164.4
+        "equity": 171.91
       },
       {
         "t": 1795810560,
         "t_pt": "Nov 27, 2026, 12:16 PM PT",
-        "equity": 164.4
+        "equity": 171.91
       },
       {
         "t": 1795811460,
         "t_pt": "Nov 27, 2026, 12:31 PM PT",
-        "equity": 164.4
+        "equity": 171.91
       },
       {
         "t": 1795812360,
         "t_pt": "Nov 27, 2026, 12:46 PM PT",
-        "equity": 164.4
+        "equity": 171.91
       },
       {
         "t": 1795813260,
         "t_pt": "Nov 27, 2026, 1:01 PM PT",
-        "equity": 164.4
+        "equity": 171.91
       },
       {
         "t": 1795814160,
         "t_pt": "Nov 27, 2026, 1:16 PM PT",
-        "equity": 164.4
+        "equity": 171.91
       },
       {
         "t": 1795815060,
         "t_pt": "Nov 27, 2026, 1:31 PM PT",
-        "equity": 164.4
+        "equity": 171.91
       },
       {
         "t": 1795815960,
         "t_pt": "Nov 27, 2026, 1:46 PM PT",
-        "equity": 164.4
+        "equity": 171.91
       },
       {
         "t": 1795817705,
         "t_pt": "Nov 27, 2026, 2:15 PM PT",
-        "equity": 166.91
+        "equity": 174.42
       },
       {
         "t": 1795817760,
         "t_pt": "Nov 27, 2026, 2:16 PM PT",
-        "equity": 166.91
+        "equity": 174.42
       },
       {
         "t": 1795818660,
         "t_pt": "Nov 27, 2026, 2:31 PM PT",
-        "equity": 166.91
+        "equity": 174.42
       },
       {
         "t": 1795819560,
         "t_pt": "Nov 27, 2026, 2:46 PM PT",
-        "equity": 166.91
+        "equity": 174.42
       },
       {
         "t": 1795820460,
         "t_pt": "Nov 27, 2026, 3:01 PM PT",
-        "equity": 166.91
+        "equity": 174.42
       },
       {
         "t": 1795821360,
         "t_pt": "Nov 27, 2026, 3:16 PM PT",
-        "equity": 166.91
+        "equity": 174.42
       },
       {
         "t": 1795822260,
         "t_pt": "Nov 27, 2026, 3:31 PM PT",
-        "equity": 166.91
+        "equity": 174.42
       },
       {
         "t": 1795823160,
         "t_pt": "Nov 27, 2026, 3:46 PM PT",
-        "equity": 166.91
+        "equity": 174.42
       },
       {
         "t": 1795824060,
         "t_pt": "Nov 27, 2026, 4:01 PM PT",
-        "equity": 166.91
+        "equity": 174.42
       },
       {
         "t": 1795824960,
         "t_pt": "Nov 27, 2026, 4:16 PM PT",
-        "equity": 166.91
+        "equity": 174.42
       },
       {
         "t": 1795825860,
         "t_pt": "Nov 27, 2026, 4:31 PM PT",
-        "equity": 166.91
+        "equity": 174.42
       },
       {
         "t": 1795826760,
         "t_pt": "Nov 27, 2026, 4:46 PM PT",
-        "equity": 166.91
+        "equity": 174.42
       },
       {
         "t": 1795827660,
         "t_pt": "Nov 27, 2026, 5:01 PM PT",
-        "equity": 166.91
+        "equity": 174.42
       },
       {
         "t": 1795828560,
         "t_pt": "Nov 27, 2026, 5:16 PM PT",
-        "equity": 166.91
+        "equity": 174.42
       },
       {
         "t": 1795829460,
         "t_pt": "Nov 27, 2026, 5:31 PM PT",
-        "equity": 166.91
+        "equity": 174.42
       },
       {
         "t": 1795830360,
         "t_pt": "Nov 27, 2026, 5:46 PM PT",
-        "equity": 166.91
+        "equity": 174.42
       },
       {
         "t": 1795831260,
         "t_pt": "Nov 27, 2026, 6:01 PM PT",
-        "equity": 166.91
+        "equity": 174.42
       },
       {
         "t": 1795832160,
         "t_pt": "Nov 27, 2026, 6:16 PM PT",
-        "equity": 166.91
+        "equity": 174.42
       },
       {
         "t": 1795833060,
         "t_pt": "Nov 27, 2026, 6:31 PM PT",
-        "equity": 166.91
+        "equity": 174.42
       },
       {
         "t": 1795834805,
         "t_pt": "Nov 27, 2026, 7:00 PM PT",
-        "equity": 170.04
+        "equity": 177.55
       },
       {
         "t": 1795834860,
         "t_pt": "Nov 27, 2026, 7:01 PM PT",
-        "equity": 170.04
+        "equity": 177.55
       },
       {
         "t": 1795835760,
         "t_pt": "Nov 27, 2026, 7:16 PM PT",
-        "equity": 170.04
+        "equity": 177.55
       },
       {
         "t": 1795836660,
         "t_pt": "Nov 27, 2026, 7:31 PM PT",
-        "equity": 170.04
+        "equity": 177.55
       },
       {
         "t": 1795837560,
         "t_pt": "Nov 27, 2026, 7:46 PM PT",
-        "equity": 170.04
+        "equity": 177.55
       },
       {
         "t": 1795838460,
         "t_pt": "Nov 27, 2026, 8:01 PM PT",
-        "equity": 170.04
+        "equity": 177.55
       },
       {
         "t": 1795839360,
         "t_pt": "Nov 27, 2026, 8:16 PM PT",
-        "equity": 170.04
+        "equity": 177.55
       },
       {
         "t": 1795840260,
         "t_pt": "Nov 27, 2026, 8:31 PM PT",
-        "equity": 170.04
+        "equity": 177.55
       },
       {
         "t": 1795841160,
         "t_pt": "Nov 27, 2026, 8:46 PM PT",
-        "equity": 170.04
+        "equity": 177.55
       },
       {
         "t": 1795842905,
         "t_pt": "Nov 27, 2026, 9:15 PM PT",
-        "equity": 171.81
+        "equity": 179.32
       },
       {
         "t": 1795842960,
         "t_pt": "Nov 27, 2026, 9:16 PM PT",
-        "equity": 171.81
+        "equity": 179.32
       },
       {
         "t": 1795843860,
         "t_pt": "Nov 27, 2026, 9:31 PM PT",
-        "equity": 171.81
+        "equity": 179.32
       },
       {
         "t": 1795844760,
         "t_pt": "Nov 27, 2026, 9:46 PM PT",
-        "equity": 171.81
+        "equity": 179.32
       },
       {
         "t": 1795845660,
         "t_pt": "Nov 27, 2026, 10:01 PM PT",
-        "equity": 171.81
+        "equity": 179.32
       },
       {
         "t": 1795846560,
         "t_pt": "Nov 27, 2026, 10:16 PM PT",
-        "equity": 171.81
+        "equity": 179.32
       },
       {
         "t": 1795847460,
         "t_pt": "Nov 27, 2026, 10:31 PM PT",
-        "equity": 171.81
+        "equity": 179.32
       },
       {
         "t": 1795848360,
         "t_pt": "Nov 27, 2026, 10:46 PM PT",
-        "equity": 171.81
+        "equity": 179.32
       },
       {
         "t": 1795849260,
         "t_pt": "Nov 27, 2026, 11:01 PM PT",
-        "equity": 171.81
+        "equity": 179.32
       },
       {
         "t": 1795850160,
         "t_pt": "Nov 27, 2026, 11:16 PM PT",
-        "equity": 171.81
+        "equity": 179.32
       },
       {
         "t": 1795851060,
         "t_pt": "Nov 27, 2026, 11:31 PM PT",
-        "equity": 171.81
+        "equity": 179.32
       },
       {
         "t": 1795851960,
         "t_pt": "Nov 27, 2026, 11:46 PM PT",
-        "equity": 171.81
+        "equity": 179.32
       },
       {
         "t": 1795852860,
         "t_pt": "Nov 28, 2026, 12:01 AM PT",
-        "equity": 171.81
+        "equity": 179.32
       },
       {
         "t": 1795853760,
         "t_pt": "Nov 28, 2026, 12:16 AM PT",
-        "equity": 171.81
+        "equity": 179.32
       },
       {
         "t": 1795854660,
         "t_pt": "Nov 28, 2026, 12:31 AM PT",
-        "equity": 171.81
+        "equity": 179.32
       },
       {
         "t": 1795855560,
         "t_pt": "Nov 28, 2026, 12:46 AM PT",
-        "equity": 171.81
+        "equity": 179.32
       },
       {
         "t": 1795856460,
         "t_pt": "Nov 28, 2026, 1:01 AM PT",
-        "equity": 171.81
+        "equity": 179.32
       },
       {
         "t": 1795857360,
         "t_pt": "Nov 28, 2026, 1:16 AM PT",
-        "equity": 171.81
+        "equity": 179.32
       },
       {
         "t": 1795858260,
         "t_pt": "Nov 28, 2026, 1:31 AM PT",
-        "equity": 171.81
+        "equity": 179.32
       },
       {
         "t": 1795859160,
         "t_pt": "Nov 28, 2026, 1:46 AM PT",
-        "equity": 171.81
+        "equity": 179.32
       },
       {
         "t": 1795860060,
         "t_pt": "Nov 28, 2026, 2:01 AM PT",
-        "equity": 171.81
+        "equity": 179.32
       },
       {
         "t": 1795860960,
         "t_pt": "Nov 28, 2026, 2:16 AM PT",
-        "equity": 171.81
+        "equity": 179.32
       },
       {
         "t": 1795861860,
         "t_pt": "Nov 28, 2026, 2:31 AM PT",
-        "equity": 171.81
+        "equity": 179.32
       },
       {
         "t": 1795862760,
         "t_pt": "Nov 28, 2026, 2:46 AM PT",
-        "equity": 171.81
+        "equity": 179.32
       },
       {
         "t": 1795863660,
         "t_pt": "Nov 28, 2026, 3:01 AM PT",
-        "equity": 171.81
+        "equity": 179.32
       },
       {
         "t": 1795864560,
         "t_pt": "Nov 28, 2026, 3:16 AM PT",
-        "equity": 171.81
+        "equity": 179.32
       },
       {
         "t": 1795865460,
         "t_pt": "Nov 28, 2026, 3:31 AM PT",
-        "equity": 171.81
+        "equity": 179.32
       },
       {
         "t": 1795866360,
         "t_pt": "Nov 28, 2026, 3:46 AM PT",
-        "equity": 171.81
+        "equity": 179.32
       },
       {
         "t": 1795867260,
         "t_pt": "Nov 28, 2026, 4:01 AM PT",
-        "equity": 171.81
+        "equity": 179.32
       },
       {
         "t": 1795868160,
         "t_pt": "Nov 28, 2026, 4:16 AM PT",
-        "equity": 171.81
+        "equity": 179.32
       },
       {
         "t": 1795869060,
         "t_pt": "Nov 28, 2026, 4:31 AM PT",
-        "equity": 171.81
+        "equity": 179.32
       },
       {
         "t": 1795869960,
         "t_pt": "Nov 28, 2026, 4:46 AM PT",
-        "equity": 171.81
+        "equity": 179.32
       },
       {
         "t": 1795870860,
         "t_pt": "Nov 28, 2026, 5:01 AM PT",
-        "equity": 171.81
+        "equity": 179.32
       },
       {
         "t": 1795871760,
         "t_pt": "Nov 28, 2026, 5:16 AM PT",
-        "equity": 171.81
+        "equity": 179.32
       },
       {
         "t": 1795872660,
         "t_pt": "Nov 28, 2026, 5:31 AM PT",
-        "equity": 171.81
+        "equity": 179.32
       },
       {
         "t": 1795873560,
         "t_pt": "Nov 28, 2026, 5:46 AM PT",
-        "equity": 171.81
+        "equity": 179.32
       },
       {
         "t": 1795874460,
         "t_pt": "Nov 28, 2026, 6:01 AM PT",
-        "equity": 171.81
+        "equity": 179.32
       },
       {
         "t": 1795875360,
         "t_pt": "Nov 28, 2026, 6:16 AM PT",
-        "equity": 171.81
+        "equity": 179.32
       },
       {
         "t": 1795876260,
         "t_pt": "Nov 28, 2026, 6:31 AM PT",
-        "equity": 171.81
+        "equity": 179.32
       },
       {
         "t": 1795877160,
         "t_pt": "Nov 28, 2026, 6:46 AM PT",
-        "equity": 171.81
+        "equity": 179.32
       },
       {
         "t": 1795878060,
         "t_pt": "Nov 28, 2026, 7:01 AM PT",
-        "equity": 171.81
+        "equity": 179.32
       },
       {
         "t": 1795878960,
         "t_pt": "Nov 28, 2026, 7:16 AM PT",
-        "equity": 171.81
+        "equity": 179.32
       },
       {
         "t": 1795879860,
         "t_pt": "Nov 28, 2026, 7:31 AM PT",
-        "equity": 171.81
+        "equity": 179.32
       },
       {
         "t": 1795880760,
         "t_pt": "Nov 28, 2026, 7:46 AM PT",
-        "equity": 171.81
+        "equity": 179.32
       },
       {
         "t": 1795881660,
         "t_pt": "Nov 28, 2026, 8:01 AM PT",
-        "equity": 171.81
+        "equity": 179.32
       },
       {
         "t": 1795882560,
         "t_pt": "Nov 28, 2026, 8:16 AM PT",
-        "equity": 171.81
+        "equity": 179.32
+      },
+      {
+        "t": 1795883460,
+        "t_pt": "Nov 28, 2026, 8:31 AM PT",
+        "equity": 179.32
       }
     ],
     "trades": [
@@ -10066,7 +10072,7 @@
         "reason_entry": "EMA 9 < 21 ($59,923 < $59,938); price below the 50-period EMA; MACD histogram is negative; RSI 33; 5-minute trend agrees. BTC $-48.19 vs the $59,931.32 strike, No ask 69\u00a2 \u2014 Buy No. Spot-fair edge +4\u00a2. Normal signal ($4 ticket): RSI 33 in the heart of the bearish band.",
         "reason_exit": "Held to settlement: official result was NO (BTC 59730.66 vs strike 59931.32).",
         "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov280015-15",
-        "running_balance": 171.81,
+        "running_balance": 179.32,
         "total_in": 4.23,
         "amount_bought": 4.23,
         "stake": 4.0,
@@ -10096,7 +10102,7 @@
         "reason_entry": "EMA 9 < 21 ($59,944 < $59,988); price below the 50-period EMA; MACD histogram is negative; RSI 26; 5-minute trend agrees. BTC $-56.41 vs the $59,949.53 strike, No ask 70\u00a2 \u2014 Buy No. Spot-fair edge +6\u00a2. Top signal ($8 ticket): EMA 9/21 spread $44; BTC $56 from the strike; 5-minute trend is clearly aligned ($22 EMA spread).",
         "reason_exit": "Held to settlement: official result was NO (BTC 59903.97 vs strike 59949.53).",
         "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov272200-00",
-        "running_balance": 170.04,
+        "running_balance": 177.55,
         "total_in": 7.87,
         "amount_bought": 7.87,
         "stake": 8.0,
@@ -10126,7 +10132,7 @@
         "reason_entry": "EMA 9 < 21 ($59,731 < $59,740); price below the 50-period EMA; MACD histogram is negative; RSI 35; 5-minute trend agrees. BTC $-69.85 vs the $59,749.62 strike, No ask 67\u00a2 \u2014 Buy No. Spot-fair edge +16\u00a2. Strong signal ($6 ticket): RSI 35 in the heart of the bearish band; BTC $70 from the strike.",
         "reason_exit": "Held to settlement: official result was NO (BTC 59623.69 vs strike 59749.62).",
         "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov271715-15",
-        "running_balance": 166.91,
+        "running_balance": 174.42,
         "total_in": 5.49,
         "amount_bought": 5.49,
         "stake": 6.0,
@@ -10156,7 +10162,7 @@
         "reason_entry": "EMA 9 < 21 ($59,674 < $59,763); price below the 50-period EMA; MACD histogram is negative; RSI 32; 5-minute trend agrees. BTC $-100.64 vs the $59,655.70 strike, No ask 64\u00a2 \u2014 Buy No. Spot-fair edge +3\u00a2. Top signal ($8 ticket): EMA 9/21 spread $89; MACD hist 19.5; RSI 32 in the heart of the bearish band; BTC $101 from the strike; 5-minute trend is clearly aligned ($115 EMA spread).",
         "reason_exit": "Held to settlement: official result was NO (BTC 59524.71 vs strike 59655.7).",
         "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov271245-45",
-        "running_balance": 164.4,
+        "running_balance": 171.91,
         "total_in": 7.88,
         "amount_bought": 7.88,
         "stake": 8.0,
@@ -10186,7 +10192,7 @@
         "reason_entry": "EMA 9 > 21 ($61,533 > $61,500); price above the 50-period EMA; MACD histogram is positive; RSI 60; 5-minute trend agrees. BTC +$77.12 vs the $61,510.41 strike, Yes ask 67\u00a2 \u2014 Buy Yes. Spot-fair edge +1\u00a2. Top signal ($8 ticket): EMA 9/21 spread $32; RSI 60 in the heart of the bullish band; BTC $77 from the strike; 5-minute trend is clearly aligned ($166 EMA spread).",
         "reason_exit": "Reversal exit: BTC broke back through the strike and the 1m EMA/MACD flipped against YES. Selling at 39\u00a2 (entry 67\u00a2).",
         "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov262245-45",
-        "running_balance": 160.28,
+        "running_balance": 167.79,
         "total_in": 7.55,
         "amount_bought": 7.55,
         "stake": 8.0,
@@ -10216,7 +10222,7 @@
         "reason_entry": "EMA 9 < 21 ($60,457 < $60,490); price below the 50-period EMA; MACD histogram is negative; RSI 36; 5-minute trend agrees. BTC $-62.67 vs the $60,461.27 strike, No ask 65\u00a2 \u2014 Buy No. Spot-fair edge +5\u00a2. Top signal ($8 ticket): EMA 9/21 spread $34; MACD hist 13.7; RSI 36 in the heart of the bearish band; BTC $63 from the strike; 5-minute trend is clearly aligned ($63 EMA spread).",
         "reason_exit": "Held to settlement: official result was NO (BTC 60389.43 vs strike 60461.27).",
         "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov261815-15",
-        "running_balance": 163.73,
+        "running_balance": 171.24,
         "total_in": 8.0,
         "amount_bought": 8.0,
         "stake": 8.0,
@@ -10246,7 +10252,7 @@
         "reason_entry": "EMA 9 < 21 ($60,440 < $60,463); price below the 50-period EMA; MACD histogram is negative; RSI 36; 5-minute trend agrees. BTC $-88.12 vs the $60,444.58 strike, No ask 73\u00a2 \u2014 Buy No. Spot-fair edge +4\u00a2. Top signal ($8 ticket): MACD hist 10.5; RSI 36 in the heart of the bearish band; BTC $88 from the strike.",
         "reason_exit": "Held to settlement: official result was NO (BTC 60361.47 vs strike 60444.58).",
         "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov261245-45",
-        "running_balance": 159.73,
+        "running_balance": 167.24,
         "total_in": 7.44,
         "amount_bought": 7.44,
         "stake": 8.0,
@@ -10276,7 +10282,7 @@
         "reason_entry": "EMA 9 < 21 ($60,674 < $60,696); price below the 50-period EMA; MACD histogram is negative; RSI 35; 5-minute trend agrees. BTC $-99.41 vs the $60,681.08 strike, No ask 73\u00a2 \u2014 Buy No. Spot-fair edge +2\u00a2. Top signal ($8 ticket): MACD hist 8.8; RSI 35 in the heart of the bearish band; BTC $99 from the strike; 5-minute trend is clearly aligned ($62 EMA spread).",
         "reason_exit": "Held to settlement: official result was NO (BTC 60163.95 vs strike 60681.08).",
         "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov261015-15",
-        "running_balance": 157.17,
+        "running_balance": 164.68,
         "total_in": 7.44,
         "amount_bought": 7.44,
         "stake": 8.0,
@@ -10306,7 +10312,7 @@
         "reason_entry": "EMA 9 < 21 ($60,661 < $60,673); price below the 50-period EMA; MACD histogram is negative; RSI 37; 5-minute trend agrees. BTC $-63.41 vs the $60,662.47 strike, No ask 67\u00a2 \u2014 Buy No. Spot-fair edge +5\u00a2. Top signal ($8 ticket): RSI 37 in the heart of the bearish band; BTC $63 from the strike; 5-minute trend is clearly aligned ($27 EMA spread).",
         "reason_exit": "Held to settlement: official result was NO (BTC 60629.97 vs strike 60662.47).",
         "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov252245-45",
-        "running_balance": 154.61,
+        "running_balance": 162.12,
         "total_in": 7.55,
         "amount_bought": 7.55,
         "stake": 8.0,
@@ -10333,10 +10339,10 @@
         "expiration_value": 60841.05,
         "strike": 60384.87,
         "pnl": 4.24,
-        "reason_entry": "EMA 9 > 21 ($60,395 > $60,344); price above the 50-period EMA; MACD histogram is positive; RSI 68; 5-minute trend agrees. BTC +$45.45 vs the $60,384.87 strike, Yes ask 63\u00a2 \u2014 Buy Yes. Spot-fair edge +5\u00a2. Top signal ($8 ticket): EMA 9/21 spread $50; RSI 68 in the heart of the bullish band; 5-minute trend is clearly aligned ($77 EMA spread).",
+        "reason_entry": "EMA 9 > 21 ($60,395 > $60,344); price above the 50-period EMA; MACD histogram is positive; RSI 68; 5-minute trend agrees. BTC +$45.53 vs the $60,384.87 strike, Yes ask 63\u00a2 \u2014 Buy Yes. Spot-fair edge +5\u00a2. Top signal ($8 ticket): EMA 9/21 spread $51; RSI 68 in the heart of the bullish band; 5-minute trend is clearly aligned ($77 EMA spread).",
         "reason_exit": "Held to settlement: official result was YES (BTC 60841.05 vs strike 60384.87).",
         "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov251915-15",
-        "running_balance": 151.16,
+        "running_balance": 158.67,
         "total_in": 7.76,
         "amount_bought": 7.76,
         "stake": 8.0,
@@ -10366,7 +10372,7 @@
         "reason_entry": "EMA 9 > 21 ($60,113 > $60,098); price above the 50-period EMA; MACD histogram is positive; RSI 56; 5-minute trend agrees. BTC +$40.37 vs the $60,089.31 strike, Yes ask 64\u00a2 \u2014 Buy Yes. Spot-fair edge +1\u00a2. Normal signal ($4 ticket).",
         "reason_exit": "Reversal exit: BTC broke back through the strike and the 1m EMA/MACD flipped against YES. Selling at 30\u00a2 (entry 64\u00a2).",
         "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov251800-00",
-        "running_balance": 146.92,
+        "running_balance": 154.43,
         "total_in": 4.6,
         "amount_bought": 4.6,
         "stake": 4.0,
@@ -10396,7 +10402,7 @@
         "reason_entry": "EMA 9 > 21 ($59,878 > $59,824); price above the 50-period EMA; MACD histogram is positive; RSI 62; 5-minute trend agrees. BTC +$121.32 vs the $59,829.48 strike, Yes ask 72\u00a2 \u2014 Buy Yes. Spot-fair edge +0\u00a2. Top signal ($8 ticket): EMA 9/21 spread $54; RSI 62 in the heart of the bullish band; BTC $121 from the strike; 5-minute trend is clearly aligned ($206 EMA spread).",
         "reason_exit": "Held to settlement: official result was YES (BTC 60134.42 vs strike 59829.48).",
         "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov251430-30",
-        "running_balance": 149.53,
+        "running_balance": 157.04,
         "total_in": 7.35,
         "amount_bought": 7.35,
         "stake": 8.0,
@@ -10426,7 +10432,7 @@
         "reason_entry": "EMA 9 < 21 ($58,270 < $58,380); price below the 50-period EMA; MACD histogram is negative; RSI 30; 5-minute trend agrees. BTC $-109.02 vs the $58,248.46 strike, No ask 63\u00a2 \u2014 Buy No. Spot-fair edge +1\u00a2. Top signal ($8 ticket): EMA 9/21 spread $110; MACD hist 18.5; RSI 30 in the heart of the bearish band; BTC $109 from the strike; 5-minute trend is clearly aligned ($93 EMA spread).",
         "reason_exit": "Held to settlement: official result was NO (BTC 57999.29 vs strike 58248.46).",
         "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov250900-00",
-        "running_balance": 146.88,
+        "running_balance": 154.39,
         "total_in": 7.76,
         "amount_bought": 7.76,
         "stake": 8.0,
@@ -10456,7 +10462,7 @@
         "reason_entry": "EMA 9 < 21 ($58,590 < $58,654); price below the 50-period EMA; MACD histogram is negative; RSI 28; 5-minute trend agrees. BTC $-86.87 vs the $58,559.58 strike, No ask 65\u00a2 \u2014 Buy No. Spot-fair edge +7\u00a2. Top signal ($8 ticket): EMA 9/21 spread $63; MACD hist 18.0; BTC $87 from the strike; 5-minute trend is clearly aligned ($101 EMA spread).",
         "reason_exit": "Held to settlement: official result was NO (BTC 58474.39 vs strike 58559.58).",
         "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov250645-45",
-        "running_balance": 142.64,
+        "running_balance": 150.15,
         "total_in": 8.0,
         "amount_bought": 8.0,
         "stake": 8.0,
@@ -10486,7 +10492,7 @@
         "reason_entry": "EMA 9 < 21 ($59,063 < $59,079); price below the 50-period EMA; MACD histogram is negative; RSI 38; 5-minute trend agrees. BTC $-63.58 vs the $59,053.70 strike, No ask 69\u00a2 \u2014 Buy No. Spot-fair edge +2\u00a2. Top signal ($8 ticket): MACD hist 10.2; RSI 38 in the heart of the bearish band; BTC $64 from the strike; 5-minute trend is clearly aligned ($42 EMA spread).",
         "reason_exit": "Held to settlement: official result was NO (BTC 58935.23 vs strike 59053.7).",
         "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov250045-45",
-        "running_balance": 138.64,
+        "running_balance": 146.15,
         "total_in": 7.76,
         "amount_bought": 7.76,
         "stake": 8.0,
@@ -10516,7 +10522,7 @@
         "reason_entry": "EMA 9 < 21 ($59,198 < $59,213); price below the 50-period EMA; MACD histogram is negative; RSI 38; 5-minute trend agrees. BTC $-83.42 vs the $59,209.10 strike, No ask 70\u00a2 \u2014 Buy No. Spot-fair edge +4\u00a2. Top signal ($8 ticket): RSI 38 in the heart of the bearish band; BTC $83 from the strike; 5-minute trend is clearly aligned ($32 EMA spread).",
         "reason_exit": "Held to settlement: official result was NO (BTC 58965.47 vs strike 59209.1).",
         "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov242345-45",
-        "running_balance": 135.4,
+        "running_balance": 142.91,
         "total_in": 7.87,
         "amount_bought": 7.87,
         "stake": 8.0,
@@ -10546,7 +10552,7 @@
         "reason_entry": "EMA 9 < 21 ($59,259 < $59,302); price below the 50-period EMA; MACD histogram is negative; RSI 38; 5-minute trend agrees. BTC $-62.83 vs the $59,251.27 strike, No ask 63\u00a2 \u2014 Buy No. Spot-fair edge +1\u00a2. Top signal ($8 ticket): EMA 9/21 spread $42; RSI 38 in the heart of the bearish band; BTC $63 from the strike; 5-minute trend is clearly aligned ($121 EMA spread).",
         "reason_exit": "Held to settlement: official result was NO (BTC 59236.31 vs strike 59251.27).",
         "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov242100-00",
-        "running_balance": 132.27,
+        "running_balance": 139.78,
         "total_in": 7.76,
         "amount_bought": 7.76,
         "stake": 8.0,
@@ -10576,7 +10582,7 @@
         "reason_entry": "EMA 9 < 21 ($59,519 < $59,600); price below the 50-period EMA; MACD histogram is negative; RSI 25; 5-minute trend agrees. BTC $-52.70 vs the $59,465.85 strike, No ask 62\u00a2 \u2014 Buy No. Spot-fair edge +3\u00a2. Top signal ($8 ticket): EMA 9/21 spread $81; MACD hist 20.6; BTC $53 from the strike; 5-minute trend is clearly aligned ($111 EMA spread).",
         "reason_exit": "Held to settlement: official result was NO (BTC 59425.96 vs strike 59465.85).",
         "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov241930-30",
-        "running_balance": 128.03,
+        "running_balance": 135.54,
         "total_in": 7.64,
         "amount_bought": 7.64,
         "stake": 8.0,
@@ -10606,7 +10612,7 @@
         "reason_entry": "EMA 9 < 21 ($59,619 < $59,659); price below the 50-period EMA; MACD histogram is negative; RSI 32; 5-minute trend agrees. BTC $-44.44 vs the $59,613.10 strike, No ask 60\u00a2 \u2014 Buy No. Spot-fair edge +7\u00a2. Top signal ($8 ticket): EMA 9/21 spread $40; RSI 32 in the heart of the bearish band; 5-minute trend is clearly aligned ($83 EMA spread).",
         "reason_exit": "Held to settlement: official result was YES (BTC 59663.91 vs strike 59613.1).",
         "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov241515-15",
-        "running_balance": 123.67,
+        "running_balance": 131.18,
         "total_in": 7.41,
         "amount_bought": 7.41,
         "stake": 8.0,
@@ -10636,7 +10642,7 @@
         "reason_entry": "EMA 9 < 21 ($59,726 < $59,765); price below the 50-period EMA; MACD histogram is negative; RSI 40; 5-minute trend agrees. BTC $-69.79 vs the $59,678.02 strike, No ask 57\u00a2 \u2014 Buy No. Spot-fair edge +3\u00a2. Top signal ($8 ticket): EMA 9/21 spread $39; MACD hist 13.5; RSI 40 in the heart of the bearish band; BTC $70 from the strike; ask 57\u00a2 leaves upside; 5-minute trend is clearly aligned ($154 EMA spread).",
         "reason_exit": "Held to settlement: official result was NO (BTC 59443.46 vs strike 59678.02).",
         "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov241115-15",
-        "running_balance": 131.08,
+        "running_balance": 138.59,
         "total_in": 7.64,
         "amount_bought": 7.64,
         "stake": 8.0,
@@ -10666,7 +10672,7 @@
         "reason_entry": "EMA 9 < 21 ($59,954 < $60,063); price below the 50-period EMA; MACD histogram is negative; RSI 37; 5-minute trend agrees. BTC $-40.39 vs the $59,916.04 strike, No ask 52\u00a2 \u2014 Buy No. Spot-fair edge +3\u00a2. Top signal ($8 ticket): EMA 9/21 spread $110; MACD hist 19.3; RSI 37 in the heart of the bearish band; ask 52\u00a2 leaves upside; 5-minute trend is clearly aligned ($78 EMA spread).",
         "reason_exit": "Held to settlement: official result was NO (BTC 59746.31 vs strike 59916.04).",
         "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov241030-30",
-        "running_balance": 125.72,
+        "running_balance": 133.23,
         "total_in": 7.53,
         "amount_bought": 7.53,
         "stake": 8.0,
@@ -10696,7 +10702,7 @@
         "reason_entry": "EMA 9 < 21 ($59,836 < $59,873); price below the 50-period EMA; MACD histogram is negative; RSI 32; 5-minute trend agrees. BTC $-95.67 vs the $59,838.03 strike, No ask 73\u00a2 \u2014 Buy No. Spot-fair edge +6\u00a2. Top signal ($8 ticket): EMA 9/21 spread $37; MACD hist 12.4; RSI 32 in the heart of the bearish band; BTC $96 from the strike; 5-minute trend is clearly aligned ($81 EMA spread).",
         "reason_exit": "Held to settlement: official result was NO (BTC 59630.28 vs strike 59838.03).",
         "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov240545-45",
-        "running_balance": 119.25,
+        "running_balance": 126.76,
         "total_in": 7.44,
         "amount_bought": 7.44,
         "stake": 8.0,
@@ -10726,7 +10732,7 @@
         "reason_entry": "EMA 9 < 21 ($60,164 < $60,195); price below the 50-period EMA; MACD histogram is negative; RSI 34; 5-minute trend agrees. BTC $-182.42 vs the $60,189.85 strike, No ask 75\u00a2 \u2014 Buy No. Spot-fair edge +6\u00a2. Top signal ($8 ticket): EMA 9/21 spread $32; MACD hist 24.8; RSI 34 in the heart of the bearish band; BTC $182 from the strike; 5-minute trend is clearly aligned ($72 EMA spread).",
         "reason_exit": "Held to settlement: official result was NO (BTC 59843.86 vs strike 60189.85).",
         "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov240415-15",
-        "running_balance": 116.69,
+        "running_balance": 124.2,
         "total_in": 7.64,
         "amount_bought": 7.64,
         "stake": 8.0,
@@ -10756,7 +10762,7 @@
         "reason_entry": "EMA 9 > 21 ($60,582 > $60,548); price above the 50-period EMA; MACD histogram is positive; RSI 68; 5-minute trend agrees. BTC +$85.21 vs the $60,571.65 strike, Yes ask 72\u00a2 \u2014 Buy Yes. Spot-fair edge +6\u00a2. Top signal ($8 ticket): EMA 9/21 spread $34; RSI 68 in the heart of the bullish band; BTC $85 from the strike; 5-minute trend is clearly aligned ($74 EMA spread).",
         "reason_exit": "Held to settlement: official result was YES (BTC 60645.71 vs strike 60571.65).",
         "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov240045-45",
-        "running_balance": 114.33,
+        "running_balance": 121.84,
         "total_in": 7.35,
         "amount_bought": 7.35,
         "stake": 8.0,
@@ -10786,7 +10792,7 @@
         "reason_entry": "EMA 9 < 21 ($61,041 < $61,146); price below the 50-period EMA; MACD histogram is negative; RSI 25; 5-minute trend agrees. BTC $-68.49 vs the $61,007.87 strike, No ask 61\u00a2 \u2014 Buy No. Spot-fair edge +5\u00a2. Top signal ($8 ticket): EMA 9/21 spread $105; MACD hist 16.5; BTC $68 from the strike; 5-minute trend is clearly aligned ($87 EMA spread).",
         "reason_exit": "Held to settlement: official result was NO (BTC 60879.77 vs strike 61007.87).",
         "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov232115-15",
-        "running_balance": 111.68,
+        "running_balance": 119.19,
         "total_in": 7.52,
         "amount_bought": 7.52,
         "stake": 8.0,
@@ -10816,7 +10822,7 @@
         "reason_entry": "EMA 9 > 21 ($61,340 > $61,287); price above the 50-period EMA; MACD histogram is positive; RSI 66; 5-minute trend agrees. BTC +$42.62 vs the $61,349.76 strike, Yes ask 58\u00a2 \u2014 Buy Yes. Spot-fair edge +4\u00a2. Top signal ($8 ticket): EMA 9/21 spread $54; RSI 66 in the heart of the bullish band; ask 58\u00a2 leaves upside; 5-minute trend is clearly aligned ($48 EMA spread).",
         "reason_exit": "Held to settlement: official result was YES (BTC 61499.74 vs strike 61349.76).",
         "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov231830-30",
-        "running_balance": 107.2,
+        "running_balance": 114.71,
         "total_in": 7.77,
         "amount_bought": 7.77,
         "stake": 8.0,
@@ -10846,7 +10852,7 @@
         "reason_entry": "EMA 9 < 21 ($61,510 < $61,519); price below the 50-period EMA; MACD histogram is negative; RSI 41; 5-minute trend agrees. BTC $-64.35 vs the $61,499.67 strike, No ask 64\u00a2 \u2014 Buy No. Spot-fair edge +0\u00a2. Top signal ($8 ticket): RSI 41 in the heart of the bearish band; BTC $64 from the strike; 5-minute trend is clearly aligned ($193 EMA spread).",
         "reason_exit": "Held to settlement: official result was NO (BTC 61264.87 vs strike 61499.67).",
         "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov231345-45",
-        "running_balance": 101.97,
+        "running_balance": 109.48,
         "total_in": 7.88,
         "amount_bought": 7.88,
         "stake": 8.0,
@@ -10876,39 +10882,9 @@
         "reason_entry": "EMA 9 < 21 ($61,730 < $61,811); price below the 50-period EMA; MACD histogram is negative; RSI 33; 5-minute trend agrees. BTC $-47.59 vs the $61,677.24 strike, No ask 57\u00a2 \u2014 Buy No. Spot-fair edge +1\u00a2. Top signal ($8 ticket): EMA 9/21 spread $81; MACD hist 12.7; RSI 33 in the heart of the bearish band; ask 57\u00a2 leaves upside; 5-minute trend is clearly aligned ($281 EMA spread).",
         "reason_exit": "Held to settlement: official result was NO (BTC 61368.16 vs strike 61677.24).",
         "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov231245-45",
-        "running_balance": 97.85,
+        "running_balance": 105.36,
         "total_in": 7.64,
         "amount_bought": 7.64,
-        "stake": 8.0,
-        "pressed": false,
-        "strength": "top",
-        "pnl_kind": "settled",
-        "exit_kind": null
-      },
-      {
-        "status": "closed",
-        "ticker": "KXBTC15M-26NOV231200-00",
-        "side": "no",
-        "contracts": 13,
-        "entry_price": 0.56,
-        "entry_fee": 0.23,
-        "entry_time": "2026-11-23T16:46:00Z",
-        "entry_time_pt": "Nov 23, 2026, 8:46 AM PT",
-        "exit_price": 0.0,
-        "exit_fee": 0.0,
-        "exit_time": "2026-11-23T17:00:04Z",
-        "exit_time_pt": "Nov 23, 2026, 9:00 AM PT",
-        "outcome": "settlement",
-        "result": "yes",
-        "expiration_value": 62185.36,
-        "strike": 62101.16,
-        "pnl": -7.51,
-        "reason_entry": "EMA 9 < 21 ($62,180 < $62,350); price below the 50-period EMA; MACD histogram is negative; RSI 27; 5-minute trend agrees. BTC $-64.67 vs the $62,101.16 strike, No ask 56\u00a2 \u2014 Buy No. Spot-fair edge +5\u00a2. Top signal ($8 ticket): EMA 9/21 spread $170; MACD hist 41.4; BTC $65 from the strike; ask 56\u00a2 leaves upside; 5-minute trend is clearly aligned ($177 EMA spread).",
-        "reason_exit": "Held to settlement: official result was YES (BTC 62185.36 vs strike 62101.16).",
-        "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov231200-00",
-        "running_balance": 92.49,
-        "total_in": 7.51,
-        "amount_bought": 7.51,
         "stake": 8.0,
         "pressed": false,
         "strength": "top",
@@ -10918,8 +10894,8 @@
     ],
     "assumption_note": "Each window is evaluated once, 1 minute after it opens, using the real Kalshi Yes/No quotes at that minute and Coinbase 1-minute / 5-minute / 15-minute / 1-hour BTC candles, plus a spot-derived fair probability from realized 1-minute volatility. Trades use a $4\u2013$8 flat stake by signal strength (no 2\u00d7 press) and the official quadratic taker fee. When a full 15-minute Kalshi bid path is available, early take-profit and cut-loss rules are applied on that path; otherwise the ticket is held to official Yes/No settlement. The live bot can also enter later in a window (on a 5-minute scan) and uses live order-book and taker-flow data as a market reader; those live-only prints are not in this backtest.",
     "fee_note": "Paper PnL includes Kalshi\u2019s taker fee: ceil(0.07 \u00d7 contracts \u00d7 price \u00d7 (1 \u2212 price)), rounded up to the next cent.",
-    "generated_at": "2026-11-28T16:44:18Z",
-    "generated_at_pt": "Nov 28, 2026, 8:44 AM PT",
+    "generated_at": "2026-11-28T16:49:19Z",
+    "generated_at_pt": "Nov 28, 2026, 8:49 AM PT",
     "candle_source_1m": "coinbase",
     "candle_source_5m": "coinbase",
     "candle_source_15m": "coinbase",
@@ -11623,8 +11599,6 @@
       "best_reader": "spread \u22644\u00a2",
       "takeaway": "Best unseen chart is 1m (+$54.58, 82.8% WR on 29 trades). Best market-reader gate is spread \u22644\u00a2 (+$52.56). Best exit rule is hold to expiry (+$52.56, 85.7% WR on 21 trades) on 1328 windows with a full bid path."
     },
-    "last_promoted_at": "2026-11-27T23:55:39Z",
-    "last_promoted_at_pt": "Nov 27, 2026, 3:55 PM PT",
     "v1": {
       "label": "Version 1.2 \u00b7 Chart-Confirmed Active",
       "version_n": 4,
