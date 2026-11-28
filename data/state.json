@@ -1509,11 +1509,16 @@
       "t": 1795851584,
       "t_pt": "Nov 27, 2026, 11:39 PM PT",
       "equity": 86.06
+    },
+    {
+      "t": 1795851884,
+      "t_pt": "Nov 27, 2026, 11:44 PM PT",
+      "equity": 86.06
     }
   ],
   "created_at": "2026-11-26T18:33:31Z",
-  "updated_at": "2026-11-28T07:39:44Z",
-  "updated_at_pt": "Nov 27, 2026, 11:39 PM PT",
+  "updated_at": "2026-11-28T07:44:44Z",
+  "updated_at_pt": "Nov 27, 2026, 11:44 PM PT",
   "session": {
     "starting_balance": 40.0,
     "stake": 5.0,
@@ -1843,30 +1848,6 @@
         }
       ],
       "checks": [
-        {
-          "t": "2026-11-28T01:33:43Z",
-          "t_pt": "Nov 27, 2026, 5:33 PM PT",
-          "ticker": "KXBTC15M-26NOV272045-45",
-          "close_time": "2026-11-28T01:45:00Z",
-          "close_time_pt": "Nov 27, 2026, 5:45 PM PT",
-          "window_label": "5:30 PM \u2013 5:45 PM PT",
-          "action": "WAIT",
-          "label": "WAIT \u2014 No tradable ask",
-          "reason": "Neither Yes nor No is in Version 1\u2019s 35\u00a2\u201365\u00a2 buy band, so it stands aside.",
-          "reason_full": "Neither Yes nor No is in Version 1\u2019s 35\u00a2\u201365\u00a2 buy band, so it stands aside.",
-          "btc_price": 60133.11,
-          "strike": 60057.74,
-          "yes_ask": 0.73,
-          "no_ask": 0.28,
-          "side": null,
-          "ask": null,
-          "contracts": null,
-          "entry_price": null,
-          "cash": 100.0,
-          "book_id": "v1",
-          "book_label": "Version 1.2",
-          "open_count": 0
-        },
         {
           "t": "2026-11-28T01:38:43Z",
           "t_pt": "Nov 27, 2026, 5:38 PM PT",
@@ -3762,6 +3743,30 @@
           "book_id": "v1",
           "book_label": "Version 1.2",
           "open_count": 0
+        },
+        {
+          "t": "2026-11-28T07:44:44Z",
+          "t_pt": "Nov 27, 2026, 11:44 PM PT",
+          "ticker": "KXBTC15M-26NOV280245-45",
+          "close_time": "2026-11-28T07:45:00Z",
+          "close_time_pt": "Nov 27, 2026, 11:45 PM PT",
+          "window_label": "11:30 PM \u2013 11:45 PM PT",
+          "action": "WAIT",
+          "label": "Too close to expiry",
+          "reason": "Only 0:16 left in this window, so Version 1 won\u2019t open another ticket.",
+          "reason_full": "Only 0:16 left in this window, so Version 1 won\u2019t open another ticket.",
+          "btc_price": 59704.32,
+          "strike": 59619.39,
+          "yes_ask": 1.0,
+          "no_ask": 0.001,
+          "side": null,
+          "ask": null,
+          "contracts": null,
+          "entry_price": null,
+          "cash": 95.76,
+          "book_id": "v1",
+          "book_label": "Version 1.2",
+          "open_count": 0
         }
       ],
       "equity": 95.76,
@@ -3784,8 +3789,8 @@
         "Settled NO on KXBTC15M-26NOV280215-15: Settled NO at BTC 59586.18 vs strike 59690.74. PnL +8.02"
       ],
       "net_pnl": -4.24,
-      "updated_at": "2026-11-28T07:39:44Z",
-      "updated_at_pt": "Nov 27, 2026, 11:39 PM PT"
+      "updated_at": "2026-11-28T07:44:44Z",
+      "updated_at_pt": "Nov 27, 2026, 11:44 PM PT"
     },
     "v2": {
       "id": "v2",
@@ -3898,30 +3903,6 @@
         }
       ],
       "checks": [
-        {
-          "t": "2026-11-28T01:33:43Z",
-          "t_pt": "Nov 27, 2026, 5:33 PM PT",
-          "ticker": "KXBTC15M-26NOV272045-45",
-          "close_time": "2026-11-28T01:45:00Z",
-          "close_time_pt": "Nov 27, 2026, 5:45 PM PT",
-          "window_label": "5:30 PM \u2013 5:45 PM PT",
-          "action": "WAIT",
-          "label": "WAIT \u2014 No Trade",
-          "reason": "Choppy / no clean edge: price is above the strike, but the 1-minute trend/momentum is not cleanly bullish (MACD histogram is negative); Yes ask 73\u00a2.",
-          "reason_full": "Choppy / no clean edge: price is above the strike, but the 1-minute trend/momentum is not cleanly bullish (MACD histogram is negative); Yes ask 73\u00a2.",
-          "btc_price": 60133.11,
-          "strike": 60057.74,
-          "yes_ask": 0.73,
-          "no_ask": 0.28,
-          "side": null,
-          "ask": null,
-          "contracts": null,
-          "entry_price": null,
-          "cash": 102.46,
-          "book_id": "v2",
-          "book_label": "Version 2.2",
-          "open_count": 0
-        },
         {
           "t": "2026-11-28T01:38:43Z",
           "t_pt": "Nov 27, 2026, 5:38 PM PT",
@@ -5817,6 +5798,30 @@
           "book_id": "v2",
           "book_label": "Version 2.2",
           "open_count": 0
+        },
+        {
+          "t": "2026-11-28T07:44:44Z",
+          "t_pt": "Nov 27, 2026, 11:44 PM PT",
+          "ticker": "KXBTC15M-26NOV280245-45",
+          "close_time": "2026-11-28T07:45:00Z",
+          "close_time_pt": "Nov 27, 2026, 11:45 PM PT",
+          "window_label": "11:30 PM \u2013 11:45 PM PT",
+          "action": "WAIT",
+          "label": "WAIT \u2014 Too close to expiry",
+          "reason": "Only 0:16 left in this window. The bot stands aside under 2 minutes.",
+          "reason_full": "Only 0:16 left in this window. The bot stands aside under 2 minutes.",
+          "btc_price": 59704.32,
+          "strike": 59619.39,
+          "yes_ask": 1.0,
+          "no_ask": 0.001,
+          "side": null,
+          "ask": null,
+          "contracts": null,
+          "entry_price": null,
+          "cash": 105.93,
+          "book_id": "v2",
+          "book_label": "Version 2.2",
+          "open_count": 0
         }
       ],
       "equity": 105.93,
@@ -5832,8 +5837,8 @@
       "created_at": "2026-11-28T00:04:13Z",
       "events": [],
       "net_pnl": 5.93,
-      "updated_at": "2026-11-28T07:39:44Z",
-      "updated_at_pt": "Nov 27, 2026, 11:39 PM PT"
+      "updated_at": "2026-11-28T07:44:44Z",
+      "updated_at_pt": "Nov 27, 2026, 11:44 PM PT"
     },
     "leader": "v2",
     "leader_label": "Version 2 ahead",
@@ -5842,8 +5847,8 @@
     "choice": {
       "v1": {
         "action": "WAIT",
-        "label": "WAIT \u2014 No tradable ask",
-        "reason": "Neither Yes nor No is in Version 1\u2019s 35\u00a2\u201365\u00a2 buy band, so it stands aside.",
+        "label": "Too close to expiry",
+        "reason": "Only 0:16 left in this window, so Version 1 won\u2019t open another ticket.",
         "side": null,
         "ask": null,
         "strength": null,
@@ -5851,16 +5856,16 @@
       },
       "v2": {
         "action": "WAIT",
-        "label": "WAIT \u2014 No Trade",
-        "reason": "Choppy / no clean edge: price is above the strike, but the 1-minute trend/momentum is not cleanly bullish (5-minute trend is still down); Yes ask 86\u00a2.",
+        "label": "WAIT \u2014 Too close to expiry",
+        "reason": "Only 0:16 left in this window. The bot stands aside under 2 minutes.",
         "side": null,
         "ask": null,
         "strength": null,
         "base_stake": null
       }
     },
-    "updated_at": "2026-11-28T07:39:44Z",
-    "updated_at_pt": "Nov 27, 2026, 11:39 PM PT"
+    "updated_at": "2026-11-28T07:44:44Z",
+    "updated_at_pt": "Nov 27, 2026, 11:44 PM PT"
   },
   "race_archive": [
     {
