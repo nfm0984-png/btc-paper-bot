@@ -49,7 +49,9 @@ push_with_retry() {
     fi
     if [[ -f learn.py ]]; then
       python3 learn.py --merge-dashboard || true
-      git add docs/data.json
+      # merge-dashboard also refreshes docs/learning.json; stage it too so an
+      # unstaged file can never block the next `git pull --rebase`.
+      git add docs/data.json docs/learning.json
       if ! git diff --staged --quiet; then
         git commit -m "chore: keep learning payload on dashboard $(date -u +%Y-%m-%dT%H:%M:%SZ)"
       fi
@@ -69,6 +71,8 @@ run_tick() {
   local tick_no="$1"
   echo "======== tick ${tick_no}/${TICKS} at $(date -u +%Y-%m-%dT%H:%M:%SZ) ========"
   # Pull first so we never overwrite a concurrent learner (or a previous tick) commit.
+  # Drop any stray generated-file edits left by a failed push so the rebase can't wedge the loop.
+  git checkout -- docs/learning.json 2>/dev/null || true
   if ! git pull --rebase origin main; then
     echo "Pre-tick rebase failed; aborting rebase and continuing with local tree."
     git rebase --abort || true
@@ -76,6 +80,9 @@ run_tick() {
   python3 bot.py
 
   git add data/state.json data/backtest.json docs/data.json
+  if [[ -f docs/learning.json ]]; then
+    git add docs/learning.json
+  fi
   if [[ -f data/strategy_config.json ]]; then
     git add data/strategy_config.json
   fi
