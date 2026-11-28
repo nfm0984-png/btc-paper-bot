@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-11-27T23:52:04Z",
-  "updated_at_pt": "Nov 27, 2026, 3:52 PM PT",
+  "updated_at": "2026-11-28T01:09:42Z",
+  "updated_at_pt": "Nov 27, 2026, 5:09 PM PT",
   "runs": [
     {
       "t": "2026-11-26T20:02:10Z",
@@ -2972,6 +2972,138 @@
         "best_reader": "fair edge 3\u00a2",
         "takeaway": "Best unseen chart is 5m (+$40.04, 76.3% WR on 38 trades). Best market-reader gate is fair edge 3\u00a2 (+$49.95). Best exit rule is hold to expiry (+$40.04, 76.3% WR on 38 trades) on 1328 windows with a full bid path.",
         "windows_with_exit_path": 1328
+      }
+    },
+    {
+      "t": "2026-11-28T01:09:42Z",
+      "t_pt": "Nov 27, 2026, 5:09 PM PT",
+      "windows": 1328,
+      "train_windows": 929,
+      "val_windows": 399,
+      "candidates_tested": 67,
+      "live_version": 9,
+      "live": {
+        "train": {
+          "trade_count": 45,
+          "wins": 31,
+          "losses": 14,
+          "win_rate": 68.9,
+          "net_pnl": 23.54,
+          "profit_factor": 1.25,
+          "max_drawdown_pct": 18.26,
+          "ending_equity": 123.54
+        },
+        "val": {
+          "trade_count": 24,
+          "wins": 21,
+          "losses": 3,
+          "win_rate": 87.5,
+          "net_pnl": 64.94,
+          "profit_factor": 5.821,
+          "max_drawdown_pct": 5.74,
+          "ending_equity": 164.94
+        },
+        "overall": {
+          "trade_count": 69,
+          "wins": 52,
+          "losses": 17,
+          "win_rate": 75.4,
+          "net_pnl": 88.48,
+          "profit_factor": 1.821,
+          "max_drawdown_pct": 18.26,
+          "ending_equity": 188.48
+        }
+      },
+      "best_candidate": {
+        "name": "current",
+        "params": {
+          "min_entry_cents": 35,
+          "max_entry_cents": 75,
+          "min_strike_gap_usd": 40.0,
+          "min_mins_left": 2,
+          "max_mins_left": 15,
+          "rsi_bull_min": 54.0,
+          "rsi_bull_max": 72.0,
+          "rsi_bear_min": 25.0,
+          "rsi_bear_max": 48.0,
+          "require_ema50_align": true,
+          "require_5m_align": true,
+          "min_volatility_usd": 0.0,
+          "max_chop_ratio": 1.0,
+          "ema_flat_dollars": 8.0,
+          "chart_mode": "1m_5m",
+          "require_15m_align": false,
+          "require_1h_align": false,
+          "min_fair_edge": 0.001,
+          "max_spread_cents": 20.0,
+          "enable_early_exits": false,
+          "tp_bid": 0.8,
+          "tp_gain": 0.15,
+          "sl_drop": 0.12,
+          "tp_require_stall": false,
+          "sl_require_reversal": false,
+          "fair_giveback": false,
+          "exit_mode": "reversal",
+          "htf_gate": "off",
+          "require_vwap_side": false
+        },
+        "train": {
+          "trade_count": 45,
+          "wins": 31,
+          "losses": 14,
+          "win_rate": 68.9,
+          "net_pnl": 23.54,
+          "profit_factor": 1.25,
+          "max_drawdown_pct": 18.26,
+          "ending_equity": 123.54
+        },
+        "val": {
+          "trade_count": 24,
+          "wins": 21,
+          "losses": 3,
+          "win_rate": 87.5,
+          "net_pnl": 64.94,
+          "profit_factor": 5.821,
+          "max_drawdown_pct": 5.74,
+          "ending_equity": 164.94
+        },
+        "overall": {
+          "trade_count": 69,
+          "wins": 52,
+          "losses": 17,
+          "win_rate": 75.4,
+          "net_pnl": 88.48,
+          "profit_factor": 1.821,
+          "max_drawdown_pct": 18.26,
+          "ending_equity": 188.48
+        }
+      },
+      "promoted_to": null,
+      "promoted_params": null,
+      "decision": "KEPT v9",
+      "takeaway": "Current v9 still leads on unseen windows \u2014 kept.",
+      "reason": "no alternate beat the live rules on unseen windows",
+      "chart_scorecard": {
+        "best_chart": "5m",
+        "best_exit": "hold to expiry",
+        "best_reader": "spread \u22644\u00a2",
+        "takeaway": "Best unseen chart is 5m (+$64.94, 87.5% WR on 24 trades). Best market-reader gate is spread \u22644\u00a2 (+$64.94). Best exit rule is hold to expiry (+$64.94, 87.5% WR on 24 trades) on 1328 windows with a full bid path.",
+        "windows_with_exit_path": 1328
+      },
+      "v1": {
+        "takeaway": "Kept Version 1.2 rules (promotion cooldown still active).",
+        "promoted": false,
+        "live_val": {
+          "trade_count": 40,
+          "wins": 28,
+          "losses": 12,
+          "win_rate": 70.0,
+          "net_pnl": 31.81,
+          "profit_factor": 1.36,
+          "max_drawdown_pct": 14.53,
+          "ending_equity": 131.81
+        },
+        "best": "v1_gap_20"
       }
     }
   ]
