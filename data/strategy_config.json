@@ -70,8 +70,8 @@
     "val_windows": 399,
     "promoted_from": 8,
     "candidate": "v2.2_fair_value_gate+reversal_exit",
-    "metrics_updated_at": "2026-11-28T01:09:42Z",
-    "metrics_updated_at_pt": "Nov 27, 2026, 5:09 PM PT"
+    "metrics_updated_at": "2026-11-28T02:51:53Z",
+    "metrics_updated_at_pt": "Nov 27, 2026, 6:51 PM PT"
   },
   "plain_english": "Buys Yes/No when the 1-minute trend is clean, BTC is at least $40 from the strike, the ask is 35\u201375\u00a2, and 2\u201315 minutes remain in the window. Requires the 50-period EMA to agree. Requires the 5-minute trend to agree. Only buys when the spot-derived fair probability is at least the ask (no overpaying vs fair value). No extra chop filter. Sells early at the live Kalshi bid only when BTC breaks back through the strike and the 1m EMA 9/21 plus MACD both flip against the ticket. Otherwise holds to official settlement.",
   "last_promoted_at": "2026-11-27T23:55:39Z",
@@ -84,34 +84,34 @@
         "name": "1m",
         "kind": "chart",
         "train": {
-          "trade_count": 66,
+          "trade_count": 67,
           "wins": 41,
-          "losses": 25,
-          "win_rate": 62.1,
-          "net_pnl": 4.4,
-          "profit_factor": 1.03,
+          "losses": 26,
+          "win_rate": 61.2,
+          "net_pnl": -1.71,
+          "profit_factor": 0.989,
           "max_drawdown_pct": 31.81,
-          "ending_equity": 104.4
+          "ending_equity": 98.29
         },
         "val": {
           "trade_count": 31,
-          "wins": 25,
-          "losses": 6,
-          "win_rate": 80.6,
-          "net_pnl": 55.76,
-          "profit_factor": 2.577,
-          "max_drawdown_pct": 6.99,
-          "ending_equity": 155.76
+          "wins": 26,
+          "losses": 5,
+          "win_rate": 83.9,
+          "net_pnl": 64.96,
+          "profit_factor": 3.222,
+          "max_drawdown_pct": 6.63,
+          "ending_equity": 164.96
         },
         "overall": {
-          "trade_count": 97,
-          "wins": 66,
+          "trade_count": 98,
+          "wins": 67,
           "losses": 31,
-          "win_rate": 68.0,
-          "net_pnl": 60.16,
-          "profit_factor": 1.332,
+          "win_rate": 68.4,
+          "net_pnl": 63.25,
+          "profit_factor": 1.349,
           "max_drawdown_pct": 31.81,
-          "ending_equity": 160.16
+          "ending_equity": 163.25
         }
       },
       {
@@ -186,34 +186,34 @@
         "name": "1h",
         "kind": "chart",
         "train": {
-          "trade_count": 37,
+          "trade_count": 38,
           "wins": 22,
-          "losses": 15,
-          "win_rate": 59.5,
-          "net_pnl": -10.62,
-          "profit_factor": 0.886,
-          "max_drawdown_pct": 21.59,
-          "ending_equity": 89.38
+          "losses": 16,
+          "win_rate": 57.9,
+          "net_pnl": -16.73,
+          "profit_factor": 0.832,
+          "max_drawdown_pct": 22.88,
+          "ending_equity": 83.27
         },
         "val": {
           "trade_count": 20,
-          "wins": 15,
-          "losses": 5,
-          "win_rate": 75.0,
-          "net_pnl": 31.31,
-          "profit_factor": 2.145,
-          "max_drawdown_pct": 7.52,
-          "ending_equity": 131.31
+          "wins": 16,
+          "losses": 4,
+          "win_rate": 80.0,
+          "net_pnl": 40.51,
+          "profit_factor": 2.907,
+          "max_drawdown_pct": 7.1,
+          "ending_equity": 140.51
         },
         "overall": {
-          "trade_count": 57,
-          "wins": 37,
+          "trade_count": 58,
+          "wins": 38,
           "losses": 20,
-          "win_rate": 64.9,
-          "net_pnl": 20.69,
-          "profit_factor": 1.171,
+          "win_rate": 65.5,
+          "net_pnl": 23.78,
+          "profit_factor": 1.197,
           "max_drawdown_pct": 22.88,
-          "ending_equity": 120.69
+          "ending_equity": 123.78
         }
       },
       {
@@ -693,10 +693,10 @@
         }
       }
     ],
-    "best_chart": "5m",
+    "best_chart": "1m",
     "best_exit": "hold to expiry",
     "best_reader": "spread \u22644\u00a2",
-    "takeaway": "Best unseen chart is 5m (+$64.94, 87.5% WR on 24 trades). Best market-reader gate is spread \u22644\u00a2 (+$64.94). Best exit rule is hold to expiry (+$64.94, 87.5% WR on 24 trades) on 1328 windows with a full bid path."
+    "takeaway": "Best unseen chart is 1m (+$64.96, 83.9% WR on 31 trades). Best market-reader gate is spread \u22644\u00a2 (+$64.94). Best exit rule is hold to expiry (+$64.94, 87.5% WR on 24 trades) on 1328 windows with a full bid path."
   },
   "method_label": "Version 2.2 \u00b7 Strict + Fair-Value Edge",
   "v1": {
@@ -722,24 +722,24 @@
     },
     "metrics": {
       "overall": {
-        "trade_count": 120,
+        "trade_count": 118,
         "wins": 82,
-        "losses": 38,
-        "win_rate": 68.3,
-        "net_pnl": 86.53,
-        "profit_factor": 1.315,
-        "max_drawdown_pct": 27.23,
-        "ending_equity": 186.53
+        "losses": 36,
+        "win_rate": 69.5,
+        "net_pnl": 98.59,
+        "profit_factor": 1.376,
+        "max_drawdown_pct": 18.43,
+        "ending_equity": 198.59
       },
       "train": {
-        "trade_count": 80,
+        "trade_count": 78,
         "wins": 54,
-        "losses": 26,
-        "win_rate": 67.5,
-        "net_pnl": 54.72,
-        "profit_factor": 1.294,
-        "max_drawdown_pct": 27.23,
-        "ending_equity": 154.72
+        "losses": 24,
+        "win_rate": 69.2,
+        "net_pnl": 66.78,
+        "profit_factor": 1.384,
+        "max_drawdown_pct": 18.43,
+        "ending_equity": 166.78
       },
       "val": {
         "trade_count": 40,
@@ -758,7 +758,7 @@
     "rules": "Buys the side BTC is on (Yes above the strike, No below) when BTC is at least $30 from the strike, the ask is 35\u201365\u00a2, and 2+ minutes remain. Scores the 1m EMA 9/21/50, MACD, RSI and the 5-minute trend to pick its conviction. The 15-minute trend must not point against the side. Spot-derived fair value must be at least the ask (no overpaying). At most 1 ticket per 15-minute window and never the opposite side of a held ticket. Holds every ticket to official Kalshi settlement (no early exits).",
     "last_promoted_at": "2026-11-27T23:55:39Z",
     "last_promoted_at_pt": "Nov 27, 2026, 3:55 PM PT",
-    "metrics_updated_at": "2026-11-28T01:09:42Z",
-    "metrics_updated_at_pt": "Nov 27, 2026, 5:09 PM PT"
+    "metrics_updated_at": "2026-11-28T02:51:53Z",
+    "metrics_updated_at_pt": "Nov 27, 2026, 6:51 PM PT"
   }
 }
