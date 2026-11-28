@@ -25,8 +25,8 @@
     "strike": 59859.16,
     "reason": "EMA 9 > 21 ($59,881 > $59,849); price above the 50-period EMA; MACD histogram is positive; RSI 70; 5-minute trend agrees. BTC +$49.84 vs the $59,859.16 strike, Yes ask 74\u00a2 \u2014 Buy Yes. Spot-fair edge +11\u00a2. Top signal ($8 ticket): EMA 9/21 spread $32; RSI 70 in the heart of the bullish band; 5-minute trend is clearly aligned ($33 EMA spread).",
     "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov271915-15",
-    "mark": 7.3,
-    "pnl": -0.24,
+    "mark": 8.5,
+    "pnl": 0.96,
     "pnl_kind": "unrealized"
   },
   "trades": [
@@ -976,11 +976,16 @@
       "t": 1795824253,
       "t_pt": "Nov 27, 2026, 4:04 PM PT",
       "equity": 79.89
+    },
+    {
+      "t": 1795824767,
+      "t_pt": "Nov 27, 2026, 4:12 PM PT",
+      "equity": 81.09
     }
   ],
   "created_at": "2026-11-26T18:33:31Z",
-  "updated_at": "2026-11-28T00:04:13Z",
-  "updated_at_pt": "Nov 27, 2026, 4:04 PM PT",
+  "updated_at": "2026-11-28T00:12:47Z",
+  "updated_at_pt": "Nov 27, 2026, 4:12 PM PT",
   "session": {
     "starting_balance": 40.0,
     "stake": 5.0,
@@ -1236,6 +1241,30 @@
           "book_id": "v1",
           "book_label": "Version 1.2",
           "open_count": 0
+        },
+        {
+          "t": "2026-11-28T00:12:47Z",
+          "t_pt": "Nov 27, 2026, 4:12 PM PT",
+          "ticker": "KXBTC15M-26NOV271915-15",
+          "close_time": "2026-11-28T00:15:00Z",
+          "close_time_pt": "Nov 27, 2026, 4:15 PM PT",
+          "window_label": "4:00 PM \u2013 4:15 PM PT",
+          "action": "WAIT",
+          "label": "WAIT \u2014 No tradable ask",
+          "reason": "Neither Yes nor No is in Version 1\u2019s 35\u00a2\u201365\u00a2 buy band, so it stands aside.",
+          "reason_full": "Neither Yes nor No is in Version 1\u2019s 35\u00a2\u201365\u00a2 buy band, so it stands aside.",
+          "btc_price": 59917.86,
+          "strike": 59859.16,
+          "yes_ask": 0.86,
+          "no_ask": 0.15,
+          "side": null,
+          "ask": null,
+          "contracts": null,
+          "entry_price": null,
+          "cash": 100.0,
+          "book_id": "v1",
+          "book_label": "Version 1.2",
+          "open_count": 0
         }
       ],
       "equity": 100.0,
@@ -1251,8 +1280,8 @@
       "created_at": "2026-11-28T00:04:13Z",
       "events": [],
       "net_pnl": 0.0,
-      "updated_at": "2026-11-28T00:04:13Z",
-      "updated_at_pt": "Nov 27, 2026, 4:04 PM PT"
+      "updated_at": "2026-11-28T00:12:47Z",
+      "updated_at_pt": "Nov 27, 2026, 4:12 PM PT"
     },
     "v2": {
       "id": "v2",
@@ -1285,8 +1314,8 @@
         "strike": 59859.16,
         "reason": "EMA 9 > 21 ($59,881 > $59,849); price above the 50-period EMA; MACD histogram is positive; RSI 70; 5-minute trend agrees. BTC +$49.84 vs the $59,859.16 strike, Yes ask 74\u00a2 \u2014 Buy Yes. Spot-fair edge +11\u00a2. Top signal ($8 ticket): EMA 9/21 spread $32; RSI 70 in the heart of the bullish band; 5-minute trend is clearly aligned ($33 EMA spread).",
         "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov271915-15",
-        "mark": 7.3,
-        "pnl": -0.24,
+        "mark": 8.5,
+        "pnl": 0.96,
         "pnl_kind": "unrealized",
         "book_id": "v2",
         "book_label": "Version 2.2"
@@ -1313,8 +1342,8 @@
           "strike": 59859.16,
           "reason": "EMA 9 > 21 ($59,881 > $59,849); price above the 50-period EMA; MACD histogram is positive; RSI 70; 5-minute trend agrees. BTC +$49.84 vs the $59,859.16 strike, Yes ask 74\u00a2 \u2014 Buy Yes. Spot-fair edge +11\u00a2. Top signal ($8 ticket): EMA 9/21 spread $32; RSI 70 in the heart of the bullish band; 5-minute trend is clearly aligned ($33 EMA spread).",
           "kalshi_url": "https://kalshi.com/markets/kxbtc15m/kxbtc15m-26nov271915-15",
-          "mark": 7.3,
-          "pnl": -0.24,
+          "mark": 8.5,
+          "pnl": 0.96,
           "pnl_kind": "unrealized",
           "book_id": "v2",
           "book_label": "Version 2.2"
@@ -1368,11 +1397,35 @@
           "book_id": "v2",
           "book_label": "Version 2.2",
           "open_count": 1
+        },
+        {
+          "t": "2026-11-28T00:12:47Z",
+          "t_pt": "Nov 27, 2026, 4:12 PM PT",
+          "ticker": "KXBTC15M-26NOV271915-15",
+          "close_time": "2026-11-28T00:15:00Z",
+          "close_time_pt": "Nov 27, 2026, 4:15 PM PT",
+          "window_label": "4:00 PM \u2013 4:15 PM PT",
+          "action": "HOLD",
+          "label": "HOLD YES",
+          "reason": "Holding YES from 74\u00a2; live bid 85\u00a2. No exit trigger yet \u2014 still watching until settlement or a flip.",
+          "reason_full": "Holding YES from 74\u00a2; live bid 85\u00a2. No exit trigger yet \u2014 still watching until settlement or a flip.",
+          "btc_price": 59917.86,
+          "strike": 59859.16,
+          "yes_ask": 0.86,
+          "no_ask": 0.15,
+          "side": "yes",
+          "ask": null,
+          "contracts": 10,
+          "entry_price": 0.74,
+          "cash": 92.46,
+          "book_id": "v2",
+          "book_label": "Version 2.2",
+          "open_count": 1
         }
       ],
-      "equity": 99.76,
-      "pnl": -0.24,
-      "pnl_pct": -0.24,
+      "equity": 100.96,
+      "pnl": 0.96,
+      "pnl_pct": 0.96,
       "amount_bought": 7.54,
       "contracts_total": 10,
       "wins": 0,
@@ -1381,17 +1434,15 @@
       "win_rate": null,
       "next_stake_label": "Next stake: $4\u2013$8 flat (no press)",
       "created_at": "2026-11-28T00:04:13Z",
-      "events": [
-        "Opened YES 10x KXBTC15M-26NOV271915-15 @ 74\u00a2 (bought $7.54, $8 ticket, fee $0.14)"
-      ],
-      "net_pnl": -0.24,
-      "updated_at": "2026-11-28T00:04:13Z",
-      "updated_at_pt": "Nov 27, 2026, 4:04 PM PT"
+      "events": [],
+      "net_pnl": 0.96,
+      "updated_at": "2026-11-28T00:12:47Z",
+      "updated_at_pt": "Nov 27, 2026, 4:12 PM PT"
     },
-    "leader": "v1",
-    "leader_label": "Version 1 ahead",
-    "leader_margin": 0.24,
-    "leader_text": "Version 1 ahead by +$0.24",
+    "leader": "v2",
+    "leader_label": "Version 2 ahead",
+    "leader_margin": 0.96,
+    "leader_text": "Version 2 ahead by +$0.96",
     "choice": {
       "v1": {
         "action": "WAIT",
@@ -1404,16 +1455,16 @@
       },
       "v2": {
         "action": "HOLD",
-        "label": "HOLD YES @ 74\u00a2",
-        "reason": "Spot-fair edge +11\u00a2.",
+        "label": "HOLD YES",
+        "reason": "Holding YES from 74\u00a2; live bid 85\u00a2. No exit trigger yet \u2014 still watching until settlement or a flip.",
         "side": "yes",
-        "ask": 0.74,
-        "strength": "top",
-        "base_stake": 8.0
+        "ask": null,
+        "strength": null,
+        "base_stake": null
       }
     },
-    "updated_at": "2026-11-28T00:04:13Z",
-    "updated_at_pt": "Nov 27, 2026, 4:04 PM PT"
+    "updated_at": "2026-11-28T00:12:47Z",
+    "updated_at_pt": "Nov 27, 2026, 4:12 PM PT"
   },
   "race_archive": [
     {
