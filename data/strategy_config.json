@@ -46,32 +46,32 @@
       "ending_equity": 193.38
     },
     "train": {
-      "trade_count": 47,
-      "wins": 33,
+      "trade_count": 48,
+      "wins": 34,
       "losses": 14,
-      "win_rate": 70.2,
-      "net_pnl": 33.25,
-      "profit_factor": 1.353,
+      "win_rate": 70.8,
+      "net_pnl": 35.9,
+      "profit_factor": 1.381,
       "max_drawdown_pct": 18.26,
-      "ending_equity": 133.25
+      "ending_equity": 135.9
     },
     "val": {
-      "trade_count": 24,
-      "wins": 21,
+      "trade_count": 23,
+      "wins": 20,
       "losses": 3,
-      "win_rate": 87.5,
-      "net_pnl": 60.13,
-      "profit_factor": 5.464,
-      "max_drawdown_pct": 6.21,
-      "ending_equity": 160.13
+      "win_rate": 87.0,
+      "net_pnl": 57.48,
+      "profit_factor": 5.267,
+      "max_drawdown_pct": 6.35,
+      "ending_equity": 157.48
     },
     "windows": 1328,
     "train_windows": 929,
     "val_windows": 399,
     "promoted_from": 8,
     "candidate": "v2.2_fair_value_gate+reversal_exit",
-    "metrics_updated_at": "2026-11-28T10:52:01Z",
-    "metrics_updated_at_pt": "Nov 28, 2026, 2:52 AM PT"
+    "metrics_updated_at": "2026-11-28T11:48:00Z",
+    "metrics_updated_at_pt": "Nov 28, 2026, 3:48 AM PT"
   },
   "plain_english": "Buys Yes/No when the 1-minute trend is clean, BTC is at least $40 from the strike, the ask is 35\u201375\u00a2, and 2\u201315 minutes remain in the window. Requires the 50-period EMA to agree. Requires the 5-minute trend to agree. Only buys when the spot-derived fair probability is at least the ask (no overpaying vs fair value). No extra chop filter. Sells early at the live Kalshi bid only when BTC breaks back through the strike and the 1m EMA 9/21 plus MACD both flip against the ticket. Otherwise holds to official settlement.",
   "last_promoted_at": "2026-11-27T23:55:39Z",
@@ -84,24 +84,24 @@
         "name": "1m",
         "kind": "chart",
         "train": {
-          "trade_count": 69,
-          "wins": 43,
+          "trade_count": 70,
+          "wins": 44,
           "losses": 26,
-          "win_rate": 62.3,
-          "net_pnl": 8.0,
-          "profit_factor": 1.053,
+          "win_rate": 62.9,
+          "net_pnl": 10.65,
+          "profit_factor": 1.07,
           "max_drawdown_pct": 31.81,
-          "ending_equity": 108.0
+          "ending_equity": 110.65
         },
         "val": {
-          "trade_count": 31,
-          "wins": 26,
+          "trade_count": 30,
+          "wins": 25,
           "losses": 5,
-          "win_rate": 83.9,
-          "net_pnl": 60.15,
-          "profit_factor": 3.057,
-          "max_drawdown_pct": 7.22,
-          "ending_equity": 160.15
+          "win_rate": 83.3,
+          "net_pnl": 57.5,
+          "profit_factor": 2.966,
+          "max_drawdown_pct": 7.41,
+          "ending_equity": 157.5
         },
         "overall": {
           "trade_count": 100,
@@ -118,24 +118,24 @@
         "name": "5m",
         "kind": "chart",
         "train": {
-          "trade_count": 47,
-          "wins": 33,
+          "trade_count": 48,
+          "wins": 34,
           "losses": 14,
-          "win_rate": 70.2,
-          "net_pnl": 33.25,
-          "profit_factor": 1.353,
+          "win_rate": 70.8,
+          "net_pnl": 35.9,
+          "profit_factor": 1.381,
           "max_drawdown_pct": 18.26,
-          "ending_equity": 133.25
+          "ending_equity": 135.9
         },
         "val": {
-          "trade_count": 24,
-          "wins": 21,
+          "trade_count": 23,
+          "wins": 20,
           "losses": 3,
-          "win_rate": 87.5,
-          "net_pnl": 60.13,
-          "profit_factor": 5.464,
-          "max_drawdown_pct": 6.21,
-          "ending_equity": 160.13
+          "win_rate": 87.0,
+          "net_pnl": 57.48,
+          "profit_factor": 5.267,
+          "max_drawdown_pct": 6.35,
+          "ending_equity": 157.48
         },
         "overall": {
           "trade_count": 71,
@@ -254,24 +254,24 @@
         "name": "no fair-edge gate",
         "kind": "reader",
         "train": {
-          "trade_count": 77,
-          "wins": 53,
+          "trade_count": 78,
+          "wins": 54,
           "losses": 24,
-          "win_rate": 68.8,
-          "net_pnl": 39.33,
-          "profit_factor": 1.246,
+          "win_rate": 69.2,
+          "net_pnl": 41.98,
+          "profit_factor": 1.263,
           "max_drawdown_pct": 20.41,
-          "ending_equity": 139.33
+          "ending_equity": 141.98
         },
         "val": {
-          "trade_count": 37,
-          "wins": 27,
+          "trade_count": 36,
+          "wins": 26,
           "losses": 10,
-          "win_rate": 73.0,
-          "net_pnl": 30.35,
-          "profit_factor": 1.472,
-          "max_drawdown_pct": 13.71,
-          "ending_equity": 130.35
+          "win_rate": 72.2,
+          "net_pnl": 27.7,
+          "profit_factor": 1.431,
+          "max_drawdown_pct": 14.06,
+          "ending_equity": 127.7
         },
         "overall": {
           "trade_count": 114,
@@ -288,24 +288,24 @@
         "name": "fair edge 3\u00a2",
         "kind": "reader",
         "train": {
-          "trade_count": 22,
-          "wins": 14,
+          "trade_count": 23,
+          "wins": 15,
           "losses": 8,
-          "win_rate": 63.6,
-          "net_pnl": -4.31,
-          "profit_factor": 0.923,
+          "win_rate": 65.2,
+          "net_pnl": -1.66,
+          "profit_factor": 0.97,
           "max_drawdown_pct": 18.11,
-          "ending_equity": 95.69
+          "ending_equity": 98.34
         },
         "val": {
-          "trade_count": 16,
-          "wins": 15,
+          "trade_count": 15,
+          "wins": 14,
           "losses": 1,
-          "win_rate": 93.8,
-          "net_pnl": 45.14,
-          "profit_factor": 7.092,
-          "max_drawdown_pct": 6.21,
-          "ending_equity": 145.14
+          "win_rate": 93.3,
+          "net_pnl": 42.49,
+          "profit_factor": 6.734,
+          "max_drawdown_pct": 6.35,
+          "ending_equity": 142.49
         },
         "overall": {
           "trade_count": 38,
@@ -322,24 +322,24 @@
         "name": "fair edge 5\u00a2",
         "kind": "reader",
         "train": {
-          "trade_count": 9,
-          "wins": 4,
+          "trade_count": 10,
+          "wins": 5,
           "losses": 5,
-          "win_rate": 44.4,
-          "net_pnl": -20.95,
-          "profit_factor": 0.404,
+          "win_rate": 50.0,
+          "net_pnl": -18.3,
+          "profit_factor": 0.48,
           "max_drawdown_pct": 20.95,
-          "ending_equity": 79.05
+          "ending_equity": 81.7
         },
         "val": {
-          "trade_count": 8,
-          "wins": 7,
+          "trade_count": 7,
+          "wins": 6,
           "losses": 1,
-          "win_rate": 87.5,
-          "net_pnl": 13.25,
-          "profit_factor": 2.788,
-          "max_drawdown_pct": 6.89,
-          "ending_equity": 113.25
+          "win_rate": 85.7,
+          "net_pnl": 10.6,
+          "profit_factor": 2.43,
+          "max_drawdown_pct": 7.06,
+          "ending_equity": 110.6
         },
         "overall": {
           "trade_count": 17,
@@ -390,24 +390,24 @@
         "name": "spread \u22644\u00a2",
         "kind": "reader",
         "train": {
-          "trade_count": 47,
-          "wins": 33,
+          "trade_count": 48,
+          "wins": 34,
           "losses": 14,
-          "win_rate": 70.2,
-          "net_pnl": 33.25,
-          "profit_factor": 1.353,
+          "win_rate": 70.8,
+          "net_pnl": 35.9,
+          "profit_factor": 1.381,
           "max_drawdown_pct": 18.26,
-          "ending_equity": 133.25
+          "ending_equity": 135.9
         },
         "val": {
-          "trade_count": 24,
-          "wins": 21,
+          "trade_count": 23,
+          "wins": 20,
           "losses": 3,
-          "win_rate": 87.5,
-          "net_pnl": 60.13,
-          "profit_factor": 5.464,
-          "max_drawdown_pct": 6.21,
-          "ending_equity": 160.13
+          "win_rate": 87.0,
+          "net_pnl": 57.48,
+          "profit_factor": 5.267,
+          "max_drawdown_pct": 6.35,
+          "ending_equity": 157.48
         },
         "overall": {
           "trade_count": 71,
@@ -424,24 +424,24 @@
         "name": "spread \u22646\u00a2",
         "kind": "reader",
         "train": {
-          "trade_count": 47,
-          "wins": 33,
+          "trade_count": 48,
+          "wins": 34,
           "losses": 14,
-          "win_rate": 70.2,
-          "net_pnl": 33.25,
-          "profit_factor": 1.353,
+          "win_rate": 70.8,
+          "net_pnl": 35.9,
+          "profit_factor": 1.381,
           "max_drawdown_pct": 18.26,
-          "ending_equity": 133.25
+          "ending_equity": 135.9
         },
         "val": {
-          "trade_count": 24,
-          "wins": 21,
+          "trade_count": 23,
+          "wins": 20,
           "losses": 3,
-          "win_rate": 87.5,
-          "net_pnl": 60.13,
-          "profit_factor": 5.464,
-          "max_drawdown_pct": 6.21,
-          "ending_equity": 160.13
+          "win_rate": 87.0,
+          "net_pnl": 57.48,
+          "profit_factor": 5.267,
+          "max_drawdown_pct": 6.35,
+          "ending_equity": 157.48
         },
         "overall": {
           "trade_count": 71,
@@ -458,24 +458,24 @@
         "name": "hold to expiry",
         "kind": "exit",
         "train": {
-          "trade_count": 47,
-          "wins": 33,
+          "trade_count": 48,
+          "wins": 34,
           "losses": 14,
-          "win_rate": 70.2,
-          "net_pnl": 33.25,
-          "profit_factor": 1.353,
+          "win_rate": 70.8,
+          "net_pnl": 35.9,
+          "profit_factor": 1.381,
           "max_drawdown_pct": 18.26,
-          "ending_equity": 133.25
+          "ending_equity": 135.9
         },
         "val": {
-          "trade_count": 24,
-          "wins": 21,
+          "trade_count": 23,
+          "wins": 20,
           "losses": 3,
-          "win_rate": 87.5,
-          "net_pnl": 60.13,
-          "profit_factor": 5.464,
-          "max_drawdown_pct": 6.21,
-          "ending_equity": 160.13
+          "win_rate": 87.0,
+          "net_pnl": 57.48,
+          "profit_factor": 5.267,
+          "max_drawdown_pct": 6.35,
+          "ending_equity": 157.48
         },
         "overall": {
           "trade_count": 71,
@@ -492,24 +492,24 @@
         "name": "current TP/SL",
         "kind": "exit",
         "train": {
-          "trade_count": 47,
-          "wins": 33,
+          "trade_count": 48,
+          "wins": 34,
           "losses": 14,
-          "win_rate": 70.2,
-          "net_pnl": 33.25,
-          "profit_factor": 1.353,
+          "win_rate": 70.8,
+          "net_pnl": 35.9,
+          "profit_factor": 1.381,
           "max_drawdown_pct": 18.26,
-          "ending_equity": 133.25
+          "ending_equity": 135.9
         },
         "val": {
-          "trade_count": 24,
-          "wins": 21,
+          "trade_count": 23,
+          "wins": 20,
           "losses": 3,
-          "win_rate": 87.5,
-          "net_pnl": 60.13,
-          "profit_factor": 5.464,
-          "max_drawdown_pct": 6.21,
-          "ending_equity": 160.13
+          "win_rate": 87.0,
+          "net_pnl": 57.48,
+          "profit_factor": 5.267,
+          "max_drawdown_pct": 6.35,
+          "ending_equity": 157.48
         },
         "overall": {
           "trade_count": 71,
@@ -526,24 +526,24 @@
         "name": "TP 85\u00a2 / +25\u00a2 + stall",
         "kind": "exit",
         "train": {
-          "trade_count": 47,
-          "wins": 33,
+          "trade_count": 48,
+          "wins": 34,
           "losses": 14,
-          "win_rate": 70.2,
-          "net_pnl": 33.25,
-          "profit_factor": 1.353,
+          "win_rate": 70.8,
+          "net_pnl": 35.9,
+          "profit_factor": 1.381,
           "max_drawdown_pct": 18.26,
-          "ending_equity": 133.25
+          "ending_equity": 135.9
         },
         "val": {
-          "trade_count": 24,
-          "wins": 21,
+          "trade_count": 23,
+          "wins": 20,
           "losses": 3,
-          "win_rate": 87.5,
-          "net_pnl": 60.13,
-          "profit_factor": 5.464,
-          "max_drawdown_pct": 6.21,
-          "ending_equity": 160.13
+          "win_rate": 87.0,
+          "net_pnl": 57.48,
+          "profit_factor": 5.267,
+          "max_drawdown_pct": 6.35,
+          "ending_equity": 157.48
         },
         "overall": {
           "trade_count": 71,
@@ -560,24 +560,24 @@
         "name": "TP 90\u00a2 / +35\u00a2",
         "kind": "exit",
         "train": {
-          "trade_count": 47,
-          "wins": 33,
+          "trade_count": 48,
+          "wins": 34,
           "losses": 14,
-          "win_rate": 70.2,
-          "net_pnl": 33.25,
-          "profit_factor": 1.353,
+          "win_rate": 70.8,
+          "net_pnl": 35.9,
+          "profit_factor": 1.381,
           "max_drawdown_pct": 18.26,
-          "ending_equity": 133.25
+          "ending_equity": 135.9
         },
         "val": {
-          "trade_count": 24,
-          "wins": 21,
+          "trade_count": 23,
+          "wins": 20,
           "losses": 3,
-          "win_rate": 87.5,
-          "net_pnl": 60.13,
-          "profit_factor": 5.464,
-          "max_drawdown_pct": 6.21,
-          "ending_equity": 160.13
+          "win_rate": 87.0,
+          "net_pnl": 57.48,
+          "profit_factor": 5.267,
+          "max_drawdown_pct": 6.35,
+          "ending_equity": 157.48
         },
         "overall": {
           "trade_count": 71,
@@ -594,24 +594,24 @@
         "name": "SL only on reversal",
         "kind": "exit",
         "train": {
-          "trade_count": 47,
-          "wins": 33,
+          "trade_count": 48,
+          "wins": 34,
           "losses": 14,
-          "win_rate": 70.2,
-          "net_pnl": 33.25,
-          "profit_factor": 1.353,
+          "win_rate": 70.8,
+          "net_pnl": 35.9,
+          "profit_factor": 1.381,
           "max_drawdown_pct": 18.26,
-          "ending_equity": 133.25
+          "ending_equity": 135.9
         },
         "val": {
-          "trade_count": 24,
-          "wins": 21,
+          "trade_count": 23,
+          "wins": 20,
           "losses": 3,
-          "win_rate": 87.5,
-          "net_pnl": 60.13,
-          "profit_factor": 5.464,
-          "max_drawdown_pct": 6.21,
-          "ending_equity": 160.13
+          "win_rate": 87.0,
+          "net_pnl": 57.48,
+          "profit_factor": 5.267,
+          "max_drawdown_pct": 6.35,
+          "ending_equity": 157.48
         },
         "overall": {
           "trade_count": 71,
@@ -628,24 +628,24 @@
         "name": "fair giveback",
         "kind": "exit",
         "train": {
-          "trade_count": 47,
-          "wins": 33,
+          "trade_count": 48,
+          "wins": 34,
           "losses": 14,
-          "win_rate": 70.2,
-          "net_pnl": 33.25,
-          "profit_factor": 1.353,
+          "win_rate": 70.8,
+          "net_pnl": 35.9,
+          "profit_factor": 1.381,
           "max_drawdown_pct": 18.26,
-          "ending_equity": 133.25
+          "ending_equity": 135.9
         },
         "val": {
-          "trade_count": 24,
-          "wins": 21,
+          "trade_count": 23,
+          "wins": 20,
           "losses": 3,
-          "win_rate": 87.5,
-          "net_pnl": 60.13,
-          "profit_factor": 5.464,
-          "max_drawdown_pct": 6.21,
-          "ending_equity": 160.13
+          "win_rate": 87.0,
+          "net_pnl": 57.48,
+          "profit_factor": 5.267,
+          "max_drawdown_pct": 6.35,
+          "ending_equity": 157.48
         },
         "overall": {
           "trade_count": 71,
@@ -662,24 +662,24 @@
         "name": "protective exits",
         "kind": "exit",
         "train": {
-          "trade_count": 47,
-          "wins": 33,
+          "trade_count": 48,
+          "wins": 34,
           "losses": 14,
-          "win_rate": 70.2,
-          "net_pnl": 33.25,
-          "profit_factor": 1.353,
+          "win_rate": 70.8,
+          "net_pnl": 35.9,
+          "profit_factor": 1.381,
           "max_drawdown_pct": 18.26,
-          "ending_equity": 133.25
+          "ending_equity": 135.9
         },
         "val": {
-          "trade_count": 24,
-          "wins": 21,
+          "trade_count": 23,
+          "wins": 20,
           "losses": 3,
-          "win_rate": 87.5,
-          "net_pnl": 60.13,
-          "profit_factor": 5.464,
-          "max_drawdown_pct": 6.21,
-          "ending_equity": 160.13
+          "win_rate": 87.0,
+          "net_pnl": 57.48,
+          "profit_factor": 5.267,
+          "max_drawdown_pct": 6.35,
+          "ending_equity": 157.48
         },
         "overall": {
           "trade_count": 71,
@@ -696,7 +696,7 @@
     "best_chart": "1m",
     "best_exit": "hold to expiry",
     "best_reader": "spread \u22644\u00a2",
-    "takeaway": "Best unseen chart is 1m (+$60.15, 83.9% WR on 31 trades). Best market-reader gate is spread \u22644\u00a2 (+$60.13). Best exit rule is hold to expiry (+$60.13, 87.5% WR on 24 trades) on 1328 windows with a full bid path."
+    "takeaway": "Best unseen chart is 1m (+$57.50, 83.3% WR on 30 trades). Best market-reader gate is spread \u22644\u00a2 (+$57.48). Best exit rule is hold to expiry (+$57.48, 87.0% WR on 23 trades) on 1328 windows with a full bid path."
   },
   "method_label": "Version 2.2 \u00b7 Strict + Fair-Value Edge",
   "v1": {
@@ -722,14 +722,14 @@
     },
     "metrics": {
       "overall": {
-        "trade_count": 133,
-        "wins": 91,
+        "trade_count": 134,
+        "wins": 92,
         "losses": 42,
-        "win_rate": 68.4,
-        "net_pnl": 99.33,
-        "profit_factor": 1.324,
+        "win_rate": 68.7,
+        "net_pnl": 102.86,
+        "profit_factor": 1.336,
         "max_drawdown_pct": 20.83,
-        "ending_equity": 199.33
+        "ending_equity": 202.86
       },
       "train": {
         "trade_count": 83,
@@ -742,14 +742,14 @@
         "ending_equity": 166.85
       },
       "val": {
-        "trade_count": 50,
-        "wins": 34,
+        "trade_count": 51,
+        "wins": 35,
         "losses": 16,
-        "win_rate": 68.0,
-        "net_pnl": 32.48,
-        "profit_factor": 1.277,
+        "win_rate": 68.6,
+        "net_pnl": 36.01,
+        "profit_factor": 1.307,
         "max_drawdown_pct": 21.08,
-        "ending_equity": 132.48
+        "ending_equity": 136.01
       },
       "train_windows": 929,
       "val_windows": 399
@@ -758,7 +758,7 @@
     "rules": "Buys the side BTC is on (Yes above the strike, No below) when BTC is at least $25 from the strike, the ask is 35\u201365\u00a2, and 2+ minutes remain. Scores the 1m EMA 9/21/50, MACD, RSI and the 5-minute trend to pick its conviction. The 15-minute trend must not point against the side. Spot-derived fair value must be at least the ask (no overpaying). Price must be on the trade\u2019s side of 1m VWAP. At most 1 ticket per 15-minute window and never the opposite side of a held ticket. Holds every ticket to official Kalshi settlement (no early exits).",
     "last_promoted_at": "2026-11-28T08:51:14Z",
     "last_promoted_at_pt": "Nov 28, 2026, 12:51 AM PT",
-    "metrics_updated_at": "2026-11-28T10:52:01Z",
-    "metrics_updated_at_pt": "Nov 28, 2026, 2:52 AM PT"
+    "metrics_updated_at": "2026-11-28T11:48:00Z",
+    "metrics_updated_at_pt": "Nov 28, 2026, 3:48 AM PT"
   }
 }
