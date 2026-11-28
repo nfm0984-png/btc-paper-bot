@@ -70,8 +70,8 @@
     "val_windows": 399,
     "promoted_from": 8,
     "candidate": "v2.2_fair_value_gate+reversal_exit",
-    "metrics_updated_at": "2026-11-28T17:44:39Z",
-    "metrics_updated_at_pt": "Nov 28, 2026, 9:44 AM PT"
+    "metrics_updated_at": "2026-11-28T18:48:29Z",
+    "metrics_updated_at_pt": "Nov 28, 2026, 10:48 AM PT"
   },
   "plain_english": "Buys Yes/No when the 1-minute trend is clean, BTC is at least $40 from the strike, the ask is 35\u201375\u00a2, and 2\u201315 minutes remain in the window. Requires the 50-period EMA to agree. Requires the 5-minute trend to agree. Only buys when the spot-derived fair probability is at least the ask (no overpaying vs fair value). No extra chop filter. Sells early at the live Kalshi bid only when BTC breaks back through the strike and the 1m EMA 9/21 plus MACD both flip against the ticket. Otherwise holds to official settlement.",
   "last_promoted_at": "2026-11-27T23:55:39Z",
@@ -220,14 +220,14 @@
         "name": "multi-TF",
         "kind": "chart",
         "train": {
-          "trade_count": 39,
-          "wins": 29,
+          "trade_count": 40,
+          "wins": 30,
           "losses": 10,
-          "win_rate": 74.4,
-          "net_pnl": 39.78,
-          "profit_factor": 1.604,
-          "max_drawdown_pct": 17.33,
-          "ending_equity": 139.78
+          "win_rate": 75.0,
+          "net_pnl": 45.97,
+          "profit_factor": 1.698,
+          "max_drawdown_pct": 16.47,
+          "ending_equity": 145.97
         },
         "val": {
           "trade_count": 21,
@@ -240,28 +240,28 @@
           "ending_equity": 152.93
         },
         "overall": {
-          "trade_count": 60,
-          "wins": 47,
+          "trade_count": 61,
+          "wins": 48,
           "losses": 13,
-          "win_rate": 78.3,
-          "net_pnl": 92.71,
-          "profit_factor": 2.169,
-          "max_drawdown_pct": 17.33,
-          "ending_equity": 192.71
+          "win_rate": 78.7,
+          "net_pnl": 98.9,
+          "profit_factor": 2.247,
+          "max_drawdown_pct": 16.47,
+          "ending_equity": 198.9
         }
       },
       {
         "name": "no fair-edge gate",
         "kind": "reader",
         "train": {
-          "trade_count": 78,
-          "wins": 55,
+          "trade_count": 77,
+          "wins": 54,
           "losses": 23,
-          "win_rate": 70.5,
-          "net_pnl": 49.93,
-          "profit_factor": 1.324,
-          "max_drawdown_pct": 18.83,
-          "ending_equity": 149.93
+          "win_rate": 70.1,
+          "net_pnl": 47.37,
+          "profit_factor": 1.307,
+          "max_drawdown_pct": 19.2,
+          "ending_equity": 147.37
         },
         "val": {
           "trade_count": 34,
@@ -274,14 +274,14 @@
           "ending_equity": 133.24
         },
         "overall": {
-          "trade_count": 112,
-          "wins": 80,
+          "trade_count": 111,
+          "wins": 79,
           "losses": 32,
-          "win_rate": 71.4,
-          "net_pnl": 83.17,
-          "profit_factor": 1.394,
-          "max_drawdown_pct": 18.83,
-          "ending_equity": 183.17
+          "win_rate": 71.2,
+          "net_pnl": 80.61,
+          "profit_factor": 1.382,
+          "max_drawdown_pct": 19.2,
+          "ending_equity": 180.61
         }
       },
       {
@@ -701,10 +701,10 @@
   "method_label": "Version 2.2 \u00b7 Strict + Fair-Value Edge",
   "v1": {
     "label": "Version 1.2 \u00b7 Chart-Confirmed Active",
-    "version_n": 4,
+    "version_n": 5,
     "params": {
       "min_ask_cents": 35,
-      "max_ask_cents": 65,
+      "max_ask_cents": 60,
       "min_strike_gap_usd": 25.0,
       "min_mins_left": 2,
       "max_entries_per_window": 1,
@@ -722,43 +722,43 @@
     },
     "metrics": {
       "overall": {
-        "trade_count": 136,
-        "wins": 95,
-        "losses": 41,
-        "win_rate": 69.9,
-        "net_pnl": 101.38,
-        "profit_factor": 1.34,
-        "max_drawdown_pct": 16.68,
-        "ending_equity": 201.38
+        "trade_count": 74,
+        "wins": 50,
+        "losses": 24,
+        "win_rate": 67.6,
+        "net_pnl": 59.95,
+        "profit_factor": 1.345,
+        "max_drawdown_pct": 18.21,
+        "ending_equity": 159.95
       },
       "train": {
-        "trade_count": 85,
-        "wins": 60,
-        "losses": 25,
-        "win_rate": 70.6,
-        "net_pnl": 75.51,
-        "profit_factor": 1.417,
-        "max_drawdown_pct": 16.68,
-        "ending_equity": 175.51
+        "trade_count": 50,
+        "wins": 33,
+        "losses": 17,
+        "win_rate": 66.0,
+        "net_pnl": 35.78,
+        "profit_factor": 1.293,
+        "max_drawdown_pct": 18.21,
+        "ending_equity": 135.78
       },
       "val": {
-        "trade_count": 51,
-        "wins": 35,
-        "losses": 16,
-        "win_rate": 68.6,
-        "net_pnl": 25.87,
-        "profit_factor": 1.221,
-        "max_drawdown_pct": 24.75,
-        "ending_equity": 125.87
+        "trade_count": 24,
+        "wins": 17,
+        "losses": 7,
+        "win_rate": 70.8,
+        "net_pnl": 24.17,
+        "profit_factor": 1.466,
+        "max_drawdown_pct": 16.37,
+        "ending_equity": 124.17
       },
       "train_windows": 929,
       "val_windows": 399
     },
-    "candidate": "v1_exit_tp90_stall",
-    "rules": "Buys the side BTC is on (Yes above the strike, No below) when BTC is at least $25 from the strike, the ask is 35\u201365\u00a2, and 2+ minutes remain. Scores the 1m EMA 9/21/50, MACD, RSI and the 5-minute trend to pick its conviction. The 15-minute trend must not point against the side. Spot-derived fair value must be at least the ask (no overpaying). Price must be on the trade\u2019s side of 1m VWAP. At most 1 ticket per 15-minute window and never the opposite side of a held ticket. Takes profit at the live Kalshi bid once it reaches 90\u00a2+ and 1m momentum stalls. Otherwise holds to official settlement.",
-    "last_promoted_at": "2026-11-28T15:45:56Z",
-    "last_promoted_at_pt": "Nov 28, 2026, 7:45 AM PT",
-    "metrics_updated_at": "2026-11-28T17:44:39Z",
-    "metrics_updated_at_pt": "Nov 28, 2026, 9:44 AM PT"
+    "candidate": "v1_max_ask_60",
+    "rules": "Buys the side BTC is on (Yes above the strike, No below) when BTC is at least $25 from the strike, the ask is 35\u201360\u00a2, and 2+ minutes remain. Scores the 1m EMA 9/21/50, MACD, RSI and the 5-minute trend to pick its conviction. The 15-minute trend must not point against the side. Spot-derived fair value must be at least the ask (no overpaying). Price must be on the trade\u2019s side of 1m VWAP. At most 1 ticket per 15-minute window and never the opposite side of a held ticket. Takes profit at the live Kalshi bid once it reaches 90\u00a2+ and 1m momentum stalls. Otherwise holds to official settlement.",
+    "last_promoted_at": "2026-11-28T18:48:29Z",
+    "last_promoted_at_pt": "Nov 28, 2026, 10:48 AM PT",
+    "metrics_updated_at": "2026-11-28T18:48:29Z",
+    "metrics_updated_at_pt": "Nov 28, 2026, 10:48 AM PT"
   }
 }

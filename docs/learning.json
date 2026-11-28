@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-28T17:44:39Z",
-  "generated_at_pt": "Nov 28, 2026, 9:44 AM PT",
+  "generated_at": "2026-11-28T18:48:29Z",
+  "generated_at_pt": "Nov 28, 2026, 10:48 AM PT",
   "strategy": {
     "version": 9,
     "updated_at": "2026-11-27T23:55:39Z",
@@ -74,8 +74,8 @@
       "val_windows": 399,
       "promoted_from": 8,
       "candidate": "v2.2_fair_value_gate+reversal_exit",
-      "metrics_updated_at": "2026-11-28T17:44:39Z",
-      "metrics_updated_at_pt": "Nov 28, 2026, 9:44 AM PT"
+      "metrics_updated_at": "2026-11-28T18:48:29Z",
+      "metrics_updated_at_pt": "Nov 28, 2026, 10:48 AM PT"
     },
     "chart_scorecard": {
       "windows": 1328,
@@ -221,14 +221,14 @@
           "name": "multi-TF",
           "kind": "chart",
           "train": {
-            "trade_count": 39,
-            "wins": 29,
+            "trade_count": 40,
+            "wins": 30,
             "losses": 10,
-            "win_rate": 74.4,
-            "net_pnl": 39.78,
-            "profit_factor": 1.604,
-            "max_drawdown_pct": 17.33,
-            "ending_equity": 139.78
+            "win_rate": 75.0,
+            "net_pnl": 45.97,
+            "profit_factor": 1.698,
+            "max_drawdown_pct": 16.47,
+            "ending_equity": 145.97
           },
           "val": {
             "trade_count": 21,
@@ -241,28 +241,28 @@
             "ending_equity": 152.93
           },
           "overall": {
-            "trade_count": 60,
-            "wins": 47,
+            "trade_count": 61,
+            "wins": 48,
             "losses": 13,
-            "win_rate": 78.3,
-            "net_pnl": 92.71,
-            "profit_factor": 2.169,
-            "max_drawdown_pct": 17.33,
-            "ending_equity": 192.71
+            "win_rate": 78.7,
+            "net_pnl": 98.9,
+            "profit_factor": 2.247,
+            "max_drawdown_pct": 16.47,
+            "ending_equity": 198.9
           }
         },
         {
           "name": "no fair-edge gate",
           "kind": "reader",
           "train": {
-            "trade_count": 78,
-            "wins": 55,
+            "trade_count": 77,
+            "wins": 54,
             "losses": 23,
-            "win_rate": 70.5,
-            "net_pnl": 49.93,
-            "profit_factor": 1.324,
-            "max_drawdown_pct": 18.83,
-            "ending_equity": 149.93
+            "win_rate": 70.1,
+            "net_pnl": 47.37,
+            "profit_factor": 1.307,
+            "max_drawdown_pct": 19.2,
+            "ending_equity": 147.37
           },
           "val": {
             "trade_count": 34,
@@ -275,14 +275,14 @@
             "ending_equity": 133.24
           },
           "overall": {
-            "trade_count": 112,
-            "wins": 80,
+            "trade_count": 111,
+            "wins": 79,
             "losses": 32,
-            "win_rate": 71.4,
-            "net_pnl": 83.17,
-            "profit_factor": 1.394,
-            "max_drawdown_pct": 18.83,
-            "ending_equity": 183.17
+            "win_rate": 71.2,
+            "net_pnl": 80.61,
+            "profit_factor": 1.382,
+            "max_drawdown_pct": 19.2,
+            "ending_equity": 180.61
           }
         },
         {
@@ -703,10 +703,10 @@
     "last_promoted_at_pt": "Nov 27, 2026, 3:55 PM PT",
     "v1": {
       "label": "Version 1.2 \u00b7 Chart-Confirmed Active",
-      "version_n": 4,
+      "version_n": 5,
       "params": {
         "min_ask_cents": 35,
-        "max_ask_cents": 65,
+        "max_ask_cents": 60,
         "min_strike_gap_usd": 25.0,
         "min_mins_left": 2,
         "max_entries_per_window": 1,
@@ -724,49 +724,49 @@
       },
       "metrics": {
         "overall": {
-          "trade_count": 136,
-          "wins": 95,
-          "losses": 41,
-          "win_rate": 69.9,
-          "net_pnl": 101.38,
-          "profit_factor": 1.34,
-          "max_drawdown_pct": 16.68,
-          "ending_equity": 201.38
+          "trade_count": 74,
+          "wins": 50,
+          "losses": 24,
+          "win_rate": 67.6,
+          "net_pnl": 59.95,
+          "profit_factor": 1.345,
+          "max_drawdown_pct": 18.21,
+          "ending_equity": 159.95
         },
         "train": {
-          "trade_count": 85,
-          "wins": 60,
-          "losses": 25,
-          "win_rate": 70.6,
-          "net_pnl": 75.51,
-          "profit_factor": 1.417,
-          "max_drawdown_pct": 16.68,
-          "ending_equity": 175.51
+          "trade_count": 50,
+          "wins": 33,
+          "losses": 17,
+          "win_rate": 66.0,
+          "net_pnl": 35.78,
+          "profit_factor": 1.293,
+          "max_drawdown_pct": 18.21,
+          "ending_equity": 135.78
         },
         "val": {
-          "trade_count": 51,
-          "wins": 35,
-          "losses": 16,
-          "win_rate": 68.6,
-          "net_pnl": 25.87,
-          "profit_factor": 1.221,
-          "max_drawdown_pct": 24.75,
-          "ending_equity": 125.87
+          "trade_count": 24,
+          "wins": 17,
+          "losses": 7,
+          "win_rate": 70.8,
+          "net_pnl": 24.17,
+          "profit_factor": 1.466,
+          "max_drawdown_pct": 16.37,
+          "ending_equity": 124.17
         },
         "train_windows": 929,
         "val_windows": 399
       },
-      "candidate": "v1_exit_tp90_stall",
-      "rules": "Buys the side BTC is on (Yes above the strike, No below) when BTC is at least $25 from the strike, the ask is 35\u201365\u00a2, and 2+ minutes remain. Scores the 1m EMA 9/21/50, MACD, RSI and the 5-minute trend to pick its conviction. The 15-minute trend must not point against the side. Spot-derived fair value must be at least the ask (no overpaying). Price must be on the trade\u2019s side of 1m VWAP. At most 1 ticket per 15-minute window and never the opposite side of a held ticket. Takes profit at the live Kalshi bid once it reaches 90\u00a2+ and 1m momentum stalls. Otherwise holds to official settlement.",
-      "last_promoted_at": "2026-11-28T15:45:56Z",
-      "last_promoted_at_pt": "Nov 28, 2026, 7:45 AM PT",
-      "metrics_updated_at": "2026-11-28T17:44:39Z",
-      "metrics_updated_at_pt": "Nov 28, 2026, 9:44 AM PT"
+      "candidate": "v1_max_ask_60",
+      "rules": "Buys the side BTC is on (Yes above the strike, No below) when BTC is at least $25 from the strike, the ask is 35\u201360\u00a2, and 2+ minutes remain. Scores the 1m EMA 9/21/50, MACD, RSI and the 5-minute trend to pick its conviction. The 15-minute trend must not point against the side. Spot-derived fair value must be at least the ask (no overpaying). Price must be on the trade\u2019s side of 1m VWAP. At most 1 ticket per 15-minute window and never the opposite side of a held ticket. Takes profit at the live Kalshi bid once it reaches 90\u00a2+ and 1m momentum stalls. Otherwise holds to official settlement.",
+      "last_promoted_at": "2026-11-28T18:48:29Z",
+      "last_promoted_at_pt": "Nov 28, 2026, 10:48 AM PT",
+      "metrics_updated_at": "2026-11-28T18:48:29Z",
+      "metrics_updated_at_pt": "Nov 28, 2026, 10:48 AM PT"
     }
   },
   "learning": {
-    "generated_at": "2026-11-28T17:44:39Z",
-    "generated_at_pt": "Nov 28, 2026, 9:44 AM PT",
+    "generated_at": "2026-11-28T18:48:29Z",
+    "generated_at_pt": "Nov 28, 2026, 10:48 AM PT",
     "windows": 1328,
     "history_days": 14,
     "train_windows": 929,
@@ -918,14 +918,14 @@
           "name": "multi-TF",
           "kind": "chart",
           "train": {
-            "trade_count": 39,
-            "wins": 29,
+            "trade_count": 40,
+            "wins": 30,
             "losses": 10,
-            "win_rate": 74.4,
-            "net_pnl": 39.78,
-            "profit_factor": 1.604,
-            "max_drawdown_pct": 17.33,
-            "ending_equity": 139.78
+            "win_rate": 75.0,
+            "net_pnl": 45.97,
+            "profit_factor": 1.698,
+            "max_drawdown_pct": 16.47,
+            "ending_equity": 145.97
           },
           "val": {
             "trade_count": 21,
@@ -938,28 +938,28 @@
             "ending_equity": 152.93
           },
           "overall": {
-            "trade_count": 60,
-            "wins": 47,
+            "trade_count": 61,
+            "wins": 48,
             "losses": 13,
-            "win_rate": 78.3,
-            "net_pnl": 92.71,
-            "profit_factor": 2.169,
-            "max_drawdown_pct": 17.33,
-            "ending_equity": 192.71
+            "win_rate": 78.7,
+            "net_pnl": 98.9,
+            "profit_factor": 2.247,
+            "max_drawdown_pct": 16.47,
+            "ending_equity": 198.9
           }
         },
         {
           "name": "no fair-edge gate",
           "kind": "reader",
           "train": {
-            "trade_count": 78,
-            "wins": 55,
+            "trade_count": 77,
+            "wins": 54,
             "losses": 23,
-            "win_rate": 70.5,
-            "net_pnl": 49.93,
-            "profit_factor": 1.324,
-            "max_drawdown_pct": 18.83,
-            "ending_equity": 149.93
+            "win_rate": 70.1,
+            "net_pnl": 47.37,
+            "profit_factor": 1.307,
+            "max_drawdown_pct": 19.2,
+            "ending_equity": 147.37
           },
           "val": {
             "trade_count": 34,
@@ -972,14 +972,14 @@
             "ending_equity": 133.24
           },
           "overall": {
-            "trade_count": 112,
-            "wins": 80,
+            "trade_count": 111,
+            "wins": 79,
             "losses": 32,
-            "win_rate": 71.4,
-            "net_pnl": 83.17,
-            "profit_factor": 1.394,
-            "max_drawdown_pct": 18.83,
-            "ending_equity": 183.17
+            "win_rate": 71.2,
+            "net_pnl": 80.61,
+            "profit_factor": 1.382,
+            "max_drawdown_pct": 19.2,
+            "ending_equity": 180.61
           }
         },
         {
@@ -1397,38 +1397,38 @@
       "takeaway": "Best unseen chart is 1m (+$57.61, 83.3% WR on 30 trades). Best market-reader gate is spread \u22644\u00a2 (+$55.59). Best exit rule is hold to expiry (+$55.59, 86.4% WR on 22 trades) on 1328 windows with a full bid path."
     },
     "v1": {
-      "promoted": false,
-      "takeaway": "Kept Version 1.2 rules (promotion cooldown still active).",
+      "promoted": true,
+      "takeaway": "Version 1.2 learner promoted max ask from 65\u00a2 to 60\u00a2: unseen P&L +$24.17 vs live +$21.75.",
       "live": {
         "train": {
           "trade_count": 85,
-          "wins": 60,
-          "losses": 25,
-          "win_rate": 70.6,
-          "net_pnl": 75.51,
-          "profit_factor": 1.417,
-          "max_drawdown_pct": 16.68,
-          "ending_equity": 175.51
+          "wins": 61,
+          "losses": 24,
+          "win_rate": 71.8,
+          "net_pnl": 87.27,
+          "profit_factor": 1.503,
+          "max_drawdown_pct": 15.68,
+          "ending_equity": 187.27
         },
         "val": {
-          "trade_count": 51,
-          "wins": 35,
+          "trade_count": 50,
+          "wins": 34,
           "losses": 16,
-          "win_rate": 68.6,
-          "net_pnl": 25.87,
-          "profit_factor": 1.221,
-          "max_drawdown_pct": 24.75,
-          "ending_equity": 125.87
+          "win_rate": 68.0,
+          "net_pnl": 21.75,
+          "profit_factor": 1.185,
+          "max_drawdown_pct": 25.59,
+          "ending_equity": 121.75
         },
         "overall": {
-          "trade_count": 136,
+          "trade_count": 135,
           "wins": 95,
-          "losses": 41,
-          "win_rate": 69.9,
-          "net_pnl": 101.38,
-          "profit_factor": 1.34,
-          "max_drawdown_pct": 16.68,
-          "ending_equity": 201.38
+          "losses": 40,
+          "win_rate": 70.4,
+          "net_pnl": 109.02,
+          "profit_factor": 1.375,
+          "max_drawdown_pct": 15.68,
+          "ending_equity": 209.02
         }
       },
       "best_candidate": {
@@ -1453,40 +1453,40 @@
         },
         "train": {
           "trade_count": 105,
-          "wins": 70,
-          "losses": 35,
-          "win_rate": 66.7,
-          "net_pnl": 63.96,
-          "profit_factor": 1.255,
-          "max_drawdown_pct": 49.29,
-          "ending_equity": 163.96
+          "wins": 71,
+          "losses": 34,
+          "win_rate": 67.6,
+          "net_pnl": 75.72,
+          "profit_factor": 1.311,
+          "max_drawdown_pct": 46.06,
+          "ending_equity": 175.72
         },
         "val": {
-          "trade_count": 53,
-          "wins": 37,
+          "trade_count": 52,
+          "wins": 36,
           "losses": 16,
-          "win_rate": 69.8,
-          "net_pnl": 37.19,
-          "profit_factor": 1.317,
-          "max_drawdown_pct": 24.75,
-          "ending_equity": 137.19
+          "win_rate": 69.2,
+          "net_pnl": 33.07,
+          "profit_factor": 1.282,
+          "max_drawdown_pct": 25.59,
+          "ending_equity": 133.07
         },
         "overall": {
-          "trade_count": 158,
+          "trade_count": 157,
           "wins": 107,
-          "losses": 51,
-          "win_rate": 67.7,
-          "net_pnl": 101.15,
-          "profit_factor": 1.275,
-          "max_drawdown_pct": 49.29,
-          "ending_equity": 201.15
+          "losses": 50,
+          "win_rate": 68.2,
+          "net_pnl": 108.79,
+          "profit_factor": 1.302,
+          "max_drawdown_pct": 46.06,
+          "ending_equity": 208.79
         }
       },
       "candidates_tested": 31
     },
     "last_run": {
-      "t": "2026-11-28T17:44:39Z",
-      "t_pt": "Nov 28, 2026, 9:44 AM PT",
+      "t": "2026-11-28T18:48:29Z",
+      "t_pt": "Nov 28, 2026, 10:48 AM PT",
       "windows": 1328,
       "train_windows": 929,
       "val_windows": 399,
@@ -1601,22 +1601,154 @@
         "windows_with_exit_path": 1328
       },
       "v1": {
-        "takeaway": "Kept Version 1.2 rules (promotion cooldown still active).",
-        "promoted": false,
+        "takeaway": "Version 1.2 learner promoted max ask from 65\u00a2 to 60\u00a2: unseen P&L +$24.17 vs live +$21.75.",
+        "promoted": true,
         "live_val": {
-          "trade_count": 51,
-          "wins": 35,
+          "trade_count": 50,
+          "wins": 34,
           "losses": 16,
-          "win_rate": 68.6,
-          "net_pnl": 25.87,
-          "profit_factor": 1.221,
-          "max_drawdown_pct": 24.75,
-          "ending_equity": 125.87
+          "win_rate": 68.0,
+          "net_pnl": 21.75,
+          "profit_factor": 1.185,
+          "max_drawdown_pct": 25.59,
+          "ending_equity": 121.75
         },
         "best": "v1_gap_20"
       }
     },
     "runs": [
+      {
+        "t": "2026-11-28T18:48:29Z",
+        "t_pt": "Nov 28, 2026, 10:48 AM PT",
+        "windows": 1328,
+        "train_windows": 929,
+        "val_windows": 399,
+        "candidates_tested": 67,
+        "live_version": 9,
+        "live": {
+          "train": {
+            "trade_count": 47,
+            "wins": 35,
+            "losses": 12,
+            "win_rate": 74.5,
+            "net_pnl": 51.28,
+            "profit_factor": 1.631,
+            "max_drawdown_pct": 16.76,
+            "ending_equity": 151.28
+          },
+          "val": {
+            "trade_count": 22,
+            "wins": 19,
+            "losses": 3,
+            "win_rate": 86.4,
+            "net_pnl": 55.59,
+            "profit_factor": 5.127,
+            "max_drawdown_pct": 6.63,
+            "ending_equity": 155.59
+          },
+          "overall": {
+            "trade_count": 69,
+            "wins": 54,
+            "losses": 15,
+            "win_rate": 78.3,
+            "net_pnl": 106.87,
+            "profit_factor": 2.128,
+            "max_drawdown_pct": 16.76,
+            "ending_equity": 206.87
+          }
+        },
+        "best_candidate": {
+          "name": "chart_1m",
+          "params": {
+            "min_entry_cents": 35,
+            "max_entry_cents": 75,
+            "min_strike_gap_usd": 40.0,
+            "min_mins_left": 2,
+            "max_mins_left": 15,
+            "rsi_bull_min": 54.0,
+            "rsi_bull_max": 72.0,
+            "rsi_bear_min": 25.0,
+            "rsi_bear_max": 48.0,
+            "require_ema50_align": true,
+            "require_5m_align": false,
+            "min_volatility_usd": 0.0,
+            "max_chop_ratio": 1.0,
+            "ema_flat_dollars": 8.0,
+            "chart_mode": "1m",
+            "require_15m_align": false,
+            "require_1h_align": false,
+            "min_fair_edge": 0.001,
+            "max_spread_cents": 20.0,
+            "enable_early_exits": false,
+            "tp_bid": 0.8,
+            "tp_gain": 0.15,
+            "sl_drop": 0.12,
+            "tp_require_stall": false,
+            "sl_require_reversal": false,
+            "fair_giveback": false,
+            "exit_mode": "reversal",
+            "htf_gate": "off",
+            "require_vwap_side": false
+          },
+          "train": {
+            "trade_count": 69,
+            "wins": 45,
+            "losses": 24,
+            "win_rate": 65.2,
+            "net_pnl": 26.03,
+            "profit_factor": 1.187,
+            "max_drawdown_pct": 28.85,
+            "ending_equity": 126.03
+          },
+          "val": {
+            "trade_count": 30,
+            "wins": 25,
+            "losses": 5,
+            "win_rate": 83.3,
+            "net_pnl": 57.61,
+            "profit_factor": 2.97,
+            "max_drawdown_pct": 7.77,
+            "ending_equity": 157.61
+          },
+          "overall": {
+            "trade_count": 99,
+            "wins": 70,
+            "losses": 29,
+            "win_rate": 70.7,
+            "net_pnl": 83.64,
+            "profit_factor": 1.497,
+            "max_drawdown_pct": 28.85,
+            "ending_equity": 183.64
+          }
+        },
+        "promoted_to": null,
+        "promoted_params": null,
+        "decision": "KEPT v9",
+        "takeaway": "Current v9 still leads on unseen windows \u2014 kept. Best alternate (5-minute filter from on to off and chart mode from 1m_5m to 1m) overall drawdown 28.9% blows up vs live 16.8%.",
+        "reason": "overall drawdown 28.9% blows up vs live 16.8%",
+        "chart_scorecard": {
+          "best_chart": "1m",
+          "best_exit": "hold to expiry",
+          "best_reader": "spread \u22644\u00a2",
+          "takeaway": "Best unseen chart is 1m (+$57.61, 83.3% WR on 30 trades). Best market-reader gate is spread \u22644\u00a2 (+$55.59). Best exit rule is hold to expiry (+$55.59, 86.4% WR on 22 trades) on 1328 windows with a full bid path.",
+          "windows_with_exit_path": 1328
+        },
+        "v1": {
+          "takeaway": "Version 1.2 learner promoted max ask from 65\u00a2 to 60\u00a2: unseen P&L +$24.17 vs live +$21.75.",
+          "promoted": true,
+          "live_val": {
+            "trade_count": 50,
+            "wins": 34,
+            "losses": 16,
+            "win_rate": 68.0,
+            "net_pnl": 21.75,
+            "profit_factor": 1.185,
+            "max_drawdown_pct": 25.59,
+            "ending_equity": 121.75
+          },
+          "best": "v1_gap_20"
+        }
+      },
       {
         "t": "2026-11-28T17:44:39Z",
         "t_pt": "Nov 28, 2026, 9:44 AM PT",
